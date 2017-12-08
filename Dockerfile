@@ -6,11 +6,13 @@ FROM uwegerdes/nodejs-rpi:stretch
 MAINTAINER Uwe Gerdes <entwicklung@uwegerdes.de>
 
 ARG SERVER_HTTP='8080'
+ARG GPIO_GROUP='997'
 
 ENV NODE_ENV development
 ENV HOME ${NODE_HOME}
 ENV APP_HOME ${NODE_HOME}/app
 ENV SERVER_HTTP ${SERVER_HTTP}
+ENV GPIO_GROUP ${GPIO_GROUP}
 
 COPY package.json ${NODE_HOME}/
 
@@ -24,6 +26,17 @@ RUN apt-get update && \
 					python && \
 	apt-get clean && \
 	rm -rf /var/lib/apt/lists/* && \
+	cd /opt && \
+	git config --global http.sslVerify false && \
+	git clone https://github.com/joan2937/pigpio && \
+	cd /opt/pigpio && \
+	make && \
+	make install && \
+	ln -s /usr/local/lib/libpigpio.so /usr/lib/libpigpio.so && \
+	mkdir -p  /etc/svscan/pigpiod && \
+	echo "#!/bin/bash\nif [ ! -f /var/run/pigpio.pid ]; then\n	echo 'Starting'\n	exec /opt/pigpio/pigpiod\nfi" > /etc/svscan/pigpiod/run && \
+	chmod +x /etc/svscan/pigpiod/run && \
+	groupadd -g ${GPIO_GROUP} gpio && \
 	adduser ${USER_NAME} gpio && \
 	cd ${NODE_HOME} && \
 	chown -R ${USER_NAME}:${USER_NAME} ${NODE_HOME}/package.json && \
@@ -31,8 +44,8 @@ RUN apt-get update && \
 	npm install -g \
 				gulp \
 				jshint && \
+	export NODE_TLS_REJECT_UNAUTHORIZED=0 && \
 	npm install && \
-	chown -R ${USER_NAME}:${USER_NAME} ${NODE_HOME} && \
 	npm cache clean
 
 #COPY entrypoint.sh /usr/local/bin/
@@ -41,7 +54,8 @@ RUN apt-get update && \
 
 COPY . ${APP_HOME}
 
-RUN chown -R ${USER_NAME}:${USER_NAME} ${APP_HOME}
+RUN echo "changing ownership of ${NODE_HOME}" && \
+	chown -R ${USER_NAME}:${USER_NAME} ${NODE_HOME}
 
 WORKDIR ${APP_HOME}
 
