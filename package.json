@@ -1,0 +1,29 @@
+{
+  "name": "node-rpi-gpio",
+  "description": "use Raspberry Pi GPIO with Node.js",
+  "version": "0.0.1",
+  "keywords": [
+    "raspberry",
+    "gpio",
+    "node"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "Uwe Gerdes",
+    "email": "entwicklung@uwegerdes.de"
+  },
+  "engines": {
+    "node": ">=4.5.0"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/uwegerdes/docker-node-rpi-gpio"
+  },
+  "scripts": {
+    "start": "gulp"
+  }
+}
