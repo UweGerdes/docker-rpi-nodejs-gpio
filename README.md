@@ -19,7 +19,7 @@ CMD ["/usr/bin/svscan", "/etc/svscan/"
 Run the container and start tests or use the web server to control the gpio pins.
 
 ```bash
-$ docker run -it \
+$ docker run -it --rm \
 	-v $(pwd):/home/node/app \
 	--name gpio \
 	-p 5401:8080 \

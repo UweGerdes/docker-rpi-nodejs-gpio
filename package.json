@@ -1,7 +1,7 @@
 {
   "name": "node-rpi-gpio",
-  "description": "use Raspberry Pi GPIO with Node.js",
-  "version": "0.0.1",
+  "description": "Raspberry Pi GPIO with Node.js",
+  "version": "0.0.2",
   "keywords": [
     "raspberry",
     "gpio",
@@ -18,7 +18,23 @@
   "dependencies": {
     "onoff": "^1.1.8"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "glob": "^7.1.2",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^4.0.0",
+    "gulp-develop-server": "^0.5.2",
+    "gulp-jshint": "^2.0.4",
+    "gulp-less": "^3.3.2",
+    "gulp-less-changed": "^1.2.2",
+    "gulp-lesshint": "^4.0.0",
+    "gulp-notify": "^3.0.0",
+    "gulp-postmortem": "^1.0.5",
+    "gulp-uglify": "^3.0.0",
+    "gulp-util": "^3.0.8",
+    "jshint": "^2.9.5",
+    "rename": "^1.0.4",
+    "run-sequence": "^2.2.0"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/uwegerdes/docker-node-rpi-gpio"
