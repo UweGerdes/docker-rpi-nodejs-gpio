@@ -1,6 +1,4 @@
 # dockerignore for gulp-frontend
 .git/
-capture/
-logs/
 public/css/
 
