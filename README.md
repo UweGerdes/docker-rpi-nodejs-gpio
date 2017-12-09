@@ -10,10 +10,6 @@ $ docker build -t uwegerdes/node-rpi-gpio \
 	.
 ```
 
-```
-CMD ["/usr/bin/svscan", "/etc/svscan/"
-```
-
 ## Usage
 
 Run the container and start tests or use the web server to control the gpio pins.
