@@ -16,7 +16,9 @@
     "node": ">=4.5.0"
   },
   "dependencies": {
-    "onoff": "^1.1.8"
+    "onoff": "^1.1.8",
+    "pigpio": "^0.6.3",
+    "socket.io": "^2.0.4"
   },
   "devDependencies": {
     "glob": "^7.1.2",
@@ -40,6 +42,7 @@
     "url": "https://github.com/uwegerdes/docker-node-rpi-gpio"
   },
   "scripts": {
-    "start": "gulp"
+    "start": "gulp",
+    "blink": "node blink.js"
   }
 }

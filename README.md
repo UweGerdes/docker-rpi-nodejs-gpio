@@ -21,9 +21,10 @@ $ docker run -it --rm \
 	-p 5401:8080 \
 	--privileged \
 	--cap-add SYS_RAWIO \
-	--device /dev/mem \
-	--device /dev/vcio \
 	uwegerdes/node-rpi-gpio \
 	bash
 ```
+
+	--device /dev/mem \
+	--device /dev/vcio \
 
