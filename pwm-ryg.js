@@ -37,8 +37,8 @@ io.sockets.on('connection', function (socket) {// Web Socket Connection
     //for common cathode RGB LED 0 is fully off, and 255 is fully on
     redRGB=parseInt(data.red);
     yellowRGB=parseInt(data.yellow);
-    greenRGB=parseInt(data.green);
-
+    greenRGB=Math.ceil(parseInt(data.green) / 5) + 1;
+console.log("green: " + greenRGB);
     ledRed.pwmWrite(redRGB); //set RED LED to specified value
     ledYellow.pwmWrite(yellowRGB); //set YELLOW LED to specified value
     ledGreen.pwmWrite(greenRGB); //set GREEN LED to specified value

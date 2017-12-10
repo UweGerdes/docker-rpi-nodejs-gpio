@@ -1,7 +1,7 @@
 {
   "name": "node-rpi-gpio",
   "description": "Raspberry Pi GPIO with Node.js",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "keywords": [
     "raspberry",
     "gpio",
@@ -43,6 +43,7 @@
   },
   "scripts": {
     "start": "gulp",
-    "blink": "node blink.js"
+    "blink": "node blink.js",
+    "pwm-ryg": "sudo node pwm-ryg.js"
   }
 }
