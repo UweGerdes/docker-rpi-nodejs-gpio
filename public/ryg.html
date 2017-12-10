@@ -61,15 +61,15 @@ window.addEventListener("load", function(){ //when page loads
   var bSlider = document.getElementById("yellowSlider");
   var gSlider = document.getElementById("greenSlider");
 
-  rSlider.addEventListener("change", function() { //add event listener for when red slider changes
+  rSlider.addEventListener("input", function() { //add event listener for when red slider changes
     ryg.red = this.value; //update the RED color according to the slider
     socket.emit("rygLed", ryg); //send the updated color to LED via WebSocket
   });
-  bSlider.addEventListener("change", function() { //add event listener for when yellow slider changes
+  bSlider.addEventListener("input", function() { //add event listener for when yellow slider changes
     ryg.yellow = this.value;  //update the YELLOW color according to the slider
     socket.emit("rygLed", ryg); //send the updated color to LED via WebSocket
   });
-  gSlider.addEventListener("change", function() { //add event listener for when green slider changes
+  gSlider.addEventListener("input", function() { //add event listener for when green slider changes
     ryg.green = this.value; //update the GREEN color according to the slider
     socket.emit("rygLed", ryg); //send the updated color to LED via WebSocket
   });
