@@ -38,6 +38,8 @@ RUN apt-get update && \
 	chmod +x /etc/svscan/pigpiod/run && \
 	groupadd -g ${GPIO_GROUP} gpio && \
 	adduser ${USER_NAME} gpio && \
+	echo "${USER_NAME} ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/020_node_nopass && \
+	chmod 0440 /etc/sudoers.d/020_node_nopass && \
 	cd ${NODE_HOME} && \
 	chown -R ${USER_NAME}:${USER_NAME} ${NODE_HOME}/package.json && \
 	npm -g config set user ${USER_NAME} && \
