@@ -3,16 +3,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <style>
+.headline {
+  text-align: center;
+}
 .slider {
   -webkit-appearance: none;
   width: 100%;
-  height: 15px;
-  border-radius: 5px;
+  height: 50px;
+  border-radius: 15px;
   background: #d3d3d3;
   outline: none;
   opacity: 0.7;
   -webkit-transition: .2s;
   transition: opacity .2s;
+  margin: 20px 0;
 }
 
 .slider:hover {opacity: 1;}
@@ -27,8 +31,8 @@
 }
 
 .slider::-moz-range-thumb {
-  width: 25px;
-  height: 25px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   background: #4CAF50;
   cursor: pointer;
@@ -43,12 +47,20 @@
 
 <body>
     <div class="w3-container">
-        <h1>Rot - Gelb - Gr&uuml;n</h1>
+        <h1 class="headline">Rot - Gelb - Gr&uuml;n</h1>
         <div class="w3-cell-row">
             <div class="w3-container w3-cell w3-mobile">
                 <p><input type="range" min="0" max="255" value="0" class="slider" id="redSlider"></p>
                 <p><input type="range" min="0" max="255" value="0" class="slider" id="yellowSlider"></p>
                 <p><input type="range" min="0" max="255" value="0" class="slider" id="greenSlider"></p>
+                <p><input type="range" min="500" max="2500" value="1500" class="slider" id="servoSlider"></p>
+                <p>
+                  <button name="servo" value="2000">Links</button>
+                  <button name="servo" value="1750">Halblinks</button>
+                  <button name="servo" value="1500">Mitte</button>
+                  <button name="servo" value="1250">Halbrechts</button>
+                  <button name="servo" value="1000">Rechts</button>
+                </p>
             </div>
         </div>
     </div>
@@ -60,18 +72,28 @@ window.addEventListener("load", function(){ //when page loads
   var rSlider = document.getElementById("redSlider");
   var bSlider = document.getElementById("yellowSlider");
   var gSlider = document.getElementById("greenSlider");
+  var servoSlider = document.getElementById("servoSlider");
+  var servoButtons = document.getElementsByName('servo');
 
-  rSlider.addEventListener("input", function() { //add event listener for when red slider changes
+  rSlider.addEventListener("change", function() { //add event listener for when red slider changes
     ryg.red = this.value; //update the RED color according to the slider
     socket.emit("rygLed", ryg); //send the updated color to LED via WebSocket
   });
-  bSlider.addEventListener("input", function() { //add event listener for when yellow slider changes
+  bSlider.addEventListener("change", function() { //add event listener for when yellow slider changes
     ryg.yellow = this.value;  //update the YELLOW color according to the slider
     socket.emit("rygLed", ryg); //send the updated color to LED via WebSocket
   });
-  gSlider.addEventListener("input", function() { //add event listener for when green slider changes
+  gSlider.addEventListener("change", function() { //add event listener for when green slider changes
     ryg.green = this.value; //update the GREEN color according to the slider
     socket.emit("rygLed", ryg); //send the updated color to LED via WebSocket
+  });
+  servoSlider.addEventListener("change", function() {
+    socket.emit("servo", {'value': parseInt(this.value)});
+  });
+  servoButtons.forEach(function(button) {
+    button.addEventListener("click", function() {
+      socket.emit("servo", {'value': button.value});
+    });
   });
 });
 </script>

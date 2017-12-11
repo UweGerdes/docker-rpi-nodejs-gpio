@@ -5,16 +5,19 @@ var io = require('socket.io')(http); //require socket.io module and pass the htt
 var Gpio = require('pigpio').Gpio; //include pigpio to interact with the GPIO
 
 var ledRed = new Gpio(4, {mode: Gpio.OUTPUT}); //use GPIO pin 4 as output for RED
-var ledYellow = new Gpio(22, {mode: Gpio.OUTPUT}); //use GPIO pin 27 as output for YELLOW
-var ledGreen = new Gpio(11, {mode: Gpio.OUTPUT}); //use GPIO pin 17 as output for GREEN
+var ledYellow = new Gpio(22, {mode: Gpio.OUTPUT}); //use GPIO pin 22 as output for YELLOW
+var ledGreen = new Gpio(11, {mode: Gpio.OUTPUT}); //use GPIO pin 11 as output for GREEN
+var servo = new Gpio(18, {mode: Gpio.OUTPUT}); //use GPIO pin 18 as output for SERVO
 var redLED = 0; //set starting value of RED variable to off
 var yellowLED = 0; //set starting value of YELLOW variable to off
 var greenLED = 0; //set starting value of GREEN variable to off
+var servoValue = 0; //set starting value of SERVO variable to off
 
-//RESET LED
-ledRed.digitalWrite(0); // Turn RED LED off
-ledYellow.digitalWrite(0); // Turn YELLOW LED off
-ledGreen.digitalWrite(0); // Turn GREEN LED off
+// all off
+ledRed.digitalWrite(yellowLED); // Turn RED LED off
+ledYellow.digitalWrite(yellowLED); // Turn YELLOW LED off
+ledGreen.digitalWrite(greenLED); // Turn GREEN LED off
+servo.digitalWrite(servoValue); // Turn GREEN LED off
 
 http.listen(8080); //listen to port 8080
 
@@ -42,6 +45,16 @@ io.sockets.on('connection', function (socket) {// Web Socket Connection
     ledRed.pwmWrite(redLED); //set RED LED to specified value
     ledYellow.pwmWrite(yellowLED); //set YELLOW LED to specified value
     ledGreen.pwmWrite(greenLED); //set GREEN LED to specified value
+  });
+  socket.on('servo', function (data) {
+    console.log(data);
+    var val = parseInt(data.value);
+    if (parseInt(data.value) === 0) {
+      servo.digitalWrite(0);
+    } else if (val >= 500 && val <= 2500) {
+      servo.servoWrite(parseInt(data.value));
+      setTimeout(function() {servo.digitalWrite(0);}, 800);
+    }
   });
 });
 
