@@ -11,18 +11,18 @@ var glob = require('glob'),
 //	server = require('gulp-develop-server'),
 	jshint = require('gulp-jshint'),
 	less = require('gulp-less'),
-	lessChanged = require('gulp-less-changed'),
 	lesshint = require('gulp-lesshint'),
 	notify = require('gulp-notify'),
 //	postMortem = require('gulp-postmortem'),
 	uglify = require('gulp-uglify'),
 	gutil = require('gulp-util'),
 	path = require('path'),
-	rename = require('rename'),
 	runSequence = require('run-sequence')
 	;
 
 var baseDir = __dirname;
+var srcDir = path.join(baseDir, 'src');
+var destDir = path.join(baseDir, 'public');
 var watchFilesFor = {};
 
 /*
@@ -36,7 +36,7 @@ var log = notify.withReporter(function (options, callback) {
  * less files lint
  */
 watchFilesFor['less-lint'] = [
-	path.join(baseDir, 'less', '**', '*.less')
+	path.join(srcDir, 'less', '**', '*.less')
 ];
 gulp.task('less-lint', function () {
 	return gulp.src( watchFilesFor['less-lint'] )
@@ -50,25 +50,18 @@ gulp.task('less-lint', function () {
  * compile less files
  */
 watchFilesFor.less = [
-	path.join(baseDir, 'less', '**', '*.less'),
-	path.join(baseDir, 'less', 'app.less')
+	path.join(srcDir, 'less', '**', '*.less'),
+	path.join(srcDir, 'less', 'gpio.less')
 ];
 gulp.task('less', function () {
-	var dest = function(filename) {
-		return path.join(path.dirname(path.dirname(filename)), 'public', 'css');
-	};
 	var src = watchFilesFor.less.filter(function(el){return el.indexOf('/**/') == -1; });
-	return gulp.src( src )
-		.pipe(lessChanged({
-			getOutputFileName: function(file) {
-				return rename( file, { dirname: dest(file), extname: '.css' } );
-			}
-		}))
+	console.log('less starting');
+	return gulp.src(src)
 		.pipe(less())
 		.on('error', log.onError({ message:  'Error: <%= error.message %>' , title: 'LESS Error'}))
 		.pipe(autoprefixer('last 3 version', 'safari 5', 'ie 8', 'ie 9', 'ios 6', 'android 4'))
 		.pipe(gutil.env.type === 'production' ? uglify() : gutil.noop())
-		.pipe(gulp.dest(function(file) { return dest(file.path); }))
+		.pipe(gulp.dest(path.join(destDir, 'css')))
 		.pipe(log({ message: 'written: <%= file.path %>', title: 'Gulp less' }))
 		;
 });

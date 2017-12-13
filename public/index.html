@@ -1,29 +1,37 @@
 <!DOCTYPE html>
 <html lang="de"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Raspberry Pi 3 GPIO</title>
 <meta name="author" content="Uwe Gerdes, entwicklung@uwegerdes.de">
 <meta name="description" content="Responsive GUI for Raspberry Pi 3 GPIO with Node.js">
-<link rel="stylesheet" type="text/css" href="/css/app.css">
+<link rel="stylesheet" type="text/css" href="/css/gpio.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+<script src="/js/gpio.js"></script>
 </head>
-<body>
-	<div id="main">
-		<h1>Raspberry Pi 3 GPIO</h1>
-		<div class="status">
-			<h2>Status</h2>
-			<ul>
-				<li>stopped</li>
-			</ul>
-		</div>
-		<div class="buttons">
-			<h2>Actions</h2>
-			<ul>
-				<li><a href="/led/red/1">red on</a></li>
-				<li><a href="/led/red/0">red of</a></li>
-			</ul>
-		</div>
-	</div>
-	<div id="footer">
-	</div>
+<body class="body">
+  <div id="main">
+  <h1>Raspberry Pi 3 GPIO</h1>
+  <div class="container">
+    <h2 class="headline">Rot - Gelb - Grün</h1>
+    <div class="row">
+      <div class="cell">
+        <p><input type="range" min="0" max="255" value="0" class="slider red" id="redSlider"></p>
+        <p><input type="range" min="0" max="255" value="0" class="slider yellow" id="yellowSlider"></p>
+        <p><input type="range" min="0" max="255" value="0" class="slider green" id="greenSlider"></p>
+        <p><input type="range" min="500" max="2500" value="1500" class="slider servo" id="servoSlider"></p>
+        <p>
+          <button name="servo" value="2000">Links</button>
+          <button name="servo" value="1750">Halblinks</button>
+          <button name="servo" value="1500">Mitte</button>
+          <button name="servo" value="1250">Halbrechts</button>
+          <button name="servo" value="1000">Rechts</button>
+        </p>
+      </div>
+    </div>
+  </div>
+  </div>
+  <div id="footer">
+  </div>
 </body>
 </html>

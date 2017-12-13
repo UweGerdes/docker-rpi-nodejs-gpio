@@ -1,0 +1,64 @@
+// less file for slider layout
+
+.slider {
+  -webkit-appearance: none;
+  -webkit-transition: 0.2s;
+  background: #d3d3d3;
+  border-radius: 15px;
+  height: 50px;
+  margin: 20px 0px;
+  opacity: 0.7;
+  outline: none;
+  transition: opacity 0.2s;
+  width: 100%;
+
+  &:hover {
+      opacity: 1;
+    }
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 50%;
+    cursor: pointer;
+    height: 25px;
+    width: 25px;
+  }
+
+  &::-moz-range-thumb {
+    background: #4caf50;
+    border-radius: 50%;
+    cursor: pointer;
+    height: 50px;
+    width: 50px;
+  }
+
+  &.red {
+    &::-webkit-slider-thumb,
+    &::-moz-range-thumb {
+      background: red;
+    }
+  }
+
+  &.yellow {
+    &::-webkit-slider-thumb,
+    &::-moz-range-thumb {
+      background: red;
+    }
+  }
+
+  &.green {
+    &::-webkit-slider-thumb,
+    &::-moz-range-thumb {
+      background: red;
+    }
+  }
+
+  &.servo {
+    &::-webkit-slider-thumb,
+    &::-moz-range-thumb {
+      background: #999999;
+    }
+  }
+}
+
