@@ -53,7 +53,7 @@
                 <p><input type="range" min="0" max="255" value="0" class="slider" id="redSlider"></p>
                 <p><input type="range" min="0" max="255" value="0" class="slider" id="yellowSlider"></p>
                 <p><input type="range" min="0" max="255" value="0" class="slider" id="greenSlider"></p>
-                <p><input type="range" min="500" max="2500" value="1500" class="slider" id="servoSlider"></p>
+                <p><input type="range" min="10" max="20" value="15" class="slider" id="servoSlider"></p>
                 <p>
                   <button name="servo" value="2000">Links</button>
                   <button name="servo" value="1750">Halblinks</button>
@@ -88,7 +88,7 @@ window.addEventListener("load", function(){ //when page loads
     socket.emit("rygLed", ryg); //send the updated color to LED via WebSocket
   });
   servoSlider.addEventListener("change", function() {
-    socket.emit("servo", {'value': parseInt(this.value)});
+    socket.emit("servo", {'value': this.value + '00'});
   });
   servoButtons.forEach(function(button) {
     button.addEventListener("click", function() {
