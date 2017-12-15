@@ -15,6 +15,12 @@ var ledRed = new Gpio(4, {mode: Gpio.OUTPUT}); //use GPIO pin 4 as output for RE
 var ledYellow = new Gpio(22, {mode: Gpio.OUTPUT}); //use GPIO pin 27 as output for YELLOW
 var ledGreen = new Gpio(11, {mode: Gpio.OUTPUT}); //use GPIO pin 17 as output for GREEN
 var servo = new Gpio(18, {mode: Gpio.OUTPUT}); //use GPIO pin 18 as output for SERVO
+var pushButton = new Gpio(9, {
+    mode: Gpio.INPUT,
+    pullUpDown: Gpio.PUD_DOWN,
+    edge: Gpio.EITHER_EDGE
+  });
+
 var redLED = 0; //set starting value of RED variable to off
 var yellowLED = 0; //set starting value of YELLOW variable to off
 var greenLED = 0; //set starting value of GREEN variable to off
@@ -39,6 +45,9 @@ function handler (req, res) { //what to do on requests to port 8080
     return res.end();
   });
 }
+pushButton.on('interrupt', function (value) {
+  ledYellow.digitalWrite(value); //turn LED on or off depending on the button state (0 or 1)
+});
 
 io.sockets.on('connection', function (socket) {// Web Socket Connection
   socket.on('rygLed', function(data) { //get light switch status from client
