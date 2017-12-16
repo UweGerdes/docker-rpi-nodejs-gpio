@@ -27,7 +27,7 @@ var greenLED = 0; //set starting value of GREEN variable to off
 var servoValue = 0; //set starting value of SERVO variable to off
 
 // all off
-ledRed.digitalWrite(yellowLED); // Turn RED LED off
+ledRed.digitalWrite(redLED); // Turn RED LED off
 ledYellow.digitalWrite(yellowLED); // Turn YELLOW LED off
 ledGreen.digitalWrite(greenLED); // Turn GREEN LED off
 servo.digitalWrite(servoValue); // Turn GREEN LED off
