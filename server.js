@@ -10,10 +10,18 @@ var http = require('http').createServer(handler); //require http server, and cre
 var fs = require('fs'); //require filesystem module
 var io = require('socket.io')(http); //require socket.io module and pass the http object (server)
 var Gpio = require('pigpio').Gpio; //include pigpio to interact with the GPIO
+const Led = require('./lib/led.js'); 
 
-var ledRed = new Gpio(4, {mode: Gpio.OUTPUT}); //use GPIO pin 4 as output for RED
-var ledYellow = new Gpio(22, {mode: Gpio.OUTPUT}); //use GPIO pin 27 as output for YELLOW
-var ledGreen = new Gpio(11, {mode: Gpio.OUTPUT}); //use GPIO pin 17 as output for GREEN
+var ledBlue = new Led(10);
+//ledBlue.onOff(500);
+//ledBlue.on();
+ledBlue.blink(500);
+setTimeout( ledBlue.blinkOff.bind(ledBlue) , 3300);
+//ledBlue.onOff(1000);
+
+var ledRed = new Gpio(17, {mode: Gpio.OUTPUT}); //use GPIO pin 4 as output for RED
+var ledYellow = new Gpio(27, {mode: Gpio.OUTPUT}); //use GPIO pin 27 as output for YELLOW
+var ledGreen = new Gpio(22, {mode: Gpio.OUTPUT}); //use GPIO pin 17 as output for GREEN
 var servo = new Gpio(18, {mode: Gpio.OUTPUT}); //use GPIO pin 18 as output for SERVO
 var pushButton = new Gpio(9, {
     mode: Gpio.INPUT,

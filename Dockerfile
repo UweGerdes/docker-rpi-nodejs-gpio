@@ -1,7 +1,7 @@
 #
 # Dockerfile for rpi gpio with nodejs
 
-FROM uwegerdes/nodejs-rpi:stretch
+FROM uwegerdes/nodejs-rpi-stretch
 
 MAINTAINER Uwe Gerdes <entwicklung@uwegerdes.de>
 
