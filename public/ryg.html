@@ -96,6 +96,9 @@ window.addEventListener("load", function(){ //when page loads
     });
   });
 });
+socket.on('data', function(data) {
+  console.log('data: ' + Object.keys(data[0]));
+});
 </script>
 </body>
 </html>

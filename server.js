@@ -12,12 +12,17 @@ var io = require('socket.io')(http); //require socket.io module and pass the htt
 var Gpio = require('pigpio').Gpio; //include pigpio to interact with the GPIO
 const Led = require('./lib/led.js'); 
 
-var ledBlue = new Led(10);
+let ledList = [];
+var ledBlue = new Led(10, 'blue');
+console.log(ledBlue.toString());
 //ledBlue.onOff(500);
-//ledBlue.on();
+ledBlue.on();
+console.log(ledBlue.toString());
 ledBlue.blink(500);
 setTimeout( ledBlue.blinkOff.bind(ledBlue) , 3300);
 //ledBlue.onOff(1000);
+console.log(ledBlue.toString());
+ledList.push(ledBlue);
 
 var ledRed = new Gpio(17, {mode: Gpio.OUTPUT}); //use GPIO pin 4 as output for RED
 var ledYellow = new Gpio(27, {mode: Gpio.OUTPUT}); //use GPIO pin 27 as output for YELLOW
@@ -58,6 +63,7 @@ pushButton.on('interrupt', function (value) {
 });
 
 io.sockets.on('connection', function (socket) {// Web Socket Connection
+  socket.emit('data', getItems() );
   socket.on('rygLed', function(data) { //get light switch status from client
     //console.log(data); //output data from WebSocket connection to console
 
@@ -80,6 +86,9 @@ io.sockets.on('connection', function (socket) {// Web Socket Connection
       setTimeout(function() {servo.digitalWrite(0);}, 800);
     }
   });
+  socket.on('getData', () => {
+    return 'hello world';
+  });
 });
 
 process.on('SIGINT', exitHandler);
@@ -90,5 +99,13 @@ function exitHandler() {
   ledYellow.digitalWrite(0);
   ledGreen.digitalWrite(0);
   process.exit();
+}
+
+function getItems() {
+  let list = [];
+  ledList.forEach( (item) => {
+    list.push(item.getData());
+  });
+  return list;
 }
 
