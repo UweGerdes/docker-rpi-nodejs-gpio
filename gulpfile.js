@@ -22,6 +22,7 @@ var exec = require('child_process').exec,
   ;
 
 var baseDir = __dirname;
+var libDir = path.join(baseDir, 'lib');
 var srcDir = path.join(baseDir, 'src');
 var destDir = path.join(baseDir, 'public');
 var watchFilesFor = {};
@@ -71,12 +72,27 @@ gulp.task('less', function () {
  */
 watchFilesFor.jshint = [
   path.join(baseDir, 'package.json'),
-  path.join(baseDir, '**', '*.js')
+  path.join(baseDir, '*.js'),
+  path.join(libDir, '*.js'),
+  path.join(srcDir, 'js', '*.js')
 ];
 gulp.task('jshint', function(callback) {
   return gulp.src(watchFilesFor.jshint)
     .pipe(jshint())
     .pipe(jshint.reporter('default'))
+    ;
+});
+
+/**
+ * Copy the src/js files to public/js
+ */
+watchFilesFor.js = [
+  path.join(srcDir, 'js', '**', '*.js')
+];
+gulp.task('js', () => {
+  return gulp.src( watchFilesFor.js )
+    .pipe(gulp.dest(path.join(destDir, 'js')))
+    .pipe(log('written: <%= file.path %>'))
     ;
 });
 
@@ -87,6 +103,7 @@ gulp.task('build', function(callback) {
   runSequence('less-lint',
     'less',
     'jshint',
+    'js',
     callback);
 });
 
@@ -131,11 +148,13 @@ var myServer = {
     }
   }
 };
+
 /*
  * restart server if server.js changed
  */
 watchFilesFor.server = [
-  path.join(baseDir, 'server.js')
+  path.join(baseDir, 'server.js'),
+  path.join(libDir, '*.js')
 ];
 gulp.task('server', function() {
   myServer.start('node ' + path.join(baseDir, 'server.js'));
