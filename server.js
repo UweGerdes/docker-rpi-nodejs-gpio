@@ -14,13 +14,15 @@ var http = require("http").createServer(handler),
     fs = require("fs"),
     io = require('socket.io')(http),
     Gpio = require('pigpio').Gpio;
-const Led = require('./lib/led.js'); 
+const Led = require('./lib/led.js');
+const RGBLed = require('./lib/rgbled.js'); 
 
 let items = {};
 items['Rote LED'] = new Led(17, 'red', {min: 1, max: 255});
 items['Gelbe LED'] = new Led(27, 'yellow', {min: 1, max: 51});
 items['Grüne LED'] = new Led(22, 'green', {min: 1, max: 255} );
 items['Blaue LED'] = new Led(10, 'blue', {min: 1, max: 255});
+items['RGB LED 2'] = new RGBLed({ red: 26, green: 19, blue: 13});
 
 /*
 console.log(items['Blaue LED'].toString());
@@ -107,6 +109,16 @@ io.sockets.on('connection', function (socket) {// Web Socket Connection
       socket.on(item, function(data) {
         items[item].pwmWrite(parseInt(data.pwmValue));
       });
+    } else if (data.type === 'RGBLED') {
+      socket.on(item, function(data) {
+        var color = {};
+        if (data.color) {
+          color[data.color] = data.value;
+        } else {
+          color = data;
+        }
+        items[item].pwmWrite( color );
+      });
     }
   });
   socket.on('getData', () => {
@@ -130,7 +142,12 @@ function exitHandler() {
 function getItems() {
   let result = {};
   Object.keys(items).forEach( (item) => {
-    result[item] = items[item].getData();
+    var data = items[item].getData();
+    if (data.type === 'LED') {
+      result[item] = data;
+    } else if (data.type === 'RGBLED') {
+      result[item] = data;
+    }
   });
   return result;
 }
