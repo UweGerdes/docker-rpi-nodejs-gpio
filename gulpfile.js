@@ -10,17 +10,22 @@ var exec = require('child_process').exec,
   glob = require('glob'),
   gulp = require('gulp'),
   autoprefixer = require('gulp-autoprefixer'),
+	changed = require('gulp-changed'),
   jshint = require('gulp-jshint'),
   less = require('gulp-less'),
   lesshint = require('gulp-lesshint'),
+	gulpLivereload = require('gulp-livereload'),
   notify = require('gulp-notify'),
   postMortem = require('gulp-postmortem'),
   uglify = require('gulp-uglify'),
   gutil = require('gulp-util'),
+	os = require('os'),
   path = require('path'),
   runSequence = require('run-sequence'),
   sudo = require('sudo')
   ;
+
+var livereloadPort = process.env.GULP_LIVERELOAD || 8081;
 
 var baseDir = __dirname;
 var libDir = path.join(baseDir, 'lib');
@@ -182,6 +187,21 @@ gulp.task('server-postMortem', function() {
 });
 
 /*
+ * livereload server and task
+ */
+watchFilesFor.livereload = [
+  path.join(destDir, '*.html'),
+  path.join(destDir, 'css', '*.css'),
+  path.join(destDir, 'js', '*.js')
+];
+gulp.task('livereload', function() {
+  gulp.src(watchFilesFor.livereload)
+    .pipe(changed(path.dirname('<%= file.path %>')))
+    .pipe(log({ message: 'livereload: <%= file.path %>', title: 'Gulp livereload' }))
+    .pipe(gulpLivereload( { quiet: true } ));
+});
+
+/*
  * watch task
  */
 gulp.task('watch', function() {
@@ -198,7 +218,23 @@ gulp.task('watch', function() {
     });
     gulp.watch( watchFilesFor[task], [ task ] );
   });
+  gulpLivereload.listen( { port: livereloadPort, delay: 2000, start: true } );
+  console.log('gulp livereload listening on http://' + ipv4adresses()[0] + ':' + livereloadPort);
 });
+
+function ipv4adresses() {
+	var addresses = [];
+	var interfaces = os.networkInterfaces();
+	for (var k in interfaces) {
+		for (var k2 in interfaces[k]) {
+			var address = interfaces[k][k2];
+			if (address.family === 'IPv4' && !address.internal) {
+				addresses.push(address.address);
+			}
+		}
+	}
+	return addresses;
+}
 
 /*
  * default task: run all build tasks and watch

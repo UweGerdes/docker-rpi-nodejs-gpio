@@ -8,12 +8,16 @@
 
 'use strict';
 
-var http = require("http").createServer(handler),
-    url = require("url"),
-    path = require("path"),
-    fs = require("fs"),
+var http = require('http').createServer(handler),
+    path = require('path'),
+    fs = require('fs'),
+    os = require('os'),
+    Gpio = require('pigpio').Gpio,
     io = require('socket.io')(http),
-    Gpio = require('pigpio').Gpio;
+    url = require('url');
+
+var serverPort = process.env.SERVER_HTTP || 8080;
+
 const Led = require('./lib/led.js');
 const RGBLed = require('./lib/rgbled.js'); 
 
@@ -45,34 +49,34 @@ var pushButton = new Gpio(9, {
   });
 
 var servoValue = 0; //set starting value of SERVO variable to off
-
 // all off
-servo.digitalWrite(servoValue); // Turn GREEN LED off
+servo.digitalWrite(servoValue); // Turn off
 
-http.listen(8080); //listen to port 8080
+http.listen(serverPort);
+console.log('server listening on http://' + ipv4adresses()[0] + ':' + serverPort);
 
 function handler (request, response) { //what to do on requests to port 8080
   var uri = url.parse(request.url).pathname,
-      filename = path.join(process.cwd(), 'public', uri.replace(/\/$/, "/index.html"));
+      filename = path.join(process.cwd(), 'public', uri.replace(/\/$/, '/index.html'));
 
   var contentTypesByExtension = {
-    '.html': "text/html",
-    '.css':  "text/css",
-    '.js':   "text/javascript"
+    '.html': 'text/html',
+    '.css':  'text/css',
+    '.js':   'text/javascript'
   };
 
   fs.exists(filename, function(exists) {
     if(!exists) {
-      response.writeHead(404, {"Content-Type": "text/plain"});
-      response.write("404 Not Found\n");
+      response.writeHead(404, {'Content-Type': 'text/plain'});
+      response.write('404 Not Found\n');
       response.end();
       return;
     }
 
-    fs.readFile(filename, "binary", function(err, file) {
+    fs.readFile(filename, 'binary', function(err, file) {
       if(err) {        
-        response.writeHead(500, {"Content-Type": "text/plain"});
-        response.write(err + "\n");
+        response.writeHead(500, {'Content-Type': 'text/plain'});
+        response.write(err + '\n');
         response.end();
         return;
       }
@@ -80,10 +84,10 @@ function handler (request, response) { //what to do on requests to port 8080
       var headers = {};
       var contentType = contentTypesByExtension[path.extname(filename)];
       if (contentType) {
-        headers["Content-Type"] = contentType;
+        headers['Content-Type'] = contentType;
       }
       response.writeHead(200, headers);
-      response.write(file, "binary");
+      response.write(file, 'binary');
       response.end();
     });
   });
@@ -154,4 +158,19 @@ function getItems() {
   });
   return result;
 }
+
+function ipv4adresses() {
+	var addresses = [];
+	var interfaces = os.networkInterfaces();
+	for (var k in interfaces) {
+		for (var k2 in interfaces[k]) {
+			var address = interfaces[k][k2];
+			if (address.family === 'IPv4' && !address.internal) {
+				addresses.push(address.address);
+			}
+		}
+	}
+	return addresses;
+}
+
 

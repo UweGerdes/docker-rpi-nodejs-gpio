@@ -6,12 +6,14 @@ FROM uwegerdes/nodejs-rpi-stretch
 MAINTAINER Uwe Gerdes <entwicklung@uwegerdes.de>
 
 ARG SERVER_HTTP='8080'
+ARG GULP_LIVERELOAD='8081'
 ARG GPIO_GROUP='997'
 
 ENV NODE_ENV development
 ENV HOME ${NODE_HOME}
 ENV APP_HOME ${NODE_HOME}/app
 ENV SERVER_HTTP ${SERVER_HTTP}
+ENV GULP_LIVERELOAD ${GULP_LIVERELOAD}
 ENV GPIO_GROUP ${GPIO_GROUP}
 
 COPY package.json ${NODE_HOME}/
@@ -45,7 +47,8 @@ RUN apt-get update && \
 	npm -g config set user ${USER_NAME} && \
 	npm install -g \
 				gulp \
-				jshint
+				jshint && \
+	npm cache clean
 
 #COPY entrypoint.sh /usr/local/bin/
 #RUN chmod 755 /usr/local/bin/entrypoint.sh
@@ -67,7 +70,7 @@ WORKDIR ${APP_HOME}
 
 VOLUME [ "${APP_HOME}" ]
 
-EXPOSE ${SERVER_HTTP}
+EXPOSE ${SERVER_HTTP} ${GULP_LIVERELOAD}
 
 CMD [ "npm", "start" ]
 
