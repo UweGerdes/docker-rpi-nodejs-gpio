@@ -27,6 +27,10 @@ function documentLoaded() {
 }
 
 function createElements(container, data) {
+  if (container.childNodes.length > 0) {
+    console.log('removing elements');
+    container.removeChild(container.childNodes[0]);
+  }
   console.log('creating elements');
   var newDiv = document.createElement('div');
   Object.keys(data).forEach( (item) => {
@@ -64,7 +68,6 @@ var elementTypes = {
       addRule('#' + id + '::-moz-range-thumb', { 'background': data.color } );
     } catch(e) { /* not mozilla */ }
     element.addEventListener("change", function() {
-        console.log('data: ' + this.value);
       socket.emit(item, { pwmValue: this.value } );
     });
     return element;
@@ -75,8 +78,8 @@ var elementTypes = {
       var element = document.createElement('input');
       element.setAttribute('id', id + '_' + color);
       element.setAttribute('type', 'range');
-      element.setAttribute('min', 0);
-      element.setAttribute('max', 255);
+      element.setAttribute('min', data.range[color].min);
+      element.setAttribute('max', data.range[color].max);
       element.setAttribute('value', data.color[color] < 0 ? '0' : data.color[color]);
       element.setAttribute('class', 'slider ' + color);
       try {
@@ -108,7 +111,6 @@ var addRule = (function (style) {
         var propText = typeof css === "string" ? css : Object.keys(css).map(function (p) {
             return p + ":" + (p === "content" ? "'" + css[p] + "'" : css[p]);
         }).join(";");
-        console.log(selector + "{" + propText + "}" + sheet.cssRules.length);
         sheet.insertRule(selector + "{" + propText + "}", sheet.cssRules.length);
     };
 })(document.createElement("style"));
@@ -121,10 +123,11 @@ function hexToRgb(hex) {
     });
 
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    console.log(result[0]);
     return result ? {
         red: parseInt(result[1], 16),
-        green: parseInt(result[2], 16),
-        blue: parseInt(result[3], 16)
+        green: Math.round(parseInt(result[2], 16) / 5),
+        blue: Math.round(parseInt(result[3], 16) / 5)
     } : null;
 }
 
