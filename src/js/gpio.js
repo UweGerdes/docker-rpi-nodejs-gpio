@@ -96,11 +96,17 @@ var elementTypes = {
     var element = document.createElement('input');
     element.setAttribute('id', id + '_picker');
     element.setAttribute('type', 'color');
+    element.setAttribute('value', rgbToHex(data.color));
     element.addEventListener("change", function() {
       console.log('color: ' + this.value);
       socket.emit(item, hexToRgb(this.value) );
     });
     container.appendChild(element);
+    socket.on(item, function(result) {
+      var color = result;
+      console.log(id + ' received: ' + Object.keys(color).join(', '));
+      setRgbColor(id, color);
+    });
     return container;
   }
 };
@@ -129,6 +135,35 @@ function hexToRgb(hex) {
         green: Math.round(parseInt(result[2], 16) / 5),
         blue: Math.round(parseInt(result[3], 16) / 5)
     } : null;
+}
+
+function componentToHex(c) {
+  var hex = "00";
+  if (c) {
+    hex = c.toString(16);
+  }
+  return hex.length == 1 ? "0" + hex : hex;
+}
+
+function rgbToHex(color) {
+  var hex = '';
+  ['red', 'green', 'blue'].forEach(function(rgb) {
+    var col = color[rgb];
+    if (typeof col == 'string') {
+      col = parseInt(col);
+    }
+    col = rgb != 'red' ? Math.min(col * 5, 255) : col;
+    hex += componentToHex(col);
+  });
+  return "#" + hex;
+}
+
+function setRgbColor(id, color) {
+  console.log('setting ' + id + ' color: (' + color.red + ', ' + color.green + ', ' + color.blue + ') = ' + rgbToHex(color));
+  ['red', 'green', 'blue'].forEach(function(rgb) {
+    document.getElementById(id + '_' + rgb).value = color[rgb];
+  });
+  document.getElementById(id + '_picker').setAttribute('value', rgbToHex(color));
 }
 
 window.addEventListener("load", function(){

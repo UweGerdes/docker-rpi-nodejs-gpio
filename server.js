@@ -119,6 +119,7 @@ io.sockets.on('connection', function (socket) {// Web Socket Connection
           color = data;
         }
         items[item].pwmWrite( color );
+        socket.emit(item, items[item].color);
       });
     }
   });
