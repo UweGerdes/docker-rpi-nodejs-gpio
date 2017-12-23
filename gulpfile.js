@@ -38,6 +38,7 @@ var log = notify.withReporter(function (options, callback) {
  * less files lint
  */
 watchFilesFor['less-lint'] = [
+  path.join(baseDir, '.lesshintrc'),
   path.join(srcDir, 'less', '**', '*.less')
 ];
 gulp.task('less-lint', function () {
@@ -73,6 +74,8 @@ gulp.task('less', function () {
 watchFilesFor.jshint = [
   path.join(baseDir, 'package.json'),
   path.join(baseDir, '*.js'),
+  path.join(baseDir, '.jshintrc'),
+  path.join(baseDir, '.lesshintrc'),
   path.join(libDir, '*.js'),
   path.join(srcDir, 'js', '*.js')
 ];
@@ -130,15 +133,19 @@ var myServer = {
     });
   },
   kill: function() {
+                console.log('killing');
     if (this.cmd !== undefined && this.cmd.length > 0) {
       var child = exec('ps ax');
+                console.log('searching old server process');
       var cmd = this.cmd.join(' ');
       child.stdout.on('data', function (data) {
+                console.log('found old server process');
         data.split('\n')
           .forEach(function(line) {
             if (line.match('[0-9] ' + cmd)) {
               var pid = line.replace(/^.*?([0-9]+).*/, '$1');
               var kill = sudo([ 'kill', pid], {});
+                console.log('killing old server process');
               kill.on('close', function () {
                 console.log('killed old server process');
               });

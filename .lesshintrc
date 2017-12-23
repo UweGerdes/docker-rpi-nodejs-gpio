@@ -1,0 +1,12 @@
+{
+  "hexLength": {
+    "style": "short"
+  },
+  "spaceAfterPropertyColon": {
+    "enabled": true,
+    "style": "one_space"
+  },
+  "zeroUnit": {
+    "style": "no_unit"
+  }
+}

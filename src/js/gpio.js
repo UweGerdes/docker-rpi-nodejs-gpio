@@ -42,6 +42,8 @@ function createElements(container, data) {
 function createElement(item, data) {
   var id = item.replace(/[^A-Za-z0-9-]/g, "_");
   var newDiv = document.createElement('div');
+  newDiv.setAttribute('id', id + '_container');
+  newDiv.setAttribute('class', data.type + '_container');
   var newLabel = document.createElement('label');
   newLabel.setAttribute('for', id);
   newLabel.setAttribute('class', data.type + (data.color ? ' ' + data.color : ''));

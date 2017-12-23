@@ -24,6 +24,7 @@ items['Grüne LED'] = new Led(22, 'green', {min: 1, max: 51} );
 items['Blaue LED'] = new Led(10, 'blue', {min: 1, max: 255} );
 items['RGB LED 1'] = new RGBLed({ red: 21, green: 20, blue: 16});
 items['RGB LED 2'] = new RGBLed({ red: 26, green: 19, blue: 13});
+items['RGB LED 3'] = new RGBLed({ red: 23, green: 24, blue: 25});
 
 /*
 console.log(items['Blaue LED'].toString());
