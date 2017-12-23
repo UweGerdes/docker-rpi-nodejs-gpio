@@ -7,6 +7,7 @@
 
 var data;
 var container;
+var changedPicker = false;
 
 socket.on('data', function(result) {
   console.log('data received');
@@ -45,98 +46,127 @@ function createElement(item, data) {
   newDiv.setAttribute('id', id + '_container');
   newDiv.setAttribute('class', data.type + '_container');
   var newLabel = document.createElement('label');
+  newLabel.setAttribute('class', data.type + '_label' + (data.color ? ' ' + data.color : ''));
   newLabel.setAttribute('for', id);
-  newLabel.setAttribute('class', data.type + (data.color ? ' ' + data.color : ''));
   var newLabelText = document.createTextNode(item);
   newLabel.appendChild(newLabelText);
+  newDiv.appendChild(makePreview(item, id, data.type, data.color, data.pwmValue));
   newDiv.appendChild(newLabel);
   newDiv.appendChild(elementTypes[data.type](item, id, data));
   return newDiv;
 }
 
 var elementTypes = {
-  LED: function(item, id, data) {
-    var element = document.createElement('input');
-    element.setAttribute('id', id);
-    element.setAttribute('type', 'range');
-    element.setAttribute('min', data.range.min);
-    element.setAttribute('max', data.range.max);
-    element.setAttribute('value', data.pwmValue < 0 ? '0' : data.pwmValue);
-    element.setAttribute('class', 'slider ' + data.color);
-    try {
-      addRule('#' + id + '::-webkit-slider-thumb', { 'background': data.color } );
-    } catch(e) { /* not webkit */ }
-    try {
-      addRule('#' + id + '::-moz-range-thumb', { 'background': data.color } );
-    } catch(e) { /* not mozilla */ }
-    element.addEventListener("change", function() {
-      socket.emit(item, { pwmValue: this.value } );
-    });
-    return element;
-  },
-  RGBLED: function(item, id, data) {
-    var container = document.createElement('div');
-    ['red', 'green', 'blue'].forEach(function(color) {
-      var element = document.createElement('input');
-      element.setAttribute('id', id + '_' + color);
-      element.setAttribute('type', 'range');
-      element.setAttribute('min', data.range[color].min);
-      element.setAttribute('max', data.range[color].max);
-      element.setAttribute('value', data.color[color] < 0 ? '0' : data.color[color]);
-      element.setAttribute('class', 'slider ' + color);
-      try {
-        addRule('#' + id + '_' + color + '::-webkit-slider-thumb', { 'background': color } );
-      } catch(e) { /* not webkit */ }
-      try {
-        addRule('#' + id + '_' + color + '::-moz-range-thumb', { 'background': color } );
-      } catch(e) { /* not mozilla */ }
-      element.addEventListener("change", function() {
-        socket.emit(item, { color: color, value: this.value } );
-      });
-      container.appendChild(element);
-    });
-    var element = document.createElement('input');
-    element.setAttribute('id', id + '_picker');
-    element.setAttribute('type', 'color');
-    element.setAttribute('value', rgbToHex(data.color));
-    element.addEventListener("change", function() {
-      console.log('color: ' + this.value);
-      socket.emit(item, hexToRgb(this.value) );
-    });
-    container.appendChild(element);
-    socket.on(item, function(result) {
-      var color = result;
-      console.log(id + ' received: ' + Object.keys(color).join(', '));
-      setRgbColor(id, color);
-    });
-    return container;
-  }
+  LED: makeLED,
+  RGBLED: makeRGBLED
 };
 
-var addRule = (function (style) {
-    var sheet = document.head.appendChild(style).sheet;
-    return function (selector, css) {
-        var propText = typeof css === "string" ? css : Object.keys(css).map(function (p) {
-            return p + ":" + (p === "content" ? "'" + css[p] + "'" : css[p]);
-        }).join(";");
-        sheet.insertRule(selector + "{" + propText + "}", sheet.cssRules.length);
+function makeLED (item, id, data) {
+  var newControls = document.createElement('div');
+  newControls.setAttribute('class', data.type + '_controls');
+  var element = makeRange(item, id, data.range, data.pwmValue, data.color);
+  newControls.appendChild(element);
+  return newControls;
+}
+
+function makeRGBLED (item, id, data) {
+  var newControls = document.createElement('div');
+  newControls.setAttribute('class', data.type + '_controls');
+  data.color.forEach(function(color) {
+    var element = makeRange(item, id, data.range[color], data.pwmValue[color], color);
+    newControls.appendChild(element);
+  });
+  var element = document.createElement('input');
+  element.setAttribute('id', id + '_picker');
+  element.setAttribute('type', 'color');
+  element.setAttribute('value', rgbToHex(data.pwmValue));
+  console.log('color: ', data);
+  element.addEventListener("change", function() {
+    console.log('color: ' + this.value + ' = %o', hexToRgb(this.value) );
+    changedPicker = true;
+    var color = hexToRgb(this.value);
+    Object.keys(color).forEach( (col) => {
+      socket.emit(item, { color: col, pwmValue: color[col] });
+    });
+  });
+  newControls.appendChild(element);
+  socket.on(item, function(result) {
+    var color = result;
+    console.log(id + ' received: ' + Object.values(color).join(', '));
+    if ( ! changedPicker ) {
+      setRgbColor(id, color);
+    }
+    changedPicker = false;
+  });
+  return newControls;
+}
+
+function makePreview(item, id, type, color, pwmValue) {
+  var element = document.createElement('div');
+  element.setAttribute('id', id + '_preview');
+  element.setAttribute('class', type + '_preview');
+  var pwm = {};
+  if (typeof pwmValue === 'number') {
+    pwm[color] = pwmValue;
+  } else {
+    pwm = {
+      red: pwmValue.red,
+      green: pwmValue.green * 5,
+      blue: pwmValue.blue * 5
     };
+  }
+  element.setAttribute('data-pwmValue', pwm, rgbToHex(pwm));
+  element.style.backgroundColor = rgbToHex(pwm);
+  socket.on(item, function(data) {
+    console.log(id + '_preview received: %o', data);
+    element.style.backgroundColor = rgbToHex(data);
+  });
+  return element;
+}
+
+function makeRange(item, id, range, pwmValue, color) {
+  var element = document.createElement('input');
+  element.setAttribute('id', id + '_' + color);
+  element.setAttribute('type', 'range');
+  element.setAttribute('min', range.min);
+  element.setAttribute('max', range.max);
+  element.setAttribute('value', pwmValue < 0 ? '0' : pwmValue);
+  element.setAttribute('class', 'slider ' + color);
+  try {
+    addRule('#' + id + '_' + color + '::-webkit-slider-thumb', { 'background': color } );
+  } catch(e) { /* not webkit */ }
+  try {
+    addRule('#' + id + '_' + color + '::-moz-range-thumb', { 'background': color } );
+  } catch(e) { /* not mozilla */ }
+  element.addEventListener("change", function() {
+    socket.emit(item, { color: color, pwmValue: parseInt(this.value) } );
+  });
+  return element;
+}
+
+var addRule = (function (style) {
+  var sheet = document.head.appendChild(style).sheet;
+  return function (selector, css) {
+    var propText = typeof css === "string" ? css : Object.keys(css).map(function (p) {
+      return p + ":" + (p === "content" ? "'" + css[p] + "'" : css[p]);
+    }).join(";");
+    sheet.insertRule(selector + "{" + propText + "}", sheet.cssRules.length);
+  };
 })(document.createElement("style"));
 
 function hexToRgb(hex) {
-    // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
-    var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-    hex = hex.replace(shorthandRegex, function(m, r, g, b) {
-        return r + r + g + g + b + b;
-    });
+  // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+  var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+  hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+    return r + r + g + g + b + b;
+  });
 
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    console.log(result[0]);
-    return result ? {
-        red: parseInt(result[1], 16),
-        green: Math.round(parseInt(result[2], 16) / 5),
-        blue: Math.round(parseInt(result[3], 16) / 5)
-    } : null;
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    red: parseInt(result[1], 16),
+    green: Math.round(parseInt(result[2], 16) / 5),
+    blue: Math.round(parseInt(result[3], 16) / 5)
+  } : null;
 }
 
 function componentToHex(c) {
@@ -149,14 +179,22 @@ function componentToHex(c) {
 
 function rgbToHex(color) {
   var hex = '';
-  ['red', 'green', 'blue'].forEach(function(rgb) {
-    var col = color[rgb];
-    if (typeof col == 'string') {
-      col = parseInt(col);
-    }
-    col = rgb != 'red' ? Math.min(col * 5, 255) : col;
-    hex += componentToHex(col);
-  });
+  console.log(Object.keys(color)[0]);
+  if (Object.keys(color)[0] == 'yellow') {
+    hex += componentToHex(color.yellow);
+    hex += hex;
+    hex += '00';
+    console.log(hex);
+  } else {
+    ['red', 'green', 'blue'].forEach(function(rgb) {
+      var col = color[rgb];
+      if (typeof col == 'string') {
+        col = parseInt(col);
+      }
+      col = rgb != 'red' ? Math.min(col * 5, 255) : col;
+      hex += componentToHex(col);
+    });
+  }
   return "#" + hex;
 }
 

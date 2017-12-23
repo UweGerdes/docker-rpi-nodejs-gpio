@@ -1,4 +1,7 @@
 {
+  "finalNewline": {
+    "enabled": true
+  },
   "hexLength": {
     "style": "short"
   },
@@ -10,3 +13,4 @@
     "style": "no_unit"
   }
 }
+

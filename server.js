@@ -18,13 +18,13 @@ const Led = require('./lib/led.js');
 const RGBLed = require('./lib/rgbled.js'); 
 
 let items = {};
-items['Rote LED'] = new Led(17, 'red', {min: 1, max: 255} );
-items['Gelbe LED'] = new Led(27, 'yellow', {min: 1, max: 255} );
-items['Grüne LED'] = new Led(22, 'green', {min: 1, max: 51} );
-items['Blaue LED'] = new Led(10, 'blue', {min: 1, max: 255} );
-items['RGB LED 1'] = new RGBLed({ red: 21, green: 20, blue: 16});
-items['RGB LED 2'] = new RGBLed({ red: 26, green: 19, blue: 13});
-items['RGB LED 3'] = new RGBLed({ red: 23, green: 24, blue: 25});
+items['LED 1'] = new Led(17, 'red', {min: 1, max: 255} );
+items['LED 2'] = new Led(27, 'yellow', {min: 1, max: 255} );
+items['LED 3'] = new Led(22, 'green', {min: 1, max: 51} );
+items['LED 4'] = new Led(10, 'blue', {min: 1, max: 255} );
+items['RGB LED 1'] = new RGBLed({ red: 23, green: 24, blue: 25});
+items['RGB LED 2'] = new RGBLed({ red: 21, green: 20, blue: 16});
+items['RGB LED 3'] = new RGBLed({ red: 26, green: 19, blue: 13});
 
 /*
 console.log(items['Blaue LED'].toString());
@@ -109,18 +109,18 @@ io.sockets.on('connection', function (socket) {// Web Socket Connection
     var data = items[item].getData();
     if (data.type === 'LED') {
       socket.on(item, function(data) {
+        if (typeof data.pwmValue === 'string') {
+          console.log('received string value: %o' + data);
+        }
         items[item].pwmWrite(parseInt(data.pwmValue));
+        var pwmValue = {};
+        pwmValue[items[item].color] = items[item].pwmValue;
+        socket.emit(item, pwmValue);
       });
     } else if (data.type === 'RGBLED') {
       socket.on(item, function(data) {
-        var color = {};
-        if (data.color) {
-          color[data.color] = data.value;
-        } else {
-          color = data;
-        }
-        items[item].pwmWrite( color );
-        socket.emit(item, items[item].color);
+        items[item].pwmWrite( data );
+        socket.emit(item, items[item].pwmValue);
       });
     }
   });

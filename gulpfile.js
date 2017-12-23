@@ -6,6 +6,7 @@
 'use strict';
 
 var exec = require('child_process').exec,
+  execSync = require('child_process').execSync,
   glob = require('glob'),
   gulp = require('gulp'),
   autoprefixer = require('gulp-autoprefixer'),
@@ -135,22 +136,18 @@ var myServer = {
   kill: function() {
                 console.log('killing');
     if (this.cmd !== undefined && this.cmd.length > 0) {
-      var child = exec('ps ax');
-                console.log('searching old server process');
+      var ps = execSync('ps ax');
       var cmd = this.cmd.join(' ');
-      child.stdout.on('data', function (data) {
-                console.log('found old server process');
-        data.split('\n')
-          .forEach(function(line) {
-            if (line.match('[0-9] ' + cmd)) {
-              var pid = line.replace(/^.*?([0-9]+).*/, '$1');
-              var kill = sudo([ 'kill', pid], {});
-                console.log('killing old server process');
-              kill.on('close', function () {
-                console.log('killed old server process');
-              });
-            }
-        });
+      ps.toString().split('\n')
+        .forEach(function(line) {
+          if (line.match('[0-9] ' + cmd)) {
+            var pid = line.replace(/^.*?([0-9]+).*/, '$1');
+            var kill = sudo([ 'kill', pid], {});
+              console.log('killing old server process');
+            kill.on('close', function () {
+              console.log('killed old server process');
+            });
+          }
       });
     }
   }
