@@ -133,6 +133,9 @@ io.sockets.on('connection', function (sock) {
   socket.on('allOff', () => {
     allOff();
   });
+  socket.on('allOn', () => {
+    allOn();
+  });
   socket.on('getData', () => {
     return getItems();
   });
@@ -153,6 +156,18 @@ function allOff() {
       items[item].off();
     } else if (data.type === 'RGBLED') {
       items[item].off();
+    }
+  });
+  socket.emit('data', getItems());
+}
+
+function allOn() {
+  Object.keys(items).forEach( (item) => {
+    var data = items[item].getData();
+    if (data.type === 'LED') {
+      items[item].on();
+    } else if (data.type === 'RGBLED') {
+      items[item].on();
     }
   });
   socket.emit('data', getItems());

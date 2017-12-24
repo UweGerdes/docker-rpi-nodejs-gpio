@@ -23,6 +23,10 @@ function documentLoaded() {
   allOff.addEventListener("click", function() {
     socket.emit('allOff', true);
   });
+  var allOn = document.getElementById('allOn');
+  allOn.addEventListener("click", function() {
+    socket.emit('allOn', true);
+  });
   container = document.getElementById('elementContainer');
   if (data) {
     createElements(container, data);
