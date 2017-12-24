@@ -17,6 +17,7 @@ var http = require('http').createServer(handler),
     url = require('url');
 
 var serverPort = process.env.SERVER_HTTP || 8080;
+var socket;
 
 const Led = require('./lib/led.js');
 const RGBLed = require('./lib/rgbled.js'); 
@@ -94,10 +95,11 @@ function handler (request, response) { //what to do on requests to port 8080
 }
 
 pushButton.on('interrupt', function (value) {
-  items['Gelbe LED'].digitalWrite(value); //turn LED on or off depending on the button state (0 or 1)
+  items['Gelbe LED'].digitalWrite(value);
 });
 
-io.sockets.on('connection', function (socket) {// Web Socket Connection
+io.sockets.on('connection', function (sock) {
+  socket = sock;
   socket.emit('data', getItems());
   socket.on('servo', function (data) {
     console.log(data);
@@ -130,7 +132,6 @@ io.sockets.on('connection', function (socket) {// Web Socket Connection
   });
   socket.on('allOff', () => {
     allOff();
-    socket.emit('data', getItems());
   });
   socket.on('getData', () => {
     return getItems();
@@ -141,7 +142,6 @@ process.on('SIGINT', exitHandler);
 process.on('SIGTERM', exitHandler);
 
 function exitHandler() {
-  console.log('exiting');
   allOff();
   process.exit();
 }
@@ -155,6 +155,7 @@ function allOff() {
       items[item].off();
     }
   });
+  socket.emit('data', getItems());
 }
 
 function getItems() {
