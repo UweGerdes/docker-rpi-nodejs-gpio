@@ -136,6 +136,9 @@ io.sockets.on('connection', function (sock) {
   socket.on('allOn', () => {
     allOn();
   });
+  socket.on('smooth', (timeout) => {
+    smooth(timeout);
+  });
   socket.on('getData', () => {
     return getItems();
   });
@@ -169,6 +172,24 @@ function allOn() {
     } else if (data.type === 'RGBLED') {
       items[item].on();
     }
+  });
+  socket.emit('data', getItems());
+}
+
+function smooth(timeout) {
+  var count = 0;
+  Object.keys(items).forEach( (item) => {
+    var data = items[item].getData();
+    if (data.type === 'LED') {
+      items[item].smooth(timeout + Math.random(10) * 300);
+    } else if (data.type === 'RGBLED') {
+      items[item].smooth({
+        red: timeout + Math.random(10) * 300,
+        green: timeout + Math.random(10) * 300,
+        blue: timeout + Math.random(10) * 300,
+      });
+    }
+    count++;
   });
   socket.emit('data', getItems());
 }

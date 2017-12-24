@@ -27,6 +27,10 @@ function documentLoaded() {
   allOn.addEventListener("click", function() {
     socket.emit('allOn', true);
   });
+  var smooth = document.getElementById('smooth');
+  smooth.addEventListener("click", function() {
+    socket.emit('smooth', 2000);
+  });
   container = document.getElementById('elementContainer');
   if (data) {
     createElements(container, data);
