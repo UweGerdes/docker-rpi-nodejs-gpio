@@ -98,7 +98,7 @@ pushButton.on('interrupt', function (value) {
 });
 
 io.sockets.on('connection', function (socket) {// Web Socket Connection
-  socket.emit('data', getItems() );
+  socket.emit('data', getItems());
   socket.on('servo', function (data) {
     console.log(data);
     var val = parseInt(data.value);
@@ -128,6 +128,10 @@ io.sockets.on('connection', function (socket) {// Web Socket Connection
       });
     }
   });
+  socket.on('allOff', () => {
+    allOff();
+    socket.emit('data', getItems());
+  });
   socket.on('getData', () => {
     return getItems();
   });
@@ -137,13 +141,20 @@ process.on('SIGINT', exitHandler);
 process.on('SIGTERM', exitHandler);
 
 function exitHandler() {
+  console.log('exiting');
+  allOff();
+  process.exit();
+}
+
+function allOff() {
   Object.keys(items).forEach( (item) => {
     var data = items[item].getData();
     if (data.type === 'LED') {
       items[item].off();
+    } else if (data.type === 'RGBLED') {
+      items[item].off();
     }
   });
-  process.exit();
 }
 
 function getItems() {

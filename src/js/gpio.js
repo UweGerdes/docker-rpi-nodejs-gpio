@@ -9,9 +9,8 @@ var data;
 var container;
 var changedPicker = false;
 
-socket.on('data', function(result) {
-  console.log('data received');
-  data = result;
+socket.on('data', function(data) {
+  console.log('data: ', data);
   if (container) {
     createElements(container, data);
   }
@@ -20,7 +19,10 @@ socket.on('data', function(result) {
 window.addEventListener("load", documentLoaded);
 
 function documentLoaded() {
-  console.log('document loaded');
+  var allOff = document.getElementById('allOff');
+  allOff.addEventListener("click", function() {
+    socket.emit('allOff', true);
+  });
   container = document.getElementById('elementContainer');
   if (data) {
     createElements(container, data);
@@ -29,10 +31,8 @@ function documentLoaded() {
 
 function createElements(container, data) {
   if (container.childNodes.length > 0) {
-    console.log('removing elements');
     container.removeChild(container.childNodes[0]);
   }
-  console.log('creating elements');
   var newDiv = document.createElement('div');
   Object.keys(data).forEach( (item) => {
     newDiv.appendChild(createElement(item, data[item]));
@@ -80,9 +80,7 @@ function makeRGBLED (item, id, data) {
   element.setAttribute('id', id + '_picker');
   element.setAttribute('type', 'color');
   element.setAttribute('value', rgbToHex(data.pwmValue));
-  console.log('color: ', data);
   element.addEventListener("change", function() {
-    console.log('color: ' + this.value + ' = %o', hexToRgb(this.value) );
     changedPicker = true;
     var color = hexToRgb(this.value);
     Object.keys(color).forEach( (col) => {
@@ -92,7 +90,6 @@ function makeRGBLED (item, id, data) {
   newControls.appendChild(element);
   socket.on(item, function(result) {
     var color = result;
-    console.log(id + ' received: ' + Object.values(color).join(', '));
     if ( ! changedPicker ) {
       setRgbColor(id, color);
     }
@@ -118,7 +115,6 @@ function makePreview(item, id, type, color, pwmValue) {
   element.setAttribute('data-pwmValue', pwm, rgbToHex(pwm));
   element.style.backgroundColor = rgbToHex(pwm);
   socket.on(item, function(data) {
-    console.log(id + '_preview received: %o', data);
     element.style.backgroundColor = rgbToHex(data);
   });
   return element;
@@ -179,12 +175,10 @@ function componentToHex(c) {
 
 function rgbToHex(color) {
   var hex = '';
-  console.log(Object.keys(color)[0]);
   if (Object.keys(color)[0] == 'yellow') {
     hex += componentToHex(color.yellow);
     hex += hex;
     hex += '00';
-    console.log(hex);
   } else {
     ['red', 'green', 'blue'].forEach(function(rgb) {
       var col = color[rgb];
@@ -199,7 +193,6 @@ function rgbToHex(color) {
 }
 
 function setRgbColor(id, color) {
-  console.log('setting ' + id + ' color: (' + color.red + ', ' + color.green + ', ' + color.blue + ') = ' + rgbToHex(color));
   ['red', 'green', 'blue'].forEach(function(rgb) {
     document.getElementById(id + '_' + rgb).value = color[rgb];
   });

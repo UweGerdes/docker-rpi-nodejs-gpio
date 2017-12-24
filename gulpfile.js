@@ -5,8 +5,7 @@
  */
 'use strict';
 
-var exec = require('child_process').exec,
-  execSync = require('child_process').execSync,
+var execSync = require('child_process').execSync,
   glob = require('glob'),
   gulp = require('gulp'),
   autoprefixer = require('gulp-autoprefixer'),
@@ -100,6 +99,7 @@ watchFilesFor.js = [
 ];
 gulp.task('js', () => {
   return gulp.src( watchFilesFor.js )
+    .pipe(changed(path.join(destDir, 'js')))
     .pipe(gulp.dest(path.join(destDir, 'js')))
     .pipe(log('written: <%= file.path %>'))
     ;
@@ -135,11 +135,10 @@ var myServer = {
       console.error(data.toString());
     });
     child.on('close', function () {
-      console.log('process exited');
+      console.log('server process exited');
     });
   },
   kill: function() {
-                console.log('killing');
     if (this.cmd !== undefined && this.cmd.length > 0) {
       var ps = execSync('ps ax');
       var cmd = this.cmd.join(' ');
@@ -147,11 +146,8 @@ var myServer = {
         .forEach(function(line) {
           if (line.match('[0-9] ' + cmd)) {
             var pid = line.replace(/^.*?([0-9]+).*/, '$1');
-            var kill = sudo([ 'kill', pid], {});
-              console.log('killing old server process');
-            kill.on('close', function () {
-              console.log('killed old server process');
-            });
+            execSync('sudo kill -2 ' + pid);
+            console.log('killed server process ' + pid);
           }
       });
     }
@@ -196,8 +192,8 @@ watchFilesFor.livereload = [
 ];
 gulp.task('livereload', function() {
   gulp.src(watchFilesFor.livereload)
-    .pipe(changed(path.dirname('<%= file.path %>')))
-    .pipe(log({ message: 'livereload: <%= file.path %>', title: 'Gulp livereload' }))
+    //.pipe(changed(path.dirname('<%= file.path %>')))
+    //.pipe(log({ message: 'livereload: <%= file.path %>', title: 'Gulp livereload' }))
     .pipe(gulpLivereload( { quiet: true } ));
 });
 
