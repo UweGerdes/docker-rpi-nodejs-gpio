@@ -177,16 +177,17 @@ function allOn() {
 }
 
 function smooth(timeout) {
-  var count = 0;
+  var count = Math.floor(Math.random() * 3);
+  console.log('count: ' + count);
   Object.keys(items).forEach( (item) => {
     var data = items[item].getData();
     if (data.type === 'LED') {
-      items[item].smooth(timeout + Math.random(10) * 300);
+      items[item].smooth(timeout + Math.random() * 1000);
     } else if (data.type === 'RGBLED') {
       items[item].smooth({
-        red: timeout + Math.random(10) * 300,
-        green: timeout + Math.random(10) * 300,
-        blue: timeout + Math.random(10) * 300,
+        red: (timeout + Math.random() * 1000) * (count % 3),
+        green: (timeout + Math.random() * 1000) * ((count+1) % 3),
+        blue: (timeout + Math.random() * 100) * ((count+2) % 3),
       });
     }
     count++;
