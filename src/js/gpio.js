@@ -5,7 +5,6 @@
 /* globals socket */
 //var socket = io(); //loaded in html
 
-var container;
 var changedPicker = false;
 
 window.addEventListener("load", documentLoaded);
@@ -23,11 +22,17 @@ function documentLoaded() {
   smooth.addEventListener("click", function() {
     socket.emit('smooth', 2000);
   });
-  container = document.getElementById('elementContainer');
+  document.getElementById('RGBsmooth').addEventListener("click", function() {
+    socket.emit('RGBsmooth', 2000);
+  });
+  document.getElementById('LEDsmooth').addEventListener("click", function() {
+    socket.emit('LEDsmooth', 2000);
+  });
   socket.emit('getData', true);
 }
 
 socket.on('data', function(data) {
+  var container = document.getElementById('elementContainer');
   if (container) {
     createElements(container, data);
   }
@@ -54,7 +59,9 @@ function createElement(item, data) {
   newLabel.setAttribute('for', id);
   var newLabelText = document.createTextNode(item);
   newLabel.appendChild(newLabelText);
-  newDiv.appendChild(makePreview(item, id, data.type, data.color, data.pwmValue));
+  if (data.color) {
+    newDiv.appendChild(makePreview(item, id, data.type, data.color, data.pwmValue));
+  }
   newDiv.appendChild(newLabel);
   newDiv.appendChild(elementTypes[data.type](item, id, data));
   return newDiv;
@@ -62,7 +69,8 @@ function createElement(item, data) {
 
 var elementTypes = {
   LED: makeLED,
-  RGBLED: makeRGBLED
+  RGBLED: makeRGBLED,
+  SERVO: makeSERVO,
 };
 
 function makeLED (item, id, data) {
@@ -144,6 +152,28 @@ function makeRange(item, id, range, pwmValue, color) {
   return element;
 }
 
+function makeSERVO (item, id, data) {
+  var newControls = document.createElement('div');
+  newControls.setAttribute('class', data.type + '_controls');
+  var element = makeServoRange(item, id, data.range, data.rangeValue);
+  newControls.appendChild(element);
+  return newControls;
+}
+
+function makeServoRange(item, id, range, rangeValue, color) {
+  var element = document.createElement('input');
+  element.setAttribute('id', id + '_' + color);
+  element.setAttribute('type', 'range');
+  element.setAttribute('min', range.min);
+  element.setAttribute('max', range.max);
+  element.setAttribute('value', rangeValue < 0 ? '0' : rangeValue);
+  element.setAttribute('class', 'slider range');
+  element.addEventListener("change", function() {
+    socket.emit(item, { value: parseInt(this.value) } );
+  });
+  return element;
+}
+
 var addRule = (function (style) {
   var sheet = document.head.appendChild(style).sheet;
   return function (selector, css) {
@@ -206,9 +236,8 @@ function setRgbColor(id, color) {
 window.addEventListener("load", function(){
   var servoSlider = document.getElementById("servoSlider");
   var servoButtons = document.getElementsByName('servo');
-
   servoSlider.addEventListener("change", function() {
-    socket.emit("servo", {'value': this.value + '00'});
+    socket.emit("servo", {'value': this.value});
   });
   servoButtons.forEach(function(button) {
     button.addEventListener("click", function() {

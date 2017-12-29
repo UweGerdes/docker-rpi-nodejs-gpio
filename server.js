@@ -20,16 +20,18 @@ var serverPort = process.env.SERVER_HTTP || 8080;
 var socket;
 
 const Led = require('./lib/led.js');
-const RGBLed = require('./lib/rgbled.js'); 
+const RGBLed = require('./lib/rgbled.js');
+const Servo = require('./lib/servo.js'); 
 
 let items = {};
 items['LED 1'] = new Led(17, 'red', {min: 1, max: 255} );
 items['LED 2'] = new Led(27, 'yellow', {min: 1, max: 255} );
 items['LED 3'] = new Led(22, 'green', {min: 1, max: 51} );
-items['LED 4'] = new Led(10, 'blue', {min: 1, max: 255} );
+items['LED 4'] = new Led(18, 'blue', {min: 1, max: 255} );
 items['RGB LED 1'] = new RGBLed({ red: 23, green: 24, blue: 25});
 items['RGB LED 2'] = new RGBLed({ red: 21, green: 20, blue: 16});
 items['RGB LED 3'] = new RGBLed({ red: 26, green: 19, blue: 13});
+items['Servo 1'] = new Servo(18);
 
 /*
 console.log(items['Blaue LED'].toString());
@@ -102,12 +104,11 @@ io.sockets.on('connection', function (sock) {
   socket = sock;
   socket.emit('data', getItems());
   socket.on('servo', function (data) {
-    console.log(data);
     var val = parseInt(data.value);
     if (parseInt(data.value) === 0) {
       servo.digitalWrite(0);
     } else if (val >= 500 && val <= 2500) {
-      servo.servoWrite(parseInt(data.value));
+      servo.servoWrite(val);
       setTimeout(function() {servo.digitalWrite(0);}, 800);
     }
   });
@@ -128,6 +129,11 @@ io.sockets.on('connection', function (sock) {
         items[item].pwmWrite( data );
         socket.emit(item, items[item].pwmValue);
       });
+    } else if (data.type === 'SERVO') {
+      socket.on(item, function(data) {
+        items[item].servoWrite(parseInt(data.value));
+        socket.emit(item, items[item].rangeValue);
+      });
     }
   });
   socket.on('allOff', () => {
@@ -137,7 +143,13 @@ io.sockets.on('connection', function (sock) {
     allOn();
   });
   socket.on('smooth', (timeout) => {
-    smooth(timeout);
+    smooth(Object.keys(items), timeout);
+  });
+  socket.on('RGBsmooth', (timeout) => {
+    smooth(['RGB LED 1', 'RGB LED 2', 'RGB LED 3'], timeout);
+  });
+  socket.on('LEDsmooth', (timeout) => {
+    smooth(['LED 1', 'LED 2', 'LED 3', 'LED 4'], timeout);
   });
   socket.on('getData', () => {
     socket.emit('data', getItems());
@@ -176,10 +188,9 @@ function allOn() {
   socket.emit('data', getItems());
 }
 
-function smooth(timeout) {
+function smooth(keys, timeout) {
   var count = Math.floor(Math.random() * 3);
-  console.log('count: ' + count);
-  Object.keys(items).forEach( (item) => {
+  keys.forEach( (item) => {
     var data = items[item].getData();
     if (data.type === 'LED') {
       items[item].smooth(timeout + Math.random() * 1000);
@@ -203,6 +214,10 @@ function getItems() {
       result[item] = data;
     } else if (data.type === 'RGBLED') {
       result[item] = data;
+    } else if (data.type === 'SERVO') {
+      result[item] = data;
+    } else {
+      result[item] = {};
     }
   });
   return result;
