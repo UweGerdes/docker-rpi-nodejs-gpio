@@ -12,7 +12,6 @@ var http = require('http').createServer(handler),
     path = require('path'),
     fs = require('fs'),
     os = require('os'),
-    Gpio = require('pigpio').Gpio,
     io = require('socket.io')(http),
     url = require('url');
 
@@ -21,17 +20,19 @@ var socket;
 
 const Led = require('./lib/led.js');
 const RGBLed = require('./lib/rgbled.js');
-const Servo = require('./lib/servo.js'); 
+const Servo = require('./lib/servo.js');
+const Button = require('./lib/button.js');
 
 let items = {};
 items['LED 1'] = new Led(17, 'red', {min: 1, max: 255} );
 items['LED 2'] = new Led(27, 'yellow', {min: 1, max: 255} );
 items['LED 3'] = new Led(22, 'green', {min: 1, max: 51} );
-items['LED 4'] = new Led(18, 'blue', {min: 1, max: 255} );
+items['LED 4'] = new Led(10, 'blue', {min: 1, max: 255} );
 items['RGB LED 1'] = new RGBLed({ red: 23, green: 24, blue: 25});
 items['RGB LED 2'] = new RGBLed({ red: 21, green: 20, blue: 16});
 items['RGB LED 3'] = new RGBLed({ red: 26, green: 19, blue: 13});
 items['Servo 1'] = new Servo(18);
+items['Button 1'] = new Button(6, buttonCallback('Button 1'));
 
 /*
 console.log(items['Blaue LED'].toString());
@@ -43,17 +44,6 @@ setTimeout( items['Blaue LED'].blinkOff.bind(items['Blaue LED']) , 3300);
 //items['Blaue LED'].onOff(1000);
 console.log(items['Blaue LED'].toString());
 */
-
-var servo = new Gpio(18, {mode: Gpio.OUTPUT}); //use GPIO pin 18 as output for SERVO
-var pushButton = new Gpio(9, {
-    mode: Gpio.INPUT,
-    pullUpDown: Gpio.PUD_DOWN,
-    edge: Gpio.EITHER_EDGE
-  });
-
-var servoValue = 0; //set starting value of SERVO variable to off
-// all off
-servo.digitalWrite(servoValue); // Turn off
 
 http.listen(serverPort);
 console.log('server listening on http://' + ipv4adresses()[0] + ':' + serverPort);
@@ -96,22 +86,20 @@ function handler (request, response) { //what to do on requests to port 8080
   });
 }
 
+/*
 pushButton.on('interrupt', function (value) {
-  items['Gelbe LED'].digitalWrite(value);
+  if (value === 0) {
+    items['LED 2'].off();
+  } else if (value === 1) {
+    items['LED 2'].on();
+  } else {
+    console.log('unknown value: ' + value);
+  }
 });
-
+*/
 io.sockets.on('connection', function (sock) {
   socket = sock;
   socket.emit('data', getItems());
-  socket.on('servo', function (data) {
-    var val = parseInt(data.value);
-    if (parseInt(data.value) === 0) {
-      servo.digitalWrite(0);
-    } else if (val >= 500 && val <= 2500) {
-      servo.servoWrite(val);
-      setTimeout(function() {servo.digitalWrite(0);}, 800);
-    }
-  });
   Object.keys(items).forEach( (item) => {
     var data = items[item].getData();
     if (data.type === 'LED') {
@@ -173,7 +161,9 @@ function allOff() {
       items[item].off();
     }
   });
-  socket.emit('data', getItems());
+  if (socket) {
+    socket.emit('data', getItems());
+  }
 }
 
 function allOn() {
@@ -206,6 +196,12 @@ function smooth(keys, timeout) {
   socket.emit('data', getItems());
 }
 
+function buttonCallback(name) {
+  return function(value) {
+    socket.emit(name, value);
+  };
+}
+
 function getItems() {
   let result = {};
   Object.keys(items).forEach( (item) => {
@@ -215,6 +211,8 @@ function getItems() {
     } else if (data.type === 'RGBLED') {
       result[item] = data;
     } else if (data.type === 'SERVO') {
+      result[item] = data;
+    } else if (data.type === 'BUTTON') {
       result[item] = data;
     } else {
       result[item] = {};

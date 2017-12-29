@@ -40,6 +40,7 @@ socket.on('data', function(data) {
 
 function createElements(container, data) {
   if (container.childNodes.length > 0) {
+    //container.childNodes[0].removeEventListener
     container.removeChild(container.childNodes[0]);
   }
   var newDiv = document.createElement('div');
@@ -71,6 +72,7 @@ var elementTypes = {
   LED: makeLED,
   RGBLED: makeRGBLED,
   SERVO: makeSERVO,
+  BUTTON: makeBUTTON,
 };
 
 function makeLED (item, id, data) {
@@ -153,9 +155,10 @@ function makeRange(item, id, range, pwmValue, color) {
 }
 
 function makeSERVO (item, id, data) {
+console.log('making servo ' + item);
   var div = document.createElement('div');
   div.setAttribute('class', data.type + '_controls');
-  div.appendChild(makeRangeButtons(item, id, data, 
+  div.appendChild(makeServoButtons(item, id, data, 
       {
         'Links': data.range.min,
         'Halblinks': data.range.min + (data.range.max - data.range.min) / 4,
@@ -184,7 +187,7 @@ function makeServoRange(item, id, range, rangeValue, color) {
   return element;
 }
 
-function makeRangeButtons(item, id, data, values) {
+function makeServoButtons(item, id, data, values) {
   var container = document.createElement('div');
   container.setAttribute('class', 'controlButtons');
   var buttonContainer = document.createElement('div');
@@ -204,6 +207,21 @@ function makeRangeButtons(item, id, data, values) {
   });
   container.appendChild(buttonContainer);
   return container;
+}
+
+function makeBUTTON (item, id, data) {
+console.log('making button ' + item);
+  var div = document.createElement('div');
+  div.setAttribute('class', data.type + '_status');
+  var element = document.createElement('input');
+  element.setAttribute('id', id + '_checkbox');
+  element.setAttribute('type', 'checkbox');
+  div.appendChild(element);
+  socket.on(item, function(value) {
+    console.log('button value:: ' + value);
+    element.checked = value === 1;
+  });
+  return div;
 }
 
 var addRule = (function (style) {
