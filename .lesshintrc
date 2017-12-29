@@ -1,7 +1,6 @@
 {
-  "finalNewline": {
-    "enabled": true
-  },
+  "decimalZero": "none",
+  "finalNewline": true,
   "hexLength": {
     "style": "short"
   },

@@ -140,7 +140,7 @@ io.sockets.on('connection', function (sock) {
     smooth(timeout);
   });
   socket.on('getData', () => {
-    return getItems();
+    socket.emit('data', getItems());
   });
 });
 

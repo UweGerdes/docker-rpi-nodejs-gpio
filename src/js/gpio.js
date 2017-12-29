@@ -5,16 +5,8 @@
 /* globals socket */
 //var socket = io(); //loaded in html
 
-var data;
 var container;
 var changedPicker = false;
-
-socket.on('data', function(data) {
-  console.log('data: ', data);
-  if (container) {
-    createElements(container, data);
-  }
-});
 
 window.addEventListener("load", documentLoaded);
 
@@ -32,10 +24,14 @@ function documentLoaded() {
     socket.emit('smooth', 2000);
   });
   container = document.getElementById('elementContainer');
-  if (data) {
+  socket.emit('getData', true);
+}
+
+socket.on('data', function(data) {
+  if (container) {
     createElements(container, data);
   }
-}
+});
 
 function createElements(container, data) {
   if (container.childNodes.length > 0) {
