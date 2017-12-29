@@ -153,11 +153,18 @@ function makeRange(item, id, range, pwmValue, color) {
 }
 
 function makeSERVO (item, id, data) {
-  var newControls = document.createElement('div');
-  newControls.setAttribute('class', data.type + '_controls');
-  var element = makeServoRange(item, id, data.range, data.rangeValue);
-  newControls.appendChild(element);
-  return newControls;
+  var div = document.createElement('div');
+  div.setAttribute('class', data.type + '_controls');
+  div.appendChild(makeRangeButtons(item, id, data, 
+      {
+        'Links': data.range.min,
+        'Halblinks': data.range.min + (data.range.max - data.range.min) / 4,
+        'Mitte': data.midValue,
+        'Halbrechts': data.range.min + (data.range.max - data.range.min) * 3 / 4,
+        'Rechts': data.range.max,
+      }));
+  div.appendChild(makeServoRange(item, id, data.range, data.rangeValue));
+  return div;
 }
 
 function makeServoRange(item, id, range, rangeValue, color) {
@@ -171,7 +178,32 @@ function makeServoRange(item, id, range, rangeValue, color) {
   element.addEventListener("change", function() {
     socket.emit(item, { value: parseInt(this.value) } );
   });
+  socket.on(item, function(value) {
+    element.value = value;
+  });
   return element;
+}
+
+function makeRangeButtons(item, id, data, values) {
+  var container = document.createElement('div');
+  container.setAttribute('class', 'controlButtons');
+  var buttonContainer = document.createElement('div');
+  buttonContainer.setAttribute('class', 'buttonContainer');
+  Object.keys(values).forEach( (key) => {
+    var button = document.createElement('button');
+    button.setAttribute('id', id + '_' + key.replace(/ /g, '_'));
+    button.setAttribute('name', id + '_' + key.replace(/ /g, '_'));
+    button.setAttribute('value', values[key]);
+    button.setAttribute('class', 'button');
+    var buttonText = document.createTextNode(key);
+    button.appendChild(buttonText);
+    button.addEventListener("click", function() {
+      socket.emit(item, { value: parseInt(this.value) } );
+    });
+    buttonContainer.appendChild(button);
+  });
+  container.appendChild(buttonContainer);
+  return container;
 }
 
 var addRule = (function (style) {
@@ -232,17 +264,4 @@ function setRgbColor(id, color) {
   });
   document.getElementById(id + '_picker').setAttribute('value', rgbToHex(color));
 }
-
-window.addEventListener("load", function(){
-  var servoSlider = document.getElementById("servoSlider");
-  var servoButtons = document.getElementsByName('servo');
-  servoSlider.addEventListener("change", function() {
-    socket.emit("servo", {'value': this.value});
-  });
-  servoButtons.forEach(function(button) {
-    button.addEventListener("click", function() {
-      socket.emit("servo", {'value': button.value});
-    });
-  });
-});
 

@@ -11,7 +11,7 @@
   <div id="main">
   <h1 class="headline">Raspberry Pi 3 GPIO</h1>
   <div class="container">
-    <h2 class="subheadline">GPIO Steuerung:
+    <div class="controlButtons">
       <span class="buttonContainer">
         <button id="allOff" name="allOff" value="allOff" class="button">alle aus</button>
         <button id="allOn" name="allOn" value="allOn" class="button">alle ein</button>
@@ -21,18 +21,10 @@
         <button id="RGBsmooth" name="RGBsmooth" value="RGBsmooth" class="button">RGB smooth</button>
         <button id="LEDsmooth" name="LEDsmooth" value="LEDsmooth" class="button">LEDs smooth</button>
       </span>
-    </h2>
+    </div>
     <div class="row">
       <div class="cell">
         <div id="elementContainer"></div>
-        <p><input type="range" min="500" max="2500" value="1500" class="slider servo" id="servoSlider"></p>
-        <p>
-          <button name="servo" value="2000">Links</button>
-          <button name="servo" value="1750">Halblinks</button>
-          <button name="servo" value="1500">Mitte</button>
-          <button name="servo" value="1250">Halbrechts</button>
-          <button name="servo" value="1000">Rechts</button>
-        </p>
       </div>
     </div>
   </div>

@@ -4,19 +4,21 @@
   background-color: #f0f0f0;
 }
 
-.headline,
-.subheadline {
+.headline {
+  text-align: center;
+}
+
+.controlButtons {
+  padding: 0 0 1em;
   text-align: center;
 }
 
 .buttonContainer {
-  display: inline-block;
-  padding: 1em 0 0;
   white-space: nowrap;
 }
 
 .button {
-  font-size: .8em;
+  font-size: 1.2em;
   font-weight: bold;
   padding: .5em .6em;
 }
@@ -55,6 +57,24 @@
   }
 }
 
+.SERVO {
+  &_container {
+    border: 1px solid #ccc;
+    float: right;
+    margin: 0 0.8% 2%;
+    padding: 0 2%;
+    width: 94%;
+  }
+
+  &_label {
+    display: block;
+    float: left;
+    font-size: 1.2em;
+    font-weight: bold;
+    padding: 1em 0 0;
+    text-align: center;
+  }
+}
 @media (min-width: 1024px) {
   .LED {
     &_container {
