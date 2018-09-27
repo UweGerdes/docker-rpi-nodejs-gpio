@@ -26,6 +26,15 @@ $ docker run -it --rm \
 	bash
 ```
 
+
+## TODO
+
+Document pin layout
+https://www.elektronik-kompendium.de/sites/raspberry-pi/1907101.htm
+
+Refactoring?
+
+### not used
 	--device /dev/mem \
 	--device /dev/vcio \
 
