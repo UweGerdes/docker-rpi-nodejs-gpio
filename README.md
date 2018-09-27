@@ -5,11 +5,9 @@ Using the Raspberry Pi 3 GPIO pins with node wrapped in a docker container.
 ## Building 
 
 ```bash
-$ start=`date +%s` && \
-	docker build -t uwegerdes/node-rpi-gpio \
+$ docker build -t uwegerdes/node-rpi-gpio \
 	--build-arg GPIO_GROUP="$(sed -nr "s/^gpio:x:([0-9]+):.*/\1/p" /etc/group)" \
-	. \
-	&& runtime=$(($(date +%s)-start)) && echo "time: $((runtime/60)):$((runtime%60))"
+	.
 ```
 
 ## Usage
