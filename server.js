@@ -22,6 +22,7 @@ const Led = require('./lib/led.js');
 const RGBLed = require('./lib/rgbled.js');
 const Servo = require('./lib/servo.js');
 const Button = require('./lib/button.js');
+const Sensor = require('./lib/sensor.js');
 
 let items = {};
 items['LED 1'] = new Led(17, 'red', {min: 1, max: 255} );
@@ -33,6 +34,7 @@ items['RGB LED 2'] = new RGBLed({ red: 21, green: 20, blue: 16});
 items['RGB LED 3'] = new RGBLed({ red: 26, green: 19, blue: 13});
 items['Servo 1'] = new Servo(18);
 items['Button 1'] = new Button(6, buttonCallback('Button 1'));
+items['Sensor 1'] = new Sensor(5, sensorCallback('Sensor 1'));
 
 /*
 console.log(items['Blaue LED'].toString());
@@ -198,25 +200,28 @@ function smooth(keys, timeout) {
 
 function buttonCallback(name) {
   return function(value) {
-    socket.emit(name, value);
+    if (socket) {
+      socket.emit(name, value);
+    } else {
+      console.log(name + ': ' + value);
+    }
+  };
+}
+
+function sensorCallback(name) {
+  return function() {
+    if (socket) {
+      socket.emit(name, true);
+    } else {
+      console.log(name + ' touched');
+    }
   };
 }
 
 function getItems() {
   let result = {};
   Object.keys(items).forEach( (item) => {
-    var data = items[item].getData();
-    if (data.type === 'LED') {
-      result[item] = data;
-    } else if (data.type === 'RGBLED') {
-      result[item] = data;
-    } else if (data.type === 'SERVO') {
-      result[item] = data;
-    } else if (data.type === 'BUTTON') {
-      result[item] = data;
-    } else {
-      result[item] = {};
-    }
+    result[item] = items[item].getData();
   });
   return result;
 }

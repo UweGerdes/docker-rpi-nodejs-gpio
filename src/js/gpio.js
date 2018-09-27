@@ -7,25 +7,25 @@
 
 var changedPicker = false;
 
-window.addEventListener("load", documentLoaded);
+window.addEventListener('load', documentLoaded);
 
 function documentLoaded() {
   var allOff = document.getElementById('allOff');
-  allOff.addEventListener("click", function() {
+  allOff.addEventListener('click', function() {
     socket.emit('allOff', true);
   });
   var allOn = document.getElementById('allOn');
-  allOn.addEventListener("click", function() {
+  allOn.addEventListener('click', function() {
     socket.emit('allOn', true);
   });
   var smooth = document.getElementById('smooth');
-  smooth.addEventListener("click", function() {
+  smooth.addEventListener('click', function() {
     socket.emit('smooth', 2000);
   });
-  document.getElementById('RGBsmooth').addEventListener("click", function() {
+  document.getElementById('RGBsmooth').addEventListener('click', function() {
     socket.emit('RGBsmooth', 2000);
   });
-  document.getElementById('LEDsmooth').addEventListener("click", function() {
+  document.getElementById('LEDsmooth').addEventListener('click', function() {
     socket.emit('LEDsmooth', 2000);
   });
   socket.emit('getData', true);
@@ -51,7 +51,7 @@ function createElements(container, data) {
 }
 
 function createElement(item, data) {
-  var id = item.replace(/[^A-Za-z0-9-]/g, "_");
+  var id = item.replace(/[^A-Za-z0-9-]/g, '_');
   var newDiv = document.createElement('div');
   newDiv.setAttribute('id', id + '_container');
   newDiv.setAttribute('class', data.type + '_container');
@@ -73,6 +73,7 @@ var elementTypes = {
   RGBLED: makeRGBLED,
   SERVO: makeSERVO,
   BUTTON: makeBUTTON,
+  SENSOR: makeSENSOR,
 };
 
 function makeLED (item, id, data) {
@@ -94,7 +95,7 @@ function makeRGBLED (item, id, data) {
   element.setAttribute('id', id + '_picker');
   element.setAttribute('type', 'color');
   element.setAttribute('value', rgbToHex(data.pwmValue));
-  element.addEventListener("change", function() {
+  element.addEventListener('change', function() {
     changedPicker = true;
     var color = hexToRgb(this.value);
     Object.keys(color).forEach( (col) => {
@@ -148,14 +149,13 @@ function makeRange(item, id, range, pwmValue, color) {
   try {
     addRule('#' + id + '_' + color + '::-moz-range-thumb', { 'background': color } );
   } catch(e) { /* not mozilla */ }
-  element.addEventListener("change", function() {
+  element.addEventListener('change', function() {
     socket.emit(item, { color: color, pwmValue: parseInt(this.value) } );
   });
   return element;
 }
 
 function makeSERVO (item, id, data) {
-console.log('making servo ' + item);
   var div = document.createElement('div');
   div.setAttribute('class', data.type + '_controls');
   div.appendChild(makeServoButtons(item, id, data, 
@@ -178,7 +178,7 @@ function makeServoRange(item, id, range, rangeValue, color) {
   element.setAttribute('max', range.max);
   element.setAttribute('value', rangeValue < 0 ? '0' : rangeValue);
   element.setAttribute('class', 'slider range');
-  element.addEventListener("change", function() {
+  element.addEventListener('change', function() {
     socket.emit(item, { value: parseInt(this.value) } );
   });
   socket.on(item, function(value) {
@@ -200,7 +200,7 @@ function makeServoButtons(item, id, data, values) {
     button.setAttribute('class', 'button');
     var buttonText = document.createTextNode(key);
     button.appendChild(buttonText);
-    button.addEventListener("click", function() {
+    button.addEventListener('click', function() {
       socket.emit(item, { value: parseInt(this.value) } );
     });
     buttonContainer.appendChild(button);
@@ -210,7 +210,6 @@ function makeServoButtons(item, id, data, values) {
 }
 
 function makeBUTTON (item, id, data) {
-console.log('making button ' + item);
   var div = document.createElement('div');
   div.setAttribute('class', data.type + '_status');
   var element = document.createElement('input');
@@ -218,8 +217,22 @@ console.log('making button ' + item);
   element.setAttribute('type', 'checkbox');
   div.appendChild(element);
   socket.on(item, function(value) {
-    console.log('button value:: ' + value);
+    console.log('button value: ' + value);
     element.checked = value === 1;
+  });
+  return div;
+}
+
+function makeSENSOR (item, id, data) {
+  var div = document.createElement('div');
+  div.setAttribute('class', data.type + '_status');
+  var element = document.createElement('input');
+  element.setAttribute('id', id + '_checkbox');
+  element.setAttribute('type', 'checkbox');
+  div.appendChild(element);
+  socket.on(item, function() {
+    console.log('sensor touched');
+    element.checked = ! element.checked;
   });
   return div;
 }
@@ -227,15 +240,15 @@ console.log('making button ' + item);
 var addRule = (function (style) {
   var sheet = document.head.appendChild(style).sheet;
   return function (selector, css) {
-    var propText = typeof css === "string" ? css : Object.keys(css).map(function (p) {
-      return p + ":" + (p === "content" ? "'" + css[p] + "'" : css[p]);
-    }).join(";");
-    sheet.insertRule(selector + "{" + propText + "}", sheet.cssRules.length);
+    var propText = typeof css === 'string' ? css : Object.keys(css).map(function (p) {
+      return p + ':' + (p === 'content' ? '\'' + css[p] + '\'' : css[p]);
+    }).join(';');
+    sheet.insertRule(selector + '{' + propText + '}', sheet.cssRules.length);
   };
-})(document.createElement("style"));
+})(document.createElement('style'));
 
 function hexToRgb(hex) {
-  // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+  // Expand shorthand form (e.g. '03F') to full form (e.g. '0033FF')
   var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
   hex = hex.replace(shorthandRegex, function(m, r, g, b) {
     return r + r + g + g + b + b;
@@ -250,11 +263,11 @@ function hexToRgb(hex) {
 }
 
 function componentToHex(c) {
-  var hex = "00";
+  var hex = '00';
   if (c) {
     hex = c.toString(16);
   }
-  return hex.length == 1 ? "0" + hex : hex;
+  return hex.length == 1 ? '0' + hex : hex;
 }
 
 function rgbToHex(color) {
@@ -273,7 +286,7 @@ function rgbToHex(color) {
       hex += componentToHex(col);
     });
   }
-  return "#" + hex;
+  return '#' + hex;
 }
 
 function setRgbColor(id, color) {
