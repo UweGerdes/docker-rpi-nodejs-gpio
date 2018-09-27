@@ -30,6 +30,10 @@ $ docker run -it --rm \
 ## TODO
 
 Document pin layout
+```bash
+$ pinout
+```
+
 https://www.elektronik-kompendium.de/sites/raspberry-pi/1907101.htm
 
 Refactoring?
