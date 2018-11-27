@@ -2,7 +2,7 @@
 
 Using the Raspberry Pi 3 GPIO pins with node wrapped in a docker container.
 
-## Building 
+## Building
 
 ```bash
 $ docker build -t uwegerdes/node-rpi-gpio \
@@ -26,19 +26,15 @@ $ docker run -it --rm \
 	bash
 ```
 
+## More information on GPIO usage
 
-## TODO
+Show the pinout of your Raspberry Pi:
 
-Document pin layout
 ```bash
 $ pinout
 ```
 
-https://www.elektronik-kompendium.de/sites/raspberry-pi/1907101.htm
+## Helpful links
 
-Refactoring?
-
-### not used
-	--device /dev/mem \
-	--device /dev/vcio \
-
+- (https://www.npmjs.com/package/pigpio)[https://www.npmjs.com/package/pigpio]
+- (https://www.elektronik-kompendium.de/sites/raspberry-pi/1907101.htm)[https://www.elektronik-kompendium.de/sites/raspberry-pi/1907101.htm]
