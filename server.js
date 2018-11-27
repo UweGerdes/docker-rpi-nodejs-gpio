@@ -33,9 +33,8 @@ items['RGB LED 1'] = new RGBLed({ red: 23, green: 24, blue: 25});
 items['RGB LED 2'] = new RGBLed({ red: 21, green: 20, blue: 16});
 items['RGB LED 3'] = new RGBLed({ red: 26, green: 19, blue: 13});
 items['Servo 1'] = new Servo(18);
-items['Button 1'] = new Button(6, buttonCallback('Button 1'));
-items['Sensor 1'] = new Sensor(5, sensorCallback('Sensor 1'));
-
+items['Button 1'] = new Button(7, buttonCallback('Button 1'));
+items['Sensor 1'] = new Sensor(8, sensorCallback('Sensor 1'));
 /*
 console.log(items['Blaue LED'].toString());
 //items['Blaue LED'].onOff(500);
@@ -69,7 +68,7 @@ function handler (request, response) { //what to do on requests to port 8080
     }
 
     fs.readFile(filename, 'binary', function(err, file) {
-      if(err) {        
+      if (err) {
         response.writeHead(500, {'Content-Type': 'text/plain'});
         response.write(err + '\n');
         response.end();
@@ -88,17 +87,6 @@ function handler (request, response) { //what to do on requests to port 8080
   });
 }
 
-/*
-pushButton.on('interrupt', function (value) {
-  if (value === 0) {
-    items['LED 2'].off();
-  } else if (value === 1) {
-    items['LED 2'].on();
-  } else {
-    console.log('unknown value: ' + value);
-  }
-});
-*/
 io.sockets.on('connection', function (sock) {
   socket = sock;
   socket.emit('data', getItems());
@@ -239,5 +227,3 @@ function ipv4adresses() {
 	}
 	return addresses;
 }
-
-
