@@ -1,7 +1,8 @@
 #
 # Dockerfile for rpi gpio with nodejs
 
-FROM uwegerdes/nodejs-rpi-stretch
+ARG BASEIMAGE_VERSION=latest
+FROM uwegerdes/rpi-nodejs:${BASEIMAGE_VERSION}
 
 MAINTAINER Uwe Gerdes <entwicklung@uwegerdes.de>
 
@@ -73,4 +74,3 @@ VOLUME [ "${APP_HOME}" ]
 EXPOSE ${SERVER_HTTP} ${GULP_LIVERELOAD}
 
 CMD [ "npm", "start" ]
-
