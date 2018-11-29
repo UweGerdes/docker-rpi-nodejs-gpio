@@ -9,10 +9,13 @@ Before you build this image please build my `docker-baseimage-rpi-raspbian` and 
 ```bash
 $ docker build -t uwegerdes/node-rpi-gpio \
 	--build-arg GPIO_GROUP="$(sed -nr "s/^gpio:x:([0-9]+):.*/\1/p" /etc/group)" \
+	--network=host \
 	.
 ```
 
 The `GPIO_GROUP` is needed to give the docker internal user `node` access to `/dev/gpio*`.
+
+`--network=host` is needed if you used hostnames for apt or npm cache services. If you used ip address or no cache servers you should omit that line.
 
 ## Usage
 
