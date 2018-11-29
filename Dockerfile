@@ -46,14 +46,9 @@ RUN apt-get update && \
 	cd ${NODE_HOME} && \
 	chown -R ${USER_NAME}:${USER_NAME} ${NODE_HOME}/package.json && \
 	npm -g config set user ${USER_NAME} && \
-	npm install -g \
+	npm install -g --cache /tmp/empty-cache \
 				gulp \
-				jshint && \
-	npm cache clean
-
-#COPY entrypoint.sh /usr/local/bin/
-#RUN chmod 755 /usr/local/bin/entrypoint.sh
-#ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+				jshint
 
 COPY . ${APP_HOME}
 
@@ -63,9 +58,7 @@ RUN echo "starting chown -R ${USER_NAME}:${USER_NAME} ${APP_HOME}" && \
 USER ${USER_NAME}
 
 RUN export NODE_TLS_REJECT_UNAUTHORIZED=0 && \
-	npm install && \
-	echo "starting npm cache clean" && \
-	npm cache clean
+	npm install --cache /tmp/empty-cache
 
 WORKDIR ${APP_HOME}
 
