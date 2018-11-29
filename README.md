@@ -4,15 +4,21 @@ Using the Raspberry Pi 3 GPIO pins with node wrapped in a docker container.
 
 ## Building
 
+Before you build this image please build my `docker-baseimage-rpi-raspbian` and `docker-rpi-nodejs`, you might want to use the following command more than once and this saves some 20 mins build time.
+
 ```bash
 $ docker build -t uwegerdes/node-rpi-gpio \
 	--build-arg GPIO_GROUP="$(sed -nr "s/^gpio:x:([0-9]+):.*/\1/p" /etc/group)" \
 	.
 ```
 
+The `GPIO_GROUP` is needed to give the docker internal user `node` access to `/dev/gpio*`.
+
 ## Usage
 
-Run the container and start tests or use the web server to control the gpio pins.
+Set up your gpio connections in `server.js` - be aware that sensor doesn't work with all gpio pins.
+
+Run the container and start tests or gulp and use the web server to control the gpio pins.
 
 ```bash
 $ docker run -it --rm \
@@ -37,4 +43,4 @@ $ pinout
 ## Helpful links
 
 - (https://www.npmjs.com/package/pigpio)[https://www.npmjs.com/package/pigpio]
-- (https://www.elektronik-kompendium.de/sites/raspberry-pi/1907101.htm)[https://www.elektronik-kompendium.de/sites/raspberry-pi/1907101.htm]
+- (https://www.elektronik-kompendium.de/sites/raspberry-pi/1907101.htm [de])[https://www.elektronik-kompendium.de/sites/raspberry-pi/1907101.htm]
