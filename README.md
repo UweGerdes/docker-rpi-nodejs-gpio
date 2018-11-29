@@ -1,4 +1,4 @@
-# Docker uwegerdes/node-rpi-gpio
+# Docker uwegerdes/rpi-nodejs-gpio
 
 Using the Raspberry Pi 3 GPIO pins with node wrapped in a docker container.
 
@@ -7,7 +7,7 @@ Using the Raspberry Pi 3 GPIO pins with node wrapped in a docker container.
 Before you build this image please build my `docker-baseimage-rpi-raspbian` and `docker-rpi-nodejs`, you might want to use the following command more than once and this saves some 20 mins build time.
 
 ```bash
-$ docker build -t uwegerdes/node-rpi-gpio \
+$ docker build -t uwegerdes/rpi-nodejs-gpio \
 	--build-arg GPIO_GROUP="$(sed -nr "s/^gpio:x:([0-9]+):.*/\1/p" /etc/group)" \
 	--network=host \
 	.
@@ -26,12 +26,12 @@ Run the container and start tests or gulp and use the web server to control the 
 ```bash
 $ docker run -it --rm \
 	-v $(pwd):/home/node/app \
-	--name gpio \
+	--name nodejs-gpio \
 	-p 8080:8080 \
 	-p 8081:8081 \
 	--privileged \
 	--cap-add SYS_RAWIO \
-	uwegerdes/node-rpi-gpio \
+	uwegerdes/rpi-nodejs-gpio \
 	bash
 ```
 
