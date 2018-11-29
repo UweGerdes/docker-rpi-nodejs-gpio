@@ -46,7 +46,7 @@ RUN apt-get update && \
 	cd ${NODE_HOME} && \
 	chown -R ${USER_NAME}:${USER_NAME} ${NODE_HOME}/package.json && \
 	npm -g config set user ${USER_NAME} && \
-	npm install -g --cache /tmp/empty-cache \
+	npm install -g --cache /tmp/root-cache \
 				gulp \
 				jshint
 
@@ -58,7 +58,7 @@ RUN echo "starting chown -R ${USER_NAME}:${USER_NAME} ${APP_HOME}" && \
 USER ${USER_NAME}
 
 RUN export NODE_TLS_REJECT_UNAUTHORIZED=0 && \
-	npm install --cache /tmp/empty-cache
+	npm install --cache /tmp/node-cache
 
 WORKDIR ${APP_HOME}
 
