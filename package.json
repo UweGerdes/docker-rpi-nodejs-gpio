@@ -43,7 +43,6 @@
     "jsdom": "11.10.0",
     "jshint": "^2.9.5",
     "less-plugin-glob": "^2.0.2",
-    "node-ipc": "^9.1.1",
     "stream-combiner2": "^1.1.1",
     "sudo": "^1.0.3"
   },
