@@ -30,9 +30,10 @@ const gulp = require('gulp'),
 gulp.task('default', (callback) => {
   if (process.env.NODE_ENV == 'development') {
     sequence(
-/*      'lint',
+      'lint',
       'build',
-*/      'watch',
+      'watch',
+      'gpio-start',
       'livereload-start',
       'server-start',
       callback);

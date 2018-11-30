@@ -43,6 +43,7 @@
     "jsdom": "11.10.0",
     "jshint": "^2.9.5",
     "less-plugin-glob": "^2.0.2",
+    "node-ipc": "^9.1.1",
     "stream-combiner2": "^1.1.1",
     "sudo": "^1.0.3"
   },
@@ -52,7 +53,9 @@
   },
   "scripts": {
     "start": "gulp",
+    "dev": "nodemon --watch gulpfile.js --watch gulp --watch configuration.yaml --delay 1 --exec gulp",
     "blink": "node blink.js",
-    "pwm-ryg": "sudo node pwm-ryg.js"
+    "pwm-ryg": "sudo node pwm-ryg.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   }
 }

@@ -48,7 +48,7 @@ RUN apt-get update && \
 	npm -g config set user ${USER_NAME} && \
 	npm install -g --cache /tmp/root-cache \
 				gulp \
-				jshint
+				nodemon
 
 COPY . ${APP_HOME}
 

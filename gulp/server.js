@@ -5,17 +5,23 @@
  */
 'use strict';
 
-const gulp = require('gulp'),
+const { spawn } = require('child_process'),
+  gulp = require('gulp'),
   changedInPlace = require('gulp-changed-in-place'),
   server = require('gulp-develop-server'),
   livereload = require('gulp-livereload'),
   notify = require('gulp-notify'),
   sequence = require('gulp-sequence'),
+  path = require('path'),
   config = require('../lib/config'),
   ipv4addresses = require('../lib/ipv4addresses.js'),
   loadTasks = require('./lib/load-tasks'),
   log = require('../lib/log')
   ;
+
+const baseDir = path.join(__dirname, '..');
+
+let gpioServer;
 
 /**
  * log only to console, not GUI
@@ -39,7 +45,7 @@ const tasks = {
     if (process.env.NODE_ENV == 'development') {
       sequence(
         'server-changed',
-        'tests',
+        //'tests',
         callback
       );
     } else {
@@ -62,6 +68,51 @@ const tasks = {
       .pipe(livereload())
       .pipe(pipeLog({ message: 'livereload: <%= file.path %>', title: 'Gulp livereload' }))
       ;
+  },
+  /**
+   * ### gpio server start task
+   *
+   * @task gpio-start
+   * @namespace tasks
+   * @param {function} callback - gulp callback
+   */
+  'gpio-restart': (callback) => {
+    sequence(
+      'gpio-stop',
+      'gpio-start',
+      callback
+    );
+  },
+  /**
+   * ### gpio server start task
+   *
+   * @task gpio-start
+   * @namespace tasks
+   * @param {function} callback - gulp callback
+   */
+  'gpio-start': (callback) => {
+    gpioServer = spawn('/usr/bin/sudo', ['/usr/bin/nodejs', 'gpio.js'], { cwd: baseDir });
+    gpioServer.stdout.on('data', (data) => { // jscs:ignore jsDoc
+      console.log(`gpio stdout: ${data}`);
+    });
+    gpioServer.stderr.on('data', (data) => { // jscs:ignore jsDoc
+      console.log(`stderr: ${data}`);
+    });
+    gpioServer.on('close', (code) => { // jscs:ignore jsDoc
+      console.log(`child process exited with code ${code}`);
+    });
+    callback();
+  },
+  /**
+   * ### gpio server stop task
+   *
+   * @task gpio-stop
+   * @namespace tasks
+   * @param {function} callback - gulp callback
+   */
+  'gpio-stop': (callback) => {
+    gpioServer.kill('SIGHUP');
+    callback();
   },
   /**
    * ### server start task
