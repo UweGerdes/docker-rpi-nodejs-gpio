@@ -1,0 +1,65 @@
+#
+#  Configuration for docker-rpi-nodejs-gpio
+#
+
+gulp:
+  watch:
+    js:
+      - 'src/js/*.js'
+    jsdoc:
+      - '*.js'
+      - 'gulp/**/*.js'
+      - 'lib/**/*.js'
+      - 'src/**/*.js'
+    jshint:
+      - '*.js'
+      - 'gulp/**/*.js'
+      - 'lib/**/*.js'
+      - 'src/**/*.js'
+    jsonlint:
+      - '**/*.json'
+      - '.jscsrc'
+      - '.jshintrc'
+      - '.lesshintrc'
+    lesshint:
+      - 'src/less/**/*.less'
+    yamllint:
+      - '**/*.yaml'
+      - '**/*.yml'
+    ejslint:
+      - '**/*.ejs'
+    puglint:
+      - '**/*.pug'
+    less:
+      - 'src/less/gpio.less'
+      - 'src/less/**/*.less'
+    server-restart:
+      - './server.js'
+    livereload:
+      - 'public/**/*.html'
+      - 'public/css/gpio.css'
+      - 'public/js/**/*.js'
+  build:
+    jsdoc:
+      src:
+        - '*.js'
+        - 'gulp/**/*.js'
+        - 'lib/**/*.js'
+        - 'modules/**/*.js'
+        - 'src/**/*.js'
+      dest: 'docs/jsdoc'
+    js:
+      src: 'src/js/*.js'
+      dest: 'public/js'
+      replace:
+        '/js': ''
+    less:
+      src: 'src/less/gpio.less'
+      dest: 'public/css'
+
+server:
+  server: './server.js'
+  docroot: ./public
+  httpPort: 8080
+  livereloadPort: 8081
+  verbose: false

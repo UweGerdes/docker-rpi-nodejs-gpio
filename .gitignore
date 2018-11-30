@@ -1,5 +1,5 @@
 #
 *.log
+docs/
 public/css/
 public/js/
-

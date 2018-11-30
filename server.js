@@ -8,12 +8,15 @@
 
 'use strict';
 
-var http = require('http').createServer(handler),
-    path = require('path'),
-    fs = require('fs'),
-    os = require('os'),
-    io = require('socket.io')(http),
-    url = require('url');
+var chalk = require('chalk'),
+  fs = require('fs'),
+  http = require('http').createServer(handler),
+  io = require('socket.io')(http),
+  path = require('path'),
+  os = require('os'),
+  url = require('url'),
+  config = require('./lib/config'),
+  ipv4addresses = require('./lib/ipv4addresses');
 
 var serverPort = process.env.SERVER_HTTP || 8080;
 var socket;
@@ -47,9 +50,10 @@ console.log(items['Blaue LED'].toString());
 */
 
 http.listen(serverPort);
-console.log('server listening on http://' + ipv4adresses()[0] + ':' + serverPort);
+console.log('server listening on ' +
+  chalk.greenBright('http://' + ipv4addresses.get()[0] + ':' + config.server.httpPort));
 
-function handler (request, response) { //what to do on requests to port 8080
+function handler (request, response) {
   var uri = url.parse(request.url).pathname,
       filename = path.join(process.cwd(), 'public', uri.replace(/\/$/, '/index.html'));
 
@@ -212,18 +216,4 @@ function getItems() {
     result[item] = items[item].getData();
   });
   return result;
-}
-
-function ipv4adresses() {
-	var addresses = [];
-	var interfaces = os.networkInterfaces();
-	for (var k in interfaces) {
-		for (var k2 in interfaces[k]) {
-			var address = interfaces[k][k2];
-			if (address.family === 'IPv4' && !address.internal) {
-				addresses.push(address.address);
-			}
-		}
-	}
-	return addresses;
 }
