@@ -91,7 +91,7 @@ const tasks = {
    * @param {function} callback - gulp callback
    */
   'gpio-start': (callback) => {
-    gpioServer = spawn('/usr/bin/sudo', ['/usr/bin/nodejs', 'gpio.js'], { cwd: baseDir });
+    gpioServer = spawn('sudo', ['node', 'gpio.js'], { cwd: baseDir });
     gpioServer.stdout.on('data', (data) => { // jscs:ignore jsDoc
       console.log(`gpio stdout: ${data}`);
     });
@@ -111,8 +111,11 @@ const tasks = {
    * @param {function} callback - gulp callback
    */
   'gpio-stop': (callback) => {
-    gpioServer.kill('SIGHUP');
-    callback();
+    const kill = spawn('sudo', ['pkill', '-f', 'sudo node gpio.js']);
+    kill.on('close', (code) => { // jscs:ignore jsDoc
+      console.log(`child process exited with code ${code}`);
+      callback();
+    });
   },
   /**
    * ### server start task
@@ -156,5 +159,17 @@ const tasks = {
       ipv4addresses.get()[0] + ':' + config.server.livereloadPort);
   }
 };
+
+process.once('SIGTERM', exitHandler);
+process.once('SIGUSR2', exitHandler);
+
+function exitHandler() { // jscs:ignore jsDoc
+  console.log('stop gpio server');
+  gpioServer.kill('SIGUSR2');
+  setTimeout(() => { // jscs:ignore jsDoc
+    console.log('shutting down gulp server');
+    process.exit(0);
+  }, 500);
+}
 
 loadTasks.importTasks(tasks);

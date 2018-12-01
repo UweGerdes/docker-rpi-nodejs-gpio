@@ -139,11 +139,11 @@ io.sockets.on('connection', function (sock) { // jscs:ignore jsDoc
   });
 });
 
-//process.on('SIGINT', exitHandler);
-process.on('SIGTERM', exitHandler);
+process.once('SIGUSR2', exitHandler);
+process.once('SIGTERM', exitHandler);
 
 function exitHandler() { // jscs:ignore jsDoc
-  //allOff();
+  console.log('server exiting');
   process.exit();
 }
 

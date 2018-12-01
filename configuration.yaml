@@ -7,10 +7,10 @@ gulp:
     js:
       - 'src/js/*.js'
     jsdoc:
-      - '*.js'
+#      - '*.js'
 #      - 'gulp/**/*.js'
 #      - 'lib/**/*.js'
-#      - 'src/**/*.js'
+      - 'src/**/*.js'
     jshint:
       - '*.js'
       - 'gulp/**/*.js'
@@ -36,7 +36,7 @@ gulp:
     server-restart:
       - './server.js'
     gpio-restart:
-      - '/gpio.js'
+      - './gpio.js'
     livereload:
       - 'public/**/*.html'
       - 'public/css/gpio.css'

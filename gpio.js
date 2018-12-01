@@ -38,3 +38,16 @@ ipc.serveNet(
 );
 
 ipc.server.start();
+
+process.once('SIGUSR2', exitHandler2);
+process.once('SIGTERM', exitHandler);
+
+function exitHandler() { // jscs:ignore jsDoc
+  console.log('gpio exiting');
+  process.exit();
+}
+
+function exitHandler2() { // jscs:ignore jsDoc
+  console.log('gpio exiting 2');
+  process.exit();
+}
