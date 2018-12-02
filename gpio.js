@@ -7,12 +7,15 @@
 
 const ipc = require('node-ipc');
 
+const devices = {};
+devices.LED = require('./lib/led.js');
+devices.RGBLED = require('./lib/rgbled.js');
+devices.Servo = require('./lib/servo.js');
+devices.Button = require('./lib/button.js');
+devices.Sensor = require('./lib/sensor.js');
+
+const objects = {};
 const items = {};
-items.Led = require('./lib/led.js');
-items.RGBLed = require('./lib/rgbled.js');
-items.Servo = require('./lib/servo.js');
-items.Button = require('./lib/button.js');
-items.Sensor = require('./lib/sensor.js');
 
 ipc.config.id = 'gpio';
 ipc.config.retry = 1500;
@@ -23,31 +26,45 @@ ipc.serveNet(
     ipc.server.on(
       'app.create',
       (data, socket) => { // jscs:ignore jsDoc
-        ipc.log('gpio received:', data);
+        if (!objects[data.group]) {
+          objects[data.group] = { };
+        }
+        if (!items[data.group]) {
+          items[data.group] = { };
+        }
+        objects[data.group][data.name] = new devices[data.data.type](data.data);
+        items[data.group][data.name] = objects[data.group][data.name].getData();
         ipc.server.emit(
           socket,
-          'app.message',
+          'app.created',
           {
             id: ipc.config.id,
-            created: data
+            group: data.group,
+            name: data.name,
+            data: items[data.group][data.name]
           }
         );
+      }
+    );
+    ipc.server.on(
+      'app.off',
+      (data, socket) => { // jscs:ignore jsDoc
+        if (objects[data.group][data.name].off) {
+          console.log('app.off:', data);
+          objects[data.group][data.name].off();
+          items[data.group][data.name] = objects[data.group][data.name].getData();
+          ipc.server.emit(
+            socket,
+            'app.message',
+            {
+              id: ipc.config.id,
+              off: items[data.group][data.name]
+            }
+          );
+        }
       }
     );
   }
 );
 
 ipc.server.start();
-
-process.once('SIGUSR2', exitHandler2);
-process.once('SIGTERM', exitHandler);
-
-function exitHandler() { // jscs:ignore jsDoc
-  console.log('gpio exiting');
-  process.exit();
-}
-
-function exitHandler2() { // jscs:ignore jsDoc
-  console.log('gpio exiting 2');
-  process.exit();
-}

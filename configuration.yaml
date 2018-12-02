@@ -60,36 +60,36 @@ gulp:
       dest: 'public/css'
 
 gpio:
-  'LEDs':
+  LED:
     'LED 1':
-      type: 'Led'
+      type: 'LED'
       gpio: 17
       color: 'red'
       range: { min: 1, max: 255 }
     'LED 2':
-      type: 'Led'
+      type: 'LED'
       gpio: 27
       color: 'yellow'
       range: { min: 1, max: 255 }
     'LED 3':
-      type: 'Led'
+      type: 'LED'
       gpio: 22
       color: 'green'
       range: { min: 1, max: 51 }
     'LED 4':
-      type: 'Led'
+      type: 'LED'
       gpio: 10
       color: 'blue'
       range: { min: 1, max: 255 }
-  'RGB LEDs':
+  RGB_LED:
     'RGB LED 1':
-      type: 'RGBLed'
+      type: 'RGBLED'
       gpio: { red: 23, green: 24, blue: 25 }
     'RGB LED 2':
-      type: 'RGBLed'
+      type: 'RGBLED'
       gpio: { red: 21, green: 20, blue: 16 }
     'RGB LED 3':
-      type: 'RGBLed'
+      type: 'RGBLED'
       gpio: { red: 26, green: 19, blue: 13 }
   Servo:
     'Servo 1':

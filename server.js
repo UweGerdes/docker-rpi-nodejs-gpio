@@ -21,6 +21,8 @@ const serverPort = config.server.httpPort || process.env.SERVER_HTTP || 8080;
 let socket;
 
 let items = {};
+let items2 = {};
+
 /*
 const Led = require('./lib/led.js');
 const RGBLed = require('./lib/rgbled.js');
@@ -50,7 +52,7 @@ setTimeout( items['Blaue LED'].blinkOff.bind(items['Blaue LED']) , 3300);
 console.log(items['Blaue LED'].toString());
 */
 
-//http.listen(serverPort);
+http.listen(serverPort);
 console.log('server listening on ' +
   chalk.greenBright('http://' + ipv4addresses.get()[0] + ':' + serverPort));
 
@@ -134,8 +136,8 @@ io.sockets.on('connection', function (sock) { // jscs:ignore jsDoc
   socket.on('LEDsmooth', (timeout) => { // jscs:ignore jsDoc
     smooth(['LED 1', 'LED 2', 'LED 3', 'LED 4'], timeout);
   });
-  socket.on('getData', () => { // jscs:ignore jsDoc
-    socket.emit('data', getItems());
+  socket.on('getItems', () => { // jscs:ignore jsDoc
+    socket.emit('items', items2);
   });
 });
 
@@ -148,6 +150,19 @@ function exitHandler() { // jscs:ignore jsDoc
 }
 
 function allOff() { // jscs:ignore jsDoc
+  console.log('allOff');
+  for (const [group, list] of Object.entries(config.gpio)) {
+    //console.log('group', group);
+    for (const name of Object.keys(list)) {
+      ipc.of.gpio.emit(
+        'app.off',
+        {
+          group: group,
+          name: name
+        }
+      );
+    }
+  }
   /*
   Object.keys(items).forEach((item) => { // jscs:ignore jsDoc
     const data = items[item].getData();
@@ -236,15 +251,13 @@ ipc.connectToNet(
       'connect',
       () => { // jscs:ignore jsDoc
         for (const [group, list] of Object.entries(config.gpio)) {
-          console.log('group', group);
-          items[group] = [];
+          //console.log('group', group);
           for (const [name, data] of Object.entries(list)) {
-            //ipc.log('## connected to gpio ##', ipc.config.delay);
             ipc.of.gpio.emit(
               'app.create',
               {
                 group: group,
-                id: name,
+                name: name,
                 data: data
               }
             );
@@ -259,9 +272,22 @@ ipc.connectToNet(
       }
     );
     ipc.of.gpio.on(
+      'app.created',
+      (data) => { // jscs:ignore jsDoc
+        console.log(data.id + '.created:', data);
+        if (!items2[data.group]) {
+          items2[data.group] = { };
+        }
+        items2[data.group][data.name] = data.data;
+        if (socket) {
+          socket.emit(data.id + '.created', data);
+        }
+      }
+    );
+    ipc.of.gpio.on(
       'app.message',
       (message) => { // jscs:ignore jsDoc
-        ipc.log('got a message from gpio:', message);
+        ipc.log('server:', message);
       }
     );
 

@@ -5,60 +5,68 @@
 /* globals socket */
 //var socket = io(); //loaded in html
 
-var changedPicker = false;
+let changedPicker = false;
 
 window.addEventListener('load', documentLoaded);
 
-function documentLoaded() {
-  var allOff = document.getElementById('allOff');
-  allOff.addEventListener('click', function() {
+function documentLoaded() { // jscs:ignore jsDoc
+  const allOff = document.getElementById('allOff');
+  allOff.addEventListener('click', () => { // jscs:ignore jsDoc
     socket.emit('allOff', true);
   });
-  var allOn = document.getElementById('allOn');
-  allOn.addEventListener('click', function() {
+  const allOn = document.getElementById('allOn');
+  allOn.addEventListener('click', () => { // jscs:ignore jsDoc
     socket.emit('allOn', true);
   });
-  var smooth = document.getElementById('smooth');
-  smooth.addEventListener('click', function() {
+  const smooth = document.getElementById('smooth');
+  smooth.addEventListener('click', () => { // jscs:ignore jsDoc
     socket.emit('smooth', 2000);
   });
-  document.getElementById('RGBsmooth').addEventListener('click', function() {
+  document.getElementById('RGBsmooth').addEventListener('click', () => { // jscs:ignore jsDoc
     socket.emit('RGBsmooth', 2000);
   });
-  document.getElementById('LEDsmooth').addEventListener('click', function() {
+  document.getElementById('LEDsmooth').addEventListener('click', () => { // jscs:ignore jsDoc
     socket.emit('LEDsmooth', 2000);
   });
-  socket.emit('getData', true);
+  socket.emit('getItems', true);
 }
 
-socket.on('data', function(data) {
-  var container = document.getElementById('elementContainer');
+socket.on('items', (items) => { // jscs:ignore jsDoc
+  const container = document.getElementById('elementContainer');
   if (container) {
-    createElements(container, data);
+    createElements(container, items);
   }
 });
 
-function createElements(container, data) {
-  if (container.childNodes.length > 0) {
+socket.on('gpio.created', (data) => { // jscs:ignore jsDoc
+  console.log('gpio.created:', data);
+});
+
+function createElements(container, data) { // jscs:ignore jsDoc
+  while (container.childNodes.length > 0) {
     //container.childNodes[0].removeEventListener
     container.removeChild(container.childNodes[0]);
   }
-  var newDiv = document.createElement('div');
-  Object.keys(data).forEach( (item) => {
-    newDiv.appendChild(createElement(item, data[item]));
-  });
-  container.appendChild(newDiv);
+  for (const [name, items] of Object.entries(data)) {
+    const newDiv = document.createElement('div');
+    newDiv.setAttribute('id', name + '_container');
+    for (const [item, data] of Object.entries(items)) { // jscs:ignore jsDoc
+      console.log('creating', name, item, data);
+      newDiv.appendChild(createElement(item, data));
+    }
+    container.appendChild(newDiv);
+  }
 }
 
-function createElement(item, data) {
-  var id = item.replace(/[^A-Za-z0-9-]/g, '_');
-  var newDiv = document.createElement('div');
+function createElement(item, data) { // jscs:ignore jsDoc
+  const id = item.replace(/[^A-Za-z0-9-]/g, '_');
+  const newDiv = document.createElement('div');
   newDiv.setAttribute('id', id + '_container');
   newDiv.setAttribute('class', data.type + '_container');
-  var newLabel = document.createElement('label');
+  const newLabel = document.createElement('label');
   newLabel.setAttribute('class', data.type + '_label' + (data.color ? ' ' + data.color : ''));
   newLabel.setAttribute('for', id);
-  var newLabelText = document.createTextNode(item);
+  const newLabelText = document.createTextNode(item);
   newLabel.appendChild(newLabelText);
   if (data.color) {
     newDiv.appendChild(makePreview(item, id, data.type, data.color, data.pwmValue));
@@ -68,44 +76,44 @@ function createElement(item, data) {
   return newDiv;
 }
 
-var elementTypes = {
+const elementTypes = {
   LED: makeLED,
   RGBLED: makeRGBLED,
-  SERVO: makeSERVO,
-  BUTTON: makeBUTTON,
-  SENSOR: makeSENSOR,
+  Servo: makeServo,
+  Button: makeButton,
+  Sensor: makeSensor,
 };
 
-function makeLED (item, id, data) {
-  var newControls = document.createElement('div');
+function makeLED(item, id, data) { // jscs:ignore jsDoc
+  const newControls = document.createElement('div');
   newControls.setAttribute('class', data.type + '_controls');
-  var element = makeRange(item, id, data.range, data.pwmValue, data.color);
+  const element = makeRange(item, id, data.range, data.pwmValue, data.color);
   newControls.appendChild(element);
   return newControls;
 }
 
-function makeRGBLED (item, id, data) {
-  var newControls = document.createElement('div');
+function makeRGBLED(item, id, data) { // jscs:ignore jsDoc
+  const newControls = document.createElement('div');
   newControls.setAttribute('class', data.type + '_controls');
-  data.color.forEach(function(color) {
-    var element = makeRange(item, id, data.range[color], data.pwmValue[color], color);
+  data.color.forEach((color) => { // jscs:ignore jsDoc
+    const element = makeRange(item, id, data.range[color], data.pwmValue[color], color);
     newControls.appendChild(element);
   });
-  var element = document.createElement('input');
+  const element = document.createElement('input');
   element.setAttribute('id', id + '_picker');
   element.setAttribute('type', 'color');
   element.setAttribute('value', rgbToHex(data.pwmValue));
-  element.addEventListener('change', function() {
+  element.addEventListener('change', () => { // jscs:ignore jsDoc
     changedPicker = true;
-    var color = hexToRgb(this.value);
-    Object.keys(color).forEach( (col) => {
+    const color = hexToRgb(this.value);
+    Object.keys(color).forEach((col) => { // jscs:ignore jsDoc
       socket.emit(item, { color: col, pwmValue: color[col] });
     });
   });
   newControls.appendChild(element);
-  socket.on(item, function(result) {
-    var color = result;
-    if ( ! changedPicker ) {
+  socket.on(item, (result) => { // jscs:ignore jsDoc
+    const color = result;
+    if (!changedPicker) {
       setRgbColor(id, color);
     }
     changedPicker = false;
@@ -113,11 +121,11 @@ function makeRGBLED (item, id, data) {
   return newControls;
 }
 
-function makePreview(item, id, type, color, pwmValue) {
-  var element = document.createElement('div');
+function makePreview(item, id, type, color, pwmValue = 0) { // jscs:ignore jsDoc
+  const element = document.createElement('div');
   element.setAttribute('id', id + '_preview');
   element.setAttribute('class', type + '_preview');
-  var pwm = {};
+  let pwm = {};
   if (typeof pwmValue === 'number') {
     pwm[color] = pwmValue;
   } else {
@@ -129,14 +137,14 @@ function makePreview(item, id, type, color, pwmValue) {
   }
   element.setAttribute('data-pwmValue', pwm, rgbToHex(pwm));
   element.style.backgroundColor = rgbToHex(pwm);
-  socket.on(item, function(data) {
+  socket.on(item, (data) => { // jscs:ignore jsDoc
     element.style.backgroundColor = rgbToHex(data);
   });
   return element;
 }
 
-function makeRange(item, id, range, pwmValue, color) {
-  var element = document.createElement('input');
+function makeRange(item, id, range, pwmValue, color) { // jscs:ignore jsDoc
+  const element = document.createElement('input');
   element.setAttribute('id', id + '_' + color);
   element.setAttribute('type', 'range');
   element.setAttribute('min', range.min);
@@ -144,21 +152,21 @@ function makeRange(item, id, range, pwmValue, color) {
   element.setAttribute('value', pwmValue < 0 ? '0' : pwmValue);
   element.setAttribute('class', 'slider ' + color);
   try {
-    addRule('#' + id + '_' + color + '::-webkit-slider-thumb', { 'background': color } );
-  } catch(e) { /* not webkit */ }
+    addRule('#' + id + '_' + color + '::-webkit-slider-thumb', { 'background': color });
+  } catch (e) { /* not webkit */ }
   try {
-    addRule('#' + id + '_' + color + '::-moz-range-thumb', { 'background': color } );
-  } catch(e) { /* not mozilla */ }
-  element.addEventListener('change', function() {
-    socket.emit(item, { color: color, pwmValue: parseInt(this.value) } );
+    addRule('#' + id + '_' + color + '::-moz-range-thumb', { 'background': color });
+  } catch (e) { /* not mozilla */ }
+  element.addEventListener('change', () => { // jscs:ignore jsDoc
+    socket.emit(item, { color: color, pwmValue: parseInt(this.value) });
   });
   return element;
 }
 
-function makeSERVO (item, id, data) {
-  var div = document.createElement('div');
+function makeServo(item, id, data) { // jscs:ignore jsDoc
+  const div = document.createElement('div');
   div.setAttribute('class', data.type + '_controls');
-  div.appendChild(makeServoButtons(item, id, data, 
+  div.appendChild(makeServoButtons(item, id, data,
       {
         'Links': data.range.min,
         'Halblinks': data.range.min + (data.range.max - data.range.min) / 4,
@@ -170,38 +178,38 @@ function makeSERVO (item, id, data) {
   return div;
 }
 
-function makeServoRange(item, id, range, rangeValue, color) {
-  var element = document.createElement('input');
+function makeServoRange(item, id, range, rangeValue, color) { // jscs:ignore jsDoc
+  const element = document.createElement('input');
   element.setAttribute('id', id + '_' + color);
   element.setAttribute('type', 'range');
   element.setAttribute('min', range.min);
   element.setAttribute('max', range.max);
   element.setAttribute('value', rangeValue < 0 ? '0' : rangeValue);
   element.setAttribute('class', 'slider range');
-  element.addEventListener('change', function() {
-    socket.emit(item, { value: parseInt(this.value) } );
+  element.addEventListener('change', () => { // jscs:ignore jsDoc
+    socket.emit(item, { value: parseInt(this.value) });
   });
-  socket.on(item, function(value) {
+  socket.on(item, (value) => { // jscs:ignore jsDoc
     element.value = value;
   });
   return element;
 }
 
-function makeServoButtons(item, id, data, values) {
-  var container = document.createElement('div');
+function makeServoButtons(item, id, data, values) { // jscs:ignore jsDoc
+  const container = document.createElement('div');
   container.setAttribute('class', 'controlButtons');
-  var buttonContainer = document.createElement('div');
+  const buttonContainer = document.createElement('div');
   buttonContainer.setAttribute('class', 'buttonContainer');
-  Object.keys(values).forEach( (key) => {
-    var button = document.createElement('button');
+  Object.keys(values).forEach((key) => { // jscs:ignore jsDoc
+    const button = document.createElement('button');
     button.setAttribute('id', id + '_' + key.replace(/ /g, '_'));
     button.setAttribute('name', id + '_' + key.replace(/ /g, '_'));
     button.setAttribute('value', values[key]);
     button.setAttribute('class', 'button');
-    var buttonText = document.createTextNode(key);
+    const buttonText = document.createTextNode(key);
     button.appendChild(buttonText);
-    button.addEventListener('click', function() {
-      socket.emit(item, { value: parseInt(this.value) } );
+    button.addEventListener('click', () => { // jscs:ignore jsDoc
+      socket.emit(item, { value: parseInt(this.value) });
     });
     buttonContainer.appendChild(button);
   });
@@ -209,52 +217,53 @@ function makeServoButtons(item, id, data, values) {
   return container;
 }
 
-function makeBUTTON (item, id, data) {
-  var div = document.createElement('div');
+function makeButton(item, id, data) { // jscs:ignore jsDoc
+  const div = document.createElement('div');
   div.setAttribute('class', data.type + '_status');
-  var element = document.createElement('input');
+  const element = document.createElement('input');
   element.setAttribute('id', id + '_checkbox');
   element.setAttribute('type', 'checkbox');
   div.appendChild(element);
-  socket.on(item, function(value) {
+  socket.on(item, (value) => { // jscs:ignore jsDoc
     console.log('button value: ' + value);
     element.checked = value === 1;
   });
   return div;
 }
 
-function makeSENSOR (item, id, data) {
-  var div = document.createElement('div');
+function makeSensor(item, id, data) { // jscs:ignore jsDoc
+  const div = document.createElement('div');
   div.setAttribute('class', data.type + '_status');
-  var element = document.createElement('input');
+  const element = document.createElement('input');
   element.setAttribute('id', id + '_checkbox');
   element.setAttribute('type', 'checkbox');
   div.appendChild(element);
-  socket.on(item, function() {
+  socket.on(item, () => { // jscs:ignore jsDoc
     console.log('sensor touched');
-    element.checked = ! element.checked;
+    element.checked = !element.checked;
   });
   return div;
 }
 
-var addRule = (function (style) {
-  var sheet = document.head.appendChild(style).sheet;
-  return function (selector, css) {
-    var propText = typeof css === 'string' ? css : Object.keys(css).map(function (p) {
-      return p + ':' + (p === 'content' ? '\'' + css[p] + '\'' : css[p]);
-    }).join(';');
+const addRule = ((style) => { // jscs:ignore jsDoc
+  const sheet = document.head.appendChild(style).sheet;
+  return function (selector, css) { // jscs:ignore jsDoc
+    const propText = typeof css === 'string' ? css : Object.keys(css).map(
+      function (p) { // jscs:ignore jsDoc
+        return p + ':' + (p === 'content' ? '\'' + css[p] + '\'' : css[p]);
+      }).join(';');
     sheet.insertRule(selector + '{' + propText + '}', sheet.cssRules.length);
   };
 })(document.createElement('style'));
 
-function hexToRgb(hex) {
+function hexToRgb(hex) { // jscs:ignore jsDoc
   // Expand shorthand form (e.g. '03F') to full form (e.g. '0033FF')
-  var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-  hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+  const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+  hex = hex.replace(shorthandRegex, (m, r, g, b) => { // jscs:ignore jsDoc
     return r + r + g + g + b + b;
   });
 
-  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result ? {
     red: parseInt(result[1], 16),
     green: Math.round(parseInt(result[2], 16) / 5),
@@ -262,23 +271,23 @@ function hexToRgb(hex) {
   } : null;
 }
 
-function componentToHex(c) {
-  var hex = '00';
+function componentToHex(c) { // jscs:ignore jsDoc
+  let hex = '00';
   if (c) {
     hex = c.toString(16);
   }
   return hex.length == 1 ? '0' + hex : hex;
 }
 
-function rgbToHex(color) {
-  var hex = '';
+function rgbToHex(color) { // jscs:ignore jsDoc
+  let hex = '';
   if (Object.keys(color)[0] == 'yellow') {
     hex += componentToHex(color.yellow);
     hex += hex;
     hex += '00';
   } else {
-    ['red', 'green', 'blue'].forEach(function(rgb) {
-      var col = color[rgb];
+    ['red', 'green', 'blue'].forEach((rgb) => { // jscs:ignore jsDoc
+      let col = color[rgb];
       if (typeof col == 'string') {
         col = parseInt(col);
       }
@@ -289,10 +298,9 @@ function rgbToHex(color) {
   return '#' + hex;
 }
 
-function setRgbColor(id, color) {
-  ['red', 'green', 'blue'].forEach(function(rgb) {
+function setRgbColor(id, color) { // jscs:ignore jsDoc
+  ['red', 'green', 'blue'].forEach((rgb) => { // jscs:ignore jsDoc
     document.getElementById(id + '_' + rgb).value = color[rgb];
   });
   document.getElementById(id + '_picker').setAttribute('value', rgbToHex(color));
 }
-
