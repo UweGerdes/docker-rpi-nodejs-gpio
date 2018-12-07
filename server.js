@@ -193,12 +193,12 @@ function allOff() { // jscs:ignore jsDoc
   console.log('allOff');
   for (const [group, list] of Object.entries(config.gpio)) {
     //console.log('group', group);
-    for (const name of Object.keys(list)) {
+    for (const item of Object.keys(list)) {
       ipc.of.gpio.emit(
         'app.off',
         {
           group: group,
-          name: name
+          item: item
         }
       );
     }

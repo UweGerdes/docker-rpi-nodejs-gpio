@@ -71,16 +71,17 @@ ipc.serveNet(
     ipc.server.on(
       'app.off',
       (data, socket) => { // jscs:ignore jsDoc
-        if (objects[data.group][data.name].off) {
+        if (objects[data.group][data.item].off) {
           console.log('app.off:', data);
-          objects[data.group][data.name].off();
-          items[data.group][data.name] = objects[data.group][data.name].getData();
+          objects[data.group][data.item].off();
+          items[data.group][data.item] = objects[data.group][data.item].getData();
           ipc.server.emit(
             socket,
-            'app.message',
+            'app.item.data',
             {
-              id: ipc.config.id,
-              off: items[data.group][data.name]
+              group: data.group,
+              item: data.item,
+              data: objects[data.group][data.item].getData()
             }
           );
         }

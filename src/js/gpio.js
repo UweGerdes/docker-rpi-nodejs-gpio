@@ -192,6 +192,20 @@ function makeRange(group, item, id, range, pwmValue, color) { // jscs:ignore jsD
       }
     );
   });
+  socket.on('item.data.' + group + '.' + item, (data) => { // jscs:ignore jsDoc
+    if (data.color && typeof data.color === 'string') {
+      element.value = data.pwmValue <= 0 ? '1' : data.pwmValue;
+    } else if (data.pwmValue) {
+      if (data.pwmValue[color] >= 0) {
+        element.value = data.pwmValue[color] <= 0 ? '1' : data.pwmValue[color];
+        console.log('SET item.data.' + group + '.' + item, color,
+          data.pwmValue[color] <= 0 ? '1' : data.pwmValue[color],
+          element.getAttribute('id'));
+      }
+    } else {
+      console.log('ERROR item.data.' + group + '.' + item, data);
+    }
+  });
   return element;
 }
 
@@ -339,12 +353,3 @@ function rgbToHex(color) { // jscs:ignore jsDoc
   }
   return '#' + hex;
 }
-
-/*
-function setRgbColor(id, color) { // jscs:ignore jsDoc
-  ['red', 'green', 'blue'].forEach((rgb) => { // jscs:ignore jsDoc
-    document.getElementById(id + '_' + rgb).value = color[rgb];
-  });
-  document.getElementById(id + '_picker').setAttribute('value', rgbToHex(color));
-}
-*/
