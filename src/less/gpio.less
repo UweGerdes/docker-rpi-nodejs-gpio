@@ -23,6 +23,14 @@
   padding: .5em .6em;
 }
 
+.element_container {
+  &:after {
+    clear: both;
+    content: '';
+    display: table;
+  }
+}
+
 @import 'inc/slider';
 
 .LED,
@@ -75,6 +83,7 @@
     text-align: center;
   }
 }
+
 @media (min-width: 1024px) {
   .LED {
     &_container {
@@ -89,4 +98,3 @@
     }
   }
 }
-
