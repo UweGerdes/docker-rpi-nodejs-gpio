@@ -47,6 +47,29 @@ ipc.serveNet(
       }
     );
     ipc.server.on(
+      'app.setValue',
+      (data, socket) => { // jscs:ignore jsDoc
+        if (objects[data.group] &&
+            objects[data.group][data.item] &&
+            objects[data.group][data.item].setValue
+        ) {
+          objects[data.group][data.item].setValue(data);
+          ipc.server.emit(
+            socket,
+            'app.item.data',
+            {
+              group: data.group,
+              item: data.item,
+              data: objects[data.group][data.item].getData()
+            }
+          );
+          console.log('setValue new', objects[data.group][data.item].getData());
+        } else {
+          console.log('no setValue for', data);
+        }
+      }
+    );
+    ipc.server.on(
       'app.off',
       (data, socket) => { // jscs:ignore jsDoc
         if (objects[data.group][data.name].off) {

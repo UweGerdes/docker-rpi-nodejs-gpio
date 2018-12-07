@@ -38,6 +38,10 @@ socket.on('items', (items) => { // jscs:ignore jsDoc
   }
 });
 
+socket.on('item.data', (data) => { // jscs:ignore jsDoc
+  console.log('item.data', data);
+});
+
 function createElements(container, data) { // jscs:ignore jsDoc
   while (container.childNodes.length > 0) {
     //container.childNodes[0].removeEventListener

@@ -11,6 +11,7 @@
 const chalk = require('chalk'),
   fs = require('fs'),
   http = require('http').createServer(handler),
+  ipc = require('node-ipc'),
   io = require('socket.io')(http),
   path = require('path'),
   url = require('url'),
@@ -23,34 +24,69 @@ let socket;
 let items = {};
 let items2 = {};
 
-/*
-const Led = require('./lib/led.js');
-const RGBLed = require('./lib/rgbled.js');
-const Servo = require('./lib/servo.js');
-const Button = require('./lib/button.js');
-const Sensor = require('./lib/sensor.js');
-items['LED 1'] = new Led(17, 'red', {min: 1, max: 255} );
-items['LED 2'] = new Led(27, 'yellow', {min: 1, max: 255} );
-items['LED 3'] = new Led(22, 'green', {min: 1, max: 51} );
-items['LED 4'] = new Led(10, 'blue', {min: 1, max: 255} );
-items['RGB LED 1'] = new RGBLed({ red: 23, green: 24, blue: 25});
-items['RGB LED 2'] = new RGBLed({ red: 21, green: 20, blue: 16});
-items['RGB LED 3'] = new RGBLed({ red: 26, green: 19, blue: 13});
-items['Servo 1'] = new Servo(18);
-items['Button 1'] = new Button(7, buttonCallback('Button 1'));
-items['Sensor 1'] = new Sensor(8, sensorCallback('Sensor 1'));
-*/
+ipc.config.id = 'client';
+ipc.config.retry = 1000;
+ipc.config.silent = true;
 
-/*
-console.log(items['Blaue LED'].toString());
-//items['Blaue LED'].onOff(500);
-items['Blaue LED'].on();
-console.log(items['Blaue LED'].toString());
-items['Blaue LED'].blink(500);
-setTimeout( items['Blaue LED'].blinkOff.bind(items['Blaue LED']) , 3300);
-//items['Blaue LED'].onOff(1000);
-console.log(items['Blaue LED'].toString());
-*/
+ipc.connectToNet(
+  'gpio',
+  () => { // jscs:ignore jsDoc
+    ipc.of.gpio.on(
+      'connect',
+      () => { // jscs:ignore jsDoc
+        for (const [group, list] of Object.entries(config.gpio)) {
+          //console.log('group', group);
+          for (const [name, data] of Object.entries(list)) {
+            ipc.of.gpio.emit(
+              'app.create',
+              {
+                group: group,
+                name: name,
+                data: data
+              }
+            );
+          }
+        }
+      }
+    );
+    ipc.of.gpio.on(
+      'disconnect',
+      () => { // jscs:ignore jsDoc
+        ipc.log('disconnected from gpio');
+      }
+    );
+    ipc.of.gpio.on(
+      'app.created',
+      (data) => { // jscs:ignore jsDoc
+        //console.log(data.id + '.created:', data);
+        if (!items2[data.group]) {
+          items2[data.group] = { };
+        }
+        items2[data.group][data.name] = data.data;
+        if (socket) {
+          socket.emit(data.id + '.created', data);
+        }
+      }
+    );
+    ipc.of.gpio.on(
+      'app.message',
+      (message) => { // jscs:ignore jsDoc
+        ipc.log('server:', message);
+      }
+    );
+    ipc.of.gpio.on(
+      'app.item.data',
+      (data) => { // jscs:ignore jsDoc
+        items2[data.group][data.name] = data.data;
+        if (socket) {
+          socket.emit('item.data', data.data);
+        }
+      }
+    );
+
+    console.log('destroy', ipc.of.gpio.destroy);
+  }
+);
 
 http.listen(serverPort);
 console.log('server listening on ' +
@@ -140,11 +176,7 @@ io.sockets.on('connection', function (sock) { // jscs:ignore jsDoc
     socket.emit('items', items2);
   });
   socket.on('setValue', (data) => { // jscs:ignore jsDoc
-    if (items2[data.group] && items2[data.group][data.item] && items2[data.group][data.item].set) {
-      items2[data.group][data.item].set(data);
-    } else {
-      console.log('no setValue for', data);
-    }
+    ipc.of.gpio.emit('app.setValue', data);
   });
 });
 
@@ -244,60 +276,3 @@ function getItems() { // jscs:ignore jsDoc
   });
   return result;
 }
-
-const ipc = require('node-ipc');
-
-ipc.config.id = 'client';
-ipc.config.retry = 1000;
-ipc.config.silent = true;
-
-ipc.connectToNet(
-  'gpio',
-  () => { // jscs:ignore jsDoc
-    ipc.of.gpio.on(
-      'connect',
-      () => { // jscs:ignore jsDoc
-        for (const [group, list] of Object.entries(config.gpio)) {
-          //console.log('group', group);
-          for (const [name, data] of Object.entries(list)) {
-            ipc.of.gpio.emit(
-              'app.create',
-              {
-                group: group,
-                name: name,
-                data: data
-              }
-            );
-          }
-        }
-      }
-    );
-    ipc.of.gpio.on(
-      'disconnect',
-      () => { // jscs:ignore jsDoc
-        ipc.log('disconnected from gpio');
-      }
-    );
-    ipc.of.gpio.on(
-      'app.created',
-      (data) => { // jscs:ignore jsDoc
-        //console.log(data.id + '.created:', data);
-        if (!items2[data.group]) {
-          items2[data.group] = { };
-        }
-        items2[data.group][data.name] = data.data;
-        if (socket) {
-          socket.emit(data.id + '.created', data);
-        }
-      }
-    );
-    ipc.of.gpio.on(
-      'app.message',
-      (message) => { // jscs:ignore jsDoc
-        ipc.log('server:', message);
-      }
-    );
-
-    console.log('destroy', ipc.of.gpio.destroy);
-  }
-);
