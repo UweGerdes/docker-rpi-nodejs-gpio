@@ -37,6 +37,7 @@ gulp:
       - './server.js'
     gpio-restart:
       - './gpio.js'
+      - 'lib/**/*.js'
     livereload:
       - 'public/**/*.html'
       - 'public/css/gpio.css'
