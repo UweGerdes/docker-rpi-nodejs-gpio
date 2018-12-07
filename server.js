@@ -77,9 +77,10 @@ ipc.connectToNet(
     ipc.of.gpio.on(
       'app.item.data',
       (data) => { // jscs:ignore jsDoc
-        items2[data.group][data.name] = data.data;
+        items2[data.group][data.item] = data.data;
+        console.log('item.data.' + data.group + '.' + data.item, data.data);
         if (socket) {
-          socket.emit('item.data', data.data);
+          socket.emit('item.data.' + data.group + '.' + data.item, data.data);
         }
       }
     );

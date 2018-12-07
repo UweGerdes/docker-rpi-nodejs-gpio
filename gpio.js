@@ -63,7 +63,6 @@ ipc.serveNet(
               data: objects[data.group][data.item].getData()
             }
           );
-          console.log('setValue new', objects[data.group][data.item].getData());
         } else {
           console.log('no setValue for', data);
         }

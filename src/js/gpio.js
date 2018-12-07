@@ -40,6 +40,7 @@ socket.on('items', (items) => { // jscs:ignore jsDoc
 
 socket.on('item.data', (data) => { // jscs:ignore jsDoc
   console.log('item.data', data);
+  //var element = document.querySelector(
 });
 
 function createElements(container, data) { // jscs:ignore jsDoc
@@ -111,18 +112,23 @@ function makeRGBLED(group, item, id, data) { // jscs:ignore jsDoc
   element.addEventListener('change', (event) => { // jscs:ignore jsDoc
     changedPicker = true;
     const color = hexToRgb(event.currentTarget.value);
-    Object.keys(color).forEach((col) => { // jscs:ignore jsDoc
-      socket.emit(item, { color: col, pwmValue: color[col] });
-    });
+    socket.emit('setValue',
+      {
+        group: group,
+        item: item,
+        pwmValue: color
+      }
+    );
+  });
+  socket.on('item.data.' + group + '.' + item, (data) => { // jscs:ignore jsDoc
+    if (data.pwmValue) {
+      element.value = rgbToHex(data.pwmValue);
+      console.log('item.data.' + group + '.' + item, data, data.pwmValue, rgbToHex(data.pwmValue));
+    } else {
+      console.log('ERROR item.data.' + group + '.' + item, data);
+    }
   });
   newControls.appendChild(element);
-  socket.on(item, (result) => { // jscs:ignore jsDoc
-    const color = result;
-    if (!changedPicker) {
-      setRgbColor(id, color);
-    }
-    changedPicker = false;
-  });
   return newControls;
 }
 
@@ -144,8 +150,18 @@ function makePreview(group, item, id, type, color, pwmValue = 0) { // jscs:ignor
   }
   element.setAttribute('data-pwmValue', pwm, rgbToHex(pwm));
   element.style.backgroundColor = rgbToHex(pwm);
-  socket.on(item, (data) => { // jscs:ignore jsDoc
-    element.style.backgroundColor = rgbToHex(data);
+  socket.on('item.data.' + group + '.' + item, (data) => { // jscs:ignore jsDoc
+    if (data.color && typeof data.color === 'string') {
+      const color = { };
+      color[data.color] = data.pwmValue;
+      element.style.backgroundColor = rgbToHex(color);
+      console.log('item.data.' + group + '.' + item, data, color, rgbToHex(color));
+    } else if (data.pwmValue) {
+      element.style.backgroundColor = rgbToHex(data.pwmValue);
+      console.log('item.data.' + group + '.' + item, data, data.pwmValue, rgbToHex(data.pwmValue));
+    } else {
+      console.log('ERROR item.data.' + group + '.' + item, data);
+    }
   });
   return element;
 }
@@ -324,9 +340,11 @@ function rgbToHex(color) { // jscs:ignore jsDoc
   return '#' + hex;
 }
 
+/*
 function setRgbColor(id, color) { // jscs:ignore jsDoc
   ['red', 'green', 'blue'].forEach((rgb) => { // jscs:ignore jsDoc
     document.getElementById(id + '_' + rgb).value = color[rgb];
   });
   document.getElementById(id + '_picker').setAttribute('value', rgbToHex(color));
 }
+*/
