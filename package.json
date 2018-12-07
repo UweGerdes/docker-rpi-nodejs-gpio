@@ -1,7 +1,7 @@
 {
   "name": "node-rpi-gpio",
   "description": "Raspberry Pi GPIO with Node.js",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "keywords": [
     "raspberry",
     "gpio",
@@ -26,6 +26,7 @@
     "gulp": "^3.9.1",
     "gulp-autoprefixer": "^6.0.0",
     "gulp-changed-in-place": "^2.3.0",
+    "gulp-debug": "^4.0.0",
     "gulp-develop-server": "^0.5.2",
     "gulp-jscs": "^4.1.0",
     "gulp-jscs-stylish": "^1.4.0",
@@ -39,6 +40,7 @@
     "gulp-pug-linter": "^0.5.1",
     "gulp-rename": "^1.2.2",
     "gulp-sequence": "^1.0.0",
+    "gulp-wait": "0.0.2",
     "gulp-yaml-validate": "^1.0.2",
     "jsdom": "11.10.0",
     "jshint": "^2.9.5",

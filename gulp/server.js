@@ -8,10 +8,11 @@
 const { spawn } = require('child_process'),
   gulp = require('gulp'),
   changedInPlace = require('gulp-changed-in-place'),
+  debug = require('gulp-debug'),
   server = require('gulp-develop-server'),
   livereload = require('gulp-livereload'),
-  notify = require('gulp-notify'),
   sequence = require('gulp-sequence'),
+  wait = require('gulp-wait'),
   path = require('path'),
   config = require('../lib/config'),
   ipv4addresses = require('../lib/ipv4addresses.js'),
@@ -22,16 +23,6 @@ const { spawn } = require('child_process'),
 const baseDir = path.join(__dirname, '..');
 
 let gpioServer;
-
-/**
- * log only to console, not GUI
- *
- * @param {pbject} options - setting options
- * @param {function} callback - gulp callback
- */
-const pipeLog = notify.withReporter((options, callback) => {
-  callback();
-});
 
 const tasks = {
   /**
@@ -45,6 +36,7 @@ const tasks = {
     if (process.env.NODE_ENV == 'development') {
       sequence(
         'server-changed',
+        'livereload-delayed',
         //'tests',
         callback
       );
@@ -62,11 +54,24 @@ const tasks = {
    * @namespace tasks
    */
   'livereload': () => {
-    log.info('livereload triggered');
+    console.log('livereload triggered');
     return gulp.src(config.gulp.watch.livereload)
+      .pipe(debug({ title: 'livereload', showCount: false }))
       .pipe(changedInPlace({ howToDetermineDifference: 'modification-time' }))
       .pipe(livereload())
-      .pipe(pipeLog({ message: 'livereload: <%= file.path %>', title: 'Gulp livereload' }))
+      ;
+  },
+  /**
+   * ### trigger of livereload task with delay
+   *
+   * @task livereload-delayed
+   * @namespace tasks
+   */
+  'livereload-delayed': () => {
+    return gulp.src(config.gulp.watch['server-restart'])
+      .pipe(wait(1000))
+      .pipe(debug({ title: 'livereload', showCount: false }))
+      .pipe(livereload())
       ;
   },
   /**
@@ -141,8 +146,8 @@ const tasks = {
    */
   'server-changed': (callback) => {
     server.changed((error) => { // jscs:ignore jsDoc
-      if (!error) {
-        livereload.changed({ path: '/', quiet: false });
+      if (error) {
+        console.log('server-changed', error);
       }
       callback();
     });
