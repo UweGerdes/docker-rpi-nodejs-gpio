@@ -139,6 +139,13 @@ io.sockets.on('connection', function (sock) { // jscs:ignore jsDoc
   socket.on('getItems', () => { // jscs:ignore jsDoc
     socket.emit('items', items2);
   });
+  socket.on('setValue', (data) => { // jscs:ignore jsDoc
+    if (items2[data.group] && items2[data.group][data.item] && items2[data.group][data.item].set) {
+      items2[data.group][data.item].set(data);
+    } else {
+      console.log('no setValue for', data);
+    }
+  });
 });
 
 process.once('SIGUSR2', exitHandler);
@@ -274,7 +281,7 @@ ipc.connectToNet(
     ipc.of.gpio.on(
       'app.created',
       (data) => { // jscs:ignore jsDoc
-        console.log(data.id + '.created:', data);
+        //console.log(data.id + '.created:', data);
         if (!items2[data.group]) {
           items2[data.group] = { };
         }
