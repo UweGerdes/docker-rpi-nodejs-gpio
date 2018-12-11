@@ -17,6 +17,7 @@ devices.Sensor = require('./lib/sensor.js');
 const objects = {};
 const items = {};
 const messages = {};
+let updateInterval = null;
 
 ipc.config.id = 'gpio';
 ipc.config.retry = 1500;
@@ -25,10 +26,11 @@ ipc.config.silent = true;
 /**
  * Report the gpio status
  *
- * @param {object} data - item to switch off
  * @param {ipc} socket - connection
+ * @param {string} group - group name
+ * @param {string} item - item name
  */
-function sendStatus(data, socket) {
+function sendStatus(socket, group, item) {
   /**
    * Report the gpio status
    *
@@ -41,9 +43,9 @@ function sendStatus(data, socket) {
     socket,
     'gpio.item-status',
     {
-      group: data.group,
-      item: data.item,
-      data: objects[data.group][data.item].getData()
+      group: group,
+      item: item,
+      data: objects[group][item].getData()
     }
   );
 }
@@ -59,8 +61,56 @@ function sendStatus(data, socket) {
 messages['gpio.item-off'] = (data, socket) => {
   if (objects[data.group][data.item].off) {
     objects[data.group][data.item].off();
+    if (updateInterval) {
+      clearInterval(updateInterval);
+      updateInterval = null;
+    }
     items[data.group][data.item] = objects[data.group][data.item].getData();
-    sendStatus(data, socket);
+    sendStatus(socket, data.group, data.item);
+  }
+};
+/**
+ * Switch on LED, RGBLED
+ *
+ * @alias module:gpio.item-on
+ * @fires gpio.item-data
+ * @param {object} data - item to switch on
+ * @param {ipc} socket - connection
+ * @listens gpio.item-on
+ */
+messages['gpio.item-on'] = (data, socket) => {
+  if (objects[data.group][data.item].on) {
+    objects[data.group][data.item].on();
+    items[data.group][data.item] = objects[data.group][data.item].getData();
+    sendStatus(socket, data.group, data.item);
+  }
+};
+/**
+ * Smooth color change LED, RGBLED
+ *
+ * @alias module:gpio.item-smooth
+ * @fires gpio.item-data
+ * @param {object} data - item to set smooth mode
+ * @param {ipc} socket - connection
+ * @listens gpio.item-on
+ */
+messages['gpio.item-smooth'] = (data, socket) => {
+  if (objects[data.group][data.item].smooth) {
+    objects[data.group][data.item].smooth(data.timeout);
+    items[data.group][data.item] = objects[data.group][data.item].getData();
+    if (updateInterval === null) {
+      /** send status while smooth */
+      const intervalFunc = () => {
+        for (const [group, item] of Object.entries(items)) {
+          for (const name of Object.keys(item)) {
+            if (items[group][name].smoothTimeout) {
+              sendStatus(socket, group, name);
+            }
+          }
+        }
+      };
+      updateInterval = setInterval(intervalFunc, 200);
+    }
   }
 };
 /**
@@ -119,24 +169,9 @@ ipc.serveNet(
         }
       }
     );
-    ipc.server.on(
-      'app.off',
-      (data, socket) => { // jscs:ignore jsDoc
-        if (objects[data.group][data.item].off) {
-          objects[data.group][data.item].off();
-          items[data.group][data.item] = objects[data.group][data.item].getData();
-          ipc.server.emit(
-            socket,
-            'app.item.data',
-            {
-              group: data.group,
-              item: data.item,
-              data: objects[data.group][data.item].getData()
-            }
-          );
-        }
-      }
-    );
+    for (const [event, func] of Object.entries(messages)) {
+      ipc.server.on(event, func);
+    }
   }
 );
 

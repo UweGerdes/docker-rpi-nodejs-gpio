@@ -39,7 +39,7 @@ socket.on('items', (items) => { // jscs:ignore jsDoc
 });
 
 socket.on('item.data', (data) => { // jscs:ignore jsDoc
-  console.log('item.data', data);
+  console.log('TODO received item.data', data);
   //var element = document.querySelector(
 });
 
@@ -53,7 +53,6 @@ function createElements(container, data) { // jscs:ignore jsDoc
     newDiv.setAttribute('id', group + '_container');
     newDiv.setAttribute('class', 'element_container');
     for (const [item, data] of Object.entries(items)) { // jscs:ignore jsDoc
-      console.log('creating', group, item, data);
       newDiv.appendChild(createElement(group, item, data));
     }
     container.appendChild(newDiv);
@@ -123,7 +122,6 @@ function makeRGBLED(group, item, id, data) { // jscs:ignore jsDoc
   socket.on('item.data.' + group + '.' + item, (data) => { // jscs:ignore jsDoc
     if (data.pwmValue) {
       element.value = rgbToHex(data.pwmValue);
-      console.log('item.data.' + group + '.' + item, data, data.pwmValue, rgbToHex(data.pwmValue));
     } else {
       console.log('ERROR item.data.' + group + '.' + item, data);
     }
@@ -155,10 +153,8 @@ function makePreview(group, item, id, type, color, pwmValue = 0) { // jscs:ignor
       const color = { };
       color[data.color] = data.pwmValue;
       element.style.backgroundColor = rgbToHex(color);
-      console.log('item.data.' + group + '.' + item, data, color, rgbToHex(color));
     } else if (data.pwmValue) {
       element.style.backgroundColor = rgbToHex(data.pwmValue);
-      console.log('item.data.' + group + '.' + item, data, data.pwmValue, rgbToHex(data.pwmValue));
     } else {
       console.log('ERROR item.data.' + group + '.' + item, data);
     }
@@ -198,9 +194,6 @@ function makeRange(group, item, id, range, pwmValue, color) { // jscs:ignore jsD
     } else if (data.pwmValue) {
       if (data.pwmValue[color] >= 0) {
         element.value = data.pwmValue[color] <= 0 ? '1' : data.pwmValue[color];
-        console.log('SET item.data.' + group + '.' + item, color,
-          data.pwmValue[color] <= 0 ? '1' : data.pwmValue[color],
-          element.getAttribute('id'));
       }
     } else {
       console.log('ERROR item.data.' + group + '.' + item, data);

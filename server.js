@@ -173,7 +173,7 @@ io.sockets.on('connection', function (sock) { // jscs:ignore jsDoc
     allOn();
   });
   socket.on('smooth', (timeout) => { // jscs:ignore jsDoc
-    smooth(Object.keys(items), timeout);
+    allSmooth(timeout);
   });
   socket.on('RGBsmooth', (timeout) => { // jscs:ignore jsDoc
     smooth(['RGB LED 1', 'RGB LED 2', 'RGB LED 3'], timeout);
@@ -201,7 +201,7 @@ function allOff() { // jscs:ignore jsDoc
   for (const [group, list] of Object.entries(config.gpio)) {
     for (const item of Object.keys(list)) {
       ipc.of.gpio.emit(
-        'app.off',
+        'gpio.item-off',
         {
           group: group,
           item: item
@@ -212,15 +212,32 @@ function allOff() { // jscs:ignore jsDoc
 }
 
 function allOn() { // jscs:ignore jsDoc
-  Object.keys(items).forEach((item) => { // jscs:ignore jsDoc
-    const data = items[item].getData();
-    if (data.type === 'LED') {
-      items[item].on();
-    } else if (data.type === 'RGBLED') {
-      items[item].on();
+  for (const [group, list] of Object.entries(config.gpio)) {
+    for (const item of Object.keys(list)) {
+      ipc.of.gpio.emit(
+        'gpio.item-on',
+        {
+          group: group,
+          item: item
+        }
+      );
     }
-  });
-  socket.emit('data', getItems());
+  }
+}
+
+function allSmooth(timeout) { // jscs:ignore jsDoc
+  for (const [group, list] of Object.entries(config.gpio)) {
+    for (const item of Object.keys(list)) {
+      ipc.of.gpio.emit(
+        'gpio.item-smooth',
+        {
+          group: group,
+          item: item,
+          timeout: timeout
+        }
+      );
+    }
+  }
 }
 
 function smooth(keys, timeout) { // jscs:ignore jsDoc
