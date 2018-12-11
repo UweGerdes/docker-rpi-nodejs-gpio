@@ -133,7 +133,11 @@ ipc.serveNet(
         if (!items[data.group]) {
           items[data.group] = { };
         }
-        objects[data.group][data.name] = new devices[data.data.type](data.data);
+        const inputCallback = (status) => { // jscs:ignore jsDoc
+          console.log('sendStatus', data, status);
+          sendStatus(socket, data.group, data.name);
+        };
+        objects[data.group][data.name] = new devices[data.data.type](data.data, inputCallback);
         items[data.group][data.name] = objects[data.group][data.name].getData();
         ipc.server.emit(
           socket,

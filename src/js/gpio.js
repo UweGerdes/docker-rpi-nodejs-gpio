@@ -73,6 +73,7 @@ function createElement(group, item, data) { // jscs:ignore jsDoc
     newDiv.appendChild(makePreview(group, item, id, data.type, data.color, data.pwmValue));
   }
   newDiv.appendChild(newLabel);
+  console.log(data.type);
   newDiv.appendChild(elementTypes[data.type](group, item, id, data));
   return newDiv;
 }
@@ -306,9 +307,10 @@ function makeSensor(group, item, id, data) { // jscs:ignore jsDoc
   element.setAttribute('id', id + '_checkbox');
   element.setAttribute('type', 'checkbox');
   div.appendChild(element);
-  socket.on(item, () => { // jscs:ignore jsDoc
-    console.log('sensor touched');
-    element.checked = !element.checked;
+  socket.on('item.data.' + group + '.' + item, (data) => { // jscs:ignore jsDoc
+    if (data.touched) {
+      element.checked = !element.checked;
+    }
   });
   return div;
 }
