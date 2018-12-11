@@ -106,7 +106,7 @@ const tasks = {
         'cleverLinks': false,
         'monospaceLinks': false,
         'default': {
-          'outputSourceFiles': 'true'
+          'outputSourceFiles': true
         },
         'path': 'ink-docstrap',
         'theme': 'cerulean',

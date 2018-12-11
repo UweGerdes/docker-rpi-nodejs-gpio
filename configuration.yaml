@@ -7,9 +7,9 @@ gulp:
     js:
       - 'src/js/*.js'
     jsdoc:
-#      - '*.js'
+      - '*.js'
 #      - 'gulp/**/*.js'
-#      - 'lib/**/*.js'
+      - 'lib/**/*.js'
       - 'src/**/*.js'
     jshint:
       - '*.js'
