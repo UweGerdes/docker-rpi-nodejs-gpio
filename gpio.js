@@ -16,10 +16,61 @@ devices.Sensor = require('./lib/sensor.js');
 
 const objects = {};
 const items = {};
+const messages = {};
 
 ipc.config.id = 'gpio';
 ipc.config.retry = 1500;
 ipc.config.silent = true;
+
+/**
+ * Report the gpio status
+ *
+ * @param {object} data - item to switch off
+ * @param {ipc} socket - connection
+ */
+function sendStatus(data, socket) {
+  /**
+   * Report the gpio status
+   *
+   * @event gpio.item-status
+   * @property {string} group - group name
+   * @property {string} item - item name
+   * @property {object} data - status information
+   */
+  ipc.server.emit(
+    socket,
+    'gpio.item-status',
+    {
+      group: data.group,
+      item: data.item,
+      data: objects[data.group][data.item].getData()
+    }
+  );
+}
+/**
+ * Switch off LED, RGBLED or Servo middle
+ *
+ * @alias module:gpio.item-off
+ * @fires gpio.item-data
+ * @param {object} data - item to switch off
+ * @param {ipc} socket - connection
+ * @listens gpio.item-off
+ */
+messages['gpio.item-off'] = (data, socket) => {
+  if (objects[data.group][data.item].off) {
+    objects[data.group][data.item].off();
+    items[data.group][data.item] = objects[data.group][data.item].getData();
+    sendStatus(data, socket);
+  }
+};
+/**
+ * Gpio item off event
+ *
+ * @alias module:gpio
+ * @event gpio.item-off
+ * @property {object} data - item information
+ * @property {object} socket - connection for reply
+ */
 
 ipc.serveNet(
   () => { // jscs:ignore jsDoc
@@ -72,7 +123,6 @@ ipc.serveNet(
       'app.off',
       (data, socket) => { // jscs:ignore jsDoc
         if (objects[data.group][data.item].off) {
-          console.log('app.off:', data);
           objects[data.group][data.item].off();
           items[data.group][data.item] = objects[data.group][data.item].getData();
           ipc.server.emit(

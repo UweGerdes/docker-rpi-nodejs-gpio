@@ -78,14 +78,22 @@ ipc.connectToNet(
       'app.item.data',
       (data) => { // jscs:ignore jsDoc
         items2[data.group][data.item] = data.data;
-        console.log('item.data.' + data.group + '.' + data.item, data.data);
+        //console.log('item.data.' + data.group + '.' + data.item, data.data);
         if (socket) {
           socket.emit('item.data.' + data.group + '.' + data.item, data.data);
         }
       }
     );
-
-    console.log('destroy', ipc.of.gpio.destroy);
+    ipc.of.gpio.on(
+      'gpio.item-status',
+      (data) => { // jscs:ignore jsDoc
+        items2[data.group][data.item] = data.data;
+        //console.log('item.data.' + data.group + '.' + data.item, data.data);
+        if (socket) {
+          socket.emit('item.data.' + data.group + '.' + data.item, data.data);
+        }
+      }
+    );
   }
 );
 
@@ -190,9 +198,7 @@ function exitHandler() { // jscs:ignore jsDoc
 }
 
 function allOff() { // jscs:ignore jsDoc
-  console.log('allOff');
   for (const [group, list] of Object.entries(config.gpio)) {
-    //console.log('group', group);
     for (const item of Object.keys(list)) {
       ipc.of.gpio.emit(
         'app.off',
@@ -202,19 +208,6 @@ function allOff() { // jscs:ignore jsDoc
         }
       );
     }
-  }
-  /*
-  Object.keys(items).forEach((item) => { // jscs:ignore jsDoc
-    const data = items[item].getData();
-    if (data.type === 'LED') {
-      items[item].off();
-    } else if (data.type === 'RGBLED') {
-      items[item].off();
-    }
-  });
-  */
-  if (socket) {
-    socket.emit('data', getItems());
   }
 }
 
