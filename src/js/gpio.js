@@ -230,10 +230,23 @@ function makeServoRange(group, item, id, range, rangeValue, color) { // jscs:ign
   element.setAttribute('data-group', group);
   element.setAttribute('data-item', item);
   element.addEventListener('change', (event) => { // jscs:ignore jsDoc
-    socket.emit(item, { value: parseInt(event.currentTarget.value) });
+    socket.emit('setValue',
+      {
+        group: group,
+        item: item,
+        pwmValue: parseInt(event.currentTarget.value)
+      }
+    );
   });
   socket.on(item, (value) => { // jscs:ignore jsDoc
     element.value = value;
+  });
+  socket.on('item.data.' + group + '.' + item, (data) => { // jscs:ignore jsDoc
+    if (data.pwmValue) {
+      element.value = data.pwmValue;
+    } else {
+      console.log('ERROR item.data.' + group + '.' + item, data);
+    }
   });
   return element;
 }
@@ -254,7 +267,13 @@ function makeServoButtons(group, item, id, data, values) { // jscs:ignore jsDoc
     const buttonText = document.createTextNode(key);
     button.appendChild(buttonText);
     button.addEventListener('click', (event) => { // jscs:ignore jsDoc
-      socket.emit(item, { value: parseInt(event.currentTarget.value) });
+      socket.emit('setValue',
+        {
+          group: group,
+          item: item,
+          pwmValue: parseInt(event.currentTarget.value)
+        }
+      );
     });
     buttonContainer.appendChild(button);
   });
