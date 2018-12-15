@@ -20,13 +20,13 @@ function documentLoaded() { // jscs:ignore jsDoc
   });
   const smooth = document.getElementById('smooth');
   smooth.addEventListener('click', () => { // jscs:ignore jsDoc
-    socket.emit('smooth', 2000);
+    socket.emit('allSmooth', 2000);
   });
   document.getElementById('RGBsmooth').addEventListener('click', () => { // jscs:ignore jsDoc
-    socket.emit('RGBsmooth', 2000);
+    socket.emit('smooth', { group: 'RGB_LED', timeout: 2000 });
   });
   document.getElementById('LEDsmooth').addEventListener('click', () => { // jscs:ignore jsDoc
-    socket.emit('LEDsmooth', 2000);
+    socket.emit('smooth', { group: 'LED', timeout: 2000 });
   });
   socket.emit('getItems', true);
 }

@@ -172,14 +172,11 @@ io.sockets.on('connection', function (sock) { // jscs:ignore jsDoc
   socket.on('allOn', () => { // jscs:ignore jsDoc
     allOn();
   });
-  socket.on('smooth', (timeout) => { // jscs:ignore jsDoc
-    allSmooth(timeout);
+  socket.on('allSmooth', (timeout) => { // jscs:ignore jsDoc
+    smooth(undefined, timeout);
   });
-  socket.on('RGBsmooth', (timeout) => { // jscs:ignore jsDoc
-    smooth(['RGB LED 1', 'RGB LED 2', 'RGB LED 3'], timeout);
-  });
-  socket.on('LEDsmooth', (timeout) => { // jscs:ignore jsDoc
-    smooth(['LED 1', 'LED 2', 'LED 3', 'LED 4'], timeout);
+  socket.on('smooth', (data) => { // jscs:ignore jsDoc
+    smooth(data.items, data.timeout);
   });
   socket.on('getItems', () => { // jscs:ignore jsDoc
     socket.emit('items', items2);
@@ -225,9 +222,9 @@ function allOn() { // jscs:ignore jsDoc
   }
 }
 
-function allSmooth(timeout) { // jscs:ignore jsDoc
-  for (const [group, list] of Object.entries(config.gpio)) {
-    for (const item of Object.keys(list)) {
+function smooth(items, timeout) { // jscs:ignore jsDoc
+  for (const [group, list] of Object.entries(items || config.gpio)) {
+    for (const item of Object.keys(list.length > 0 ? list : config.gpio[group])) {
       ipc.of.gpio.emit(
         'gpio.item-smooth',
         {
@@ -239,46 +236,6 @@ function allSmooth(timeout) { // jscs:ignore jsDoc
     }
   }
 }
-
-function smooth(keys, timeout) { // jscs:ignore jsDoc
-  let count = Math.floor(Math.random() * 3);
-  keys.forEach((item) => { // jscs:ignore jsDoc
-    const data = items[item].getData();
-    if (data.type === 'LED') {
-      items[item].smooth(timeout + Math.random() * 1000);
-    } else if (data.type === 'RGBLED') {
-      items[item].smooth({
-        red: (timeout + Math.random() * 1000) * (count % 3),
-        green: (timeout + Math.random() * 1000) * ((count + 1) % 3),
-        blue: (timeout + Math.random() * 100) * ((count + 2) % 3),
-      });
-    }
-    count++;
-  });
-  socket.emit('data', getItems());
-}
-
-/*
-function buttonCallback(name) { // jscs:ignore jsDoc
-  return (value) => { // jscs:ignore jsDoc
-    if (socket) {
-      socket.emit(name, value);
-    } else {
-      console.log(name + ': ' + value);
-    }
-  };
-}
-
-function sensorCallback(name) { // jscs:ignore jsDoc
-  return () => { // jscs:ignore jsDoc
-    if (socket) {
-      socket.emit(name, true);
-    } else {
-      console.log(name + ' touched');
-    }
-  };
-}
-*/
 
 function getItems() { // jscs:ignore jsDoc
   let result = {};
