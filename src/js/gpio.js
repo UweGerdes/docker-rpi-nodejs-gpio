@@ -210,6 +210,7 @@ function makeRange(group, item, id, range, pwmValue, color) { // jscs:ignore jsD
     } else {
       console.log('ERROR item.data.' + group + '.' + item, data);
     }
+    console.log('item.data.' + group + '.' + item, data);
   });
   return element;
 }
@@ -231,9 +232,9 @@ function makeServo(group, item, id, data) { // jscs:ignore jsDoc
   return div;
 }
 
-function makeServoRange(group, item, id, range, rangeValue, color) { // jscs:ignore jsDoc
+function makeServoRange(group, item, id, range, rangeValue) { // jscs:ignore jsDoc
   const element = document.createElement('input');
-  element.setAttribute('id', id + '_' + color);
+  element.setAttribute('id', id + '_range');
   element.setAttribute('type', 'range');
   element.setAttribute('min', range.min);
   element.setAttribute('max', range.max);
@@ -249,9 +250,6 @@ function makeServoRange(group, item, id, range, rangeValue, color) { // jscs:ign
         pwmValue: parseInt(event.currentTarget.value)
       }
     );
-  });
-  socket.on(item, (value) => { // jscs:ignore jsDoc
-    element.value = value;
   });
   socket.on('item.data.' + group + '.' + item, (data) => { // jscs:ignore jsDoc
     if (data.pwmValue) {

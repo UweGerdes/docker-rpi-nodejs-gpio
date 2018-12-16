@@ -1,15 +1,13 @@
 // less file for slider layout
 
+@slider-width: 15px;
+
 .slider {
   -webkit-appearance: none;
-  -webkit-transition: 0.2s;
   background: #d3d3d3;
-  border-radius: 15px;
-  height: 50px;
-  margin: 20px 0;
-  opacity: 0.7;
-  outline: none;
-  transition: opacity 0.2s;
+  border-radius: @slider-width;
+  height: 2 * @slider-width;
+  margin: 10px 0;
   width: 100%;
 
   &:hover {
@@ -19,19 +17,18 @@
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
+    background: #303030;
     border-radius: 50%;
     cursor: pointer;
-    height: 25px;
-    width: 25px;
+    height: 2 * @slider-width;
+    width: 2 * @slider-width;
   }
 
   &::-moz-range-thumb {
-    background: #4caf50;
+    background: #303030;
     border-radius: 50%;
     cursor: pointer;
-    height: 50px;
-    width: 50px;
+    height: 2 * @slider-width;
+    width: 2 * @slider-width;
   }
 }
-
-
