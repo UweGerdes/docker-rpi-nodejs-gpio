@@ -1,5 +1,5 @@
 /*
- * Start a HTTP server for gpio led control
+ * Start a HTTP server for raspberry pi gpio control
  *
  * node server.js
  *
@@ -35,7 +35,6 @@ ipc.connectToNet(
       'connect',
       () => { // jscs:ignore jsDoc
         for (const [group, list] of Object.entries(config.gpio)) {
-          //console.log('group', group);
           for (const [name, data] of Object.entries(list)) {
             ipc.of.gpio.emit(
               'app.create',
@@ -58,7 +57,6 @@ ipc.connectToNet(
     ipc.of.gpio.on(
       'app.created',
       (data) => { // jscs:ignore jsDoc
-        //console.log(data.id + '.created:', data);
         if (!items2[data.group]) {
           items2[data.group] = { };
         }
@@ -78,7 +76,6 @@ ipc.connectToNet(
       'app.item.data',
       (data) => { // jscs:ignore jsDoc
         items2[data.group][data.item] = data.data;
-        //console.log('item.data.' + data.group + '.' + data.item, data.data);
         if (socket) {
           socket.emit('item.data.' + data.group + '.' + data.item, data.data);
         }
@@ -88,7 +85,6 @@ ipc.connectToNet(
       'gpio.item-status',
       (data) => { // jscs:ignore jsDoc
         items2[data.group][data.item] = data.data;
-        //console.log('item.data.' + data.group + '.' + data.item, data.data);
         if (socket) {
           socket.emit('item.data.' + data.group + '.' + data.item, data.data);
         }
@@ -142,30 +138,6 @@ function handler(request, response) { // jscs:ignore jsDoc
 io.sockets.on('connection', function (sock) { // jscs:ignore jsDoc
   socket = sock;
   socket.emit('data', getItems());
-  Object.keys(items).forEach((item) => { // jscs:ignore jsDoc
-    const data = items[item].getData();
-    if (data.type === 'LED') {
-      socket.on(item, (data) => { // jscs:ignore jsDoc
-        if (typeof data.pwmValue === 'string') {
-          console.log('received string value: %o' + data);
-        }
-        items[item].pwmWrite(parseInt(data.pwmValue));
-        const pwmValue = {};
-        pwmValue[items[item].color] = items[item].pwmValue;
-        socket.emit(item, pwmValue);
-      });
-    } else if (data.type === 'RGBLED') {
-      socket.on(item, (data) => { // jscs:ignore jsDoc
-        items[item].pwmWrite(data);
-        socket.emit(item, items[item].pwmValue);
-      });
-    } else if (data.type === 'SERVO') {
-      socket.on(item, (data) => { // jscs:ignore jsDoc
-        items[item].servoWrite(parseInt(data.value));
-        socket.emit(item, items[item].rangeValue);
-      });
-    }
-  });
   socket.on('allOff', () => { // jscs:ignore jsDoc
     allOff();
   });
