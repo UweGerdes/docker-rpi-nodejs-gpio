@@ -61,12 +61,9 @@ function sendStatus(socket, group, item) {
 messages['gpio.item-off'] = (data, socket) => {
   if (objects[data.group][data.item].off) {
     objects[data.group][data.item].off();
-    if (updateInterval) {
-      clearInterval(updateInterval);
-      updateInterval = null;
-    }
     items[data.group][data.item] = objects[data.group][data.item].getData();
     sendStatus(socket, data.group, data.item);
+    checkInterval();
   }
 };
 /**
@@ -83,6 +80,7 @@ messages['gpio.item-on'] = (data, socket) => {
     objects[data.group][data.item].on();
     items[data.group][data.item] = objects[data.group][data.item].getData();
     sendStatus(socket, data.group, data.item);
+    checkInterval();
   }
 };
 /**
@@ -180,3 +178,19 @@ ipc.serveNet(
 );
 
 ipc.server.start();
+
+/** check for active timeouts and clear interval if possible */
+function checkInterval() {
+  let timeoutActive = false;
+  for (const list of Object.values(items)) {
+    for (const data of Object.values(list)) {
+      if (data.smoothTimeout) {
+        timeoutActive = true;
+      }
+    }
+  }
+  if (!timeoutActive && updateInterval) {
+    clearInterval(updateInterval);
+    updateInterval = null;
+  }
+}
