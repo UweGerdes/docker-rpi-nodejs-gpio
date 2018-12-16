@@ -64,12 +64,12 @@ gpio:
   LED:
     'LED 1':
       type: 'LED'
-      gpio: 17
+      gpio: 27
       color: 'red'
       range: { min: 1, max: 255 }
     'LED 2':
       type: 'LED'
-      gpio: 27
+      gpio: 17
       color: 'yellow'
       range: { min: 1, max: 255 }
     'LED 3':
@@ -88,10 +88,10 @@ gpio:
       gpio: { red: 23, green: 24, blue: 25 }
     'RGB LED 2':
       type: 'RGBLED'
-      gpio: { red: 21, green: 20, blue: 16 }
+      gpio: { red: 26, green: 19, blue: 13 }
     'RGB LED 3':
       type: 'RGBLED'
-      gpio: { red: 26, green: 19, blue: 13 }
+      gpio: { red: 21, green: 20, blue: 16 }
   Servo:
     'Servo 1':
       type: 'Servo'
