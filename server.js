@@ -67,12 +67,6 @@ ipc.connectToNet(
       }
     );
     ipc.of.gpio.on(
-      'app.message',
-      (message) => { // jscs:ignore jsDoc
-        ipc.log('server:', message);
-      }
-    );
-    ipc.of.gpio.on(
       'app.item.data',
       (data) => { // jscs:ignore jsDoc
         items2[data.group][data.item] = data.data;
