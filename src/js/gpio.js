@@ -38,14 +38,8 @@ socket.on('items', (items) => { // jscs:ignore jsDoc
   }
 });
 
-socket.on('item.data', (data) => { // jscs:ignore jsDoc
-  console.log('TODO received item.data', data);
-  //var element = document.querySelector(
-});
-
 function createElements(container, data) { // jscs:ignore jsDoc
   while (container.childNodes.length > 0) {
-    //container.childNodes[0].removeEventListener
     container.removeChild(container.childNodes[0]);
   }
   for (const [group, items] of Object.entries(data)) {
@@ -176,7 +170,6 @@ function makePreview(group, item, id, type, color, pwmValue = 0) { // jscs:ignor
     } else {
       element.setAttribute('data-status', data.pwmValue);
     }
-    console.log('item.data.' + group + '.' + item, data);
   });
   return element;
 }
@@ -278,26 +271,38 @@ function makeServoButtons(group, item, id, data, values) { // jscs:ignore jsDoc
   const buttonContainer = document.createElement('div');
   buttonContainer.setAttribute('class', 'buttonContainer');
   Object.keys(values).forEach((key) => { // jscs:ignore jsDoc
-    const button = document.createElement('button');
-    button.setAttribute('id', id + '_' + key.replace(/ /g, '_'));
-    button.setAttribute('name', id + '_' + key.replace(/ /g, '_'));
-    button.setAttribute('value', values[key]);
-    button.setAttribute('class', 'button');
-    const buttonText = document.createTextNode(key);
-    button.appendChild(buttonText);
-    button.addEventListener('click', (event) => { // jscs:ignore jsDoc
-      socket.emit('setValue',
-        {
-          group: group,
-          item: item,
-          pwmValue: parseInt(event.currentTarget.value)
-        }
-      );
-    });
+    const button = makeServoButton(group, item, id, key, values[key]);
     buttonContainer.appendChild(button);
   });
   container.appendChild(buttonContainer);
   return container;
+}
+
+function makeServoButton(group, item, id, key, value) { // jscs:ignore jsDoc
+  const button = document.createElement('button');
+  button.setAttribute('id', id + '_' + key.replace(/ /g, '_'));
+  button.setAttribute('name', id + '_' + key.replace(/ /g, '_'));
+  button.setAttribute('value', value);
+  button.setAttribute('class', 'button');
+  const buttonText = document.createTextNode(key);
+  button.appendChild(buttonText);
+  button.addEventListener('click', (event) => { // jscs:ignore jsDoc
+    socket.emit('setValue',
+      {
+        group: group,
+        item: item,
+        pwmValue: parseInt(event.currentTarget.value)
+      }
+    );
+  });
+  socket.on('item.data.' + group + '.' + item, (data) => { // jscs:ignore jsDoc
+    if ('' + data.pwmValue == value) {
+      button.disabled = true;
+    } else {
+      button.disabled = false;
+    }
+  });
+  return button;
 }
 
 function makeButton(group, item, id, data) { // jscs:ignore jsDoc
