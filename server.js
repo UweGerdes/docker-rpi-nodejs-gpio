@@ -175,6 +175,9 @@ io.sockets.on('connection', function (sock) { // jscs:ignore jsDoc
   socket.on('allSmooth', (timeout) => { // jscs:ignore jsDoc
     smooth(undefined, undefined, timeout);
   });
+  socket.on('off', (data) => { // jscs:ignore jsDoc
+    off(data.group, data.item);
+  });
   socket.on('smooth', (data) => { // jscs:ignore jsDoc
     smooth(data.group, data.item, data.timeout);
   });
@@ -222,13 +225,27 @@ function allOn() { // jscs:ignore jsDoc
   }
 }
 
+function off(group, item) { // jscs:ignore jsDoc
+  ipc.of.gpio.emit(
+    'gpio.item-off',
+    {
+      group: group,
+      item: item
+    }
+  );
+}
+
 function smooth(group, item, timeout) { // jscs:ignore jsDoc
   let items = config.gpio;
   if (group) {
-    items = { [group]: config.gpio[group] };
+    if (item) {
+      items = { [group]: { [item]: config.gpio[group][item] } };
+    } else {
+      items = { [group]: config.gpio[group] };
+    }
   }
   for (const [group, list] of Object.entries(items)) {
-    for (const item of Object.keys(list.length > 0 ? list : config.gpio[group])) {
+    for (const item of Object.keys(list)) {
       ipc.of.gpio.emit(
         'gpio.item-smooth',
         {

@@ -149,6 +149,18 @@ function makePreview(group, item, id, type, color, pwmValue = 0) { // jscs:ignor
   }
   element.setAttribute('data-pwmValue', pwm, rgbToHex(pwm));
   element.style.backgroundColor = rgbToHex(pwm);
+  element.addEventListener('click', (event) => { // jscs:ignore jsDoc
+    if (event.currentTarget.getAttribute('data-status') == 'smooth') {
+      socket.emit('off',
+        {
+          group: group,
+          item: item
+        }
+      );
+    } else {
+      socket.emit('smooth', { group: group, item: item, timeout: 2000 });
+    }
+  });
   socket.on('item.data.' + group + '.' + item, (data) => { // jscs:ignore jsDoc
     if (data.color && typeof data.color === 'string') {
       const color = { };
@@ -159,6 +171,12 @@ function makePreview(group, item, id, type, color, pwmValue = 0) { // jscs:ignor
     } else {
       console.log('ERROR item.data.' + group + '.' + item, data);
     }
+    if (data.smoothTimeout) {
+      element.setAttribute('data-status', 'smooth');
+    } else {
+      element.setAttribute('data-status', data.pwmValue);
+    }
+    console.log('item.data.' + group + '.' + item, data);
   });
   return element;
 }
