@@ -10,9 +10,6 @@ ARG SERVER_HTTP='8080'
 ARG GULP_LIVERELOAD='8081'
 ARG GPIO_GROUP='997'
 
-ENV NODE_ENV development
-ENV HOME ${NODE_HOME}
-ENV APP_HOME ${NODE_HOME}/app
 ENV SERVER_HTTP ${SERVER_HTTP}
 ENV GULP_LIVERELOAD ${GULP_LIVERELOAD}
 ENV GPIO_GROUP ${GPIO_GROUP}
@@ -25,8 +22,6 @@ WORKDIR ${NODE_HOME}
 
 RUN apt-get update && \
 	apt-get dist-upgrade -y && \
-	apt-get install -y \
-					python && \
 	apt-get clean && \
 	rm -rf /var/lib/apt/lists/* && \
 	cd /opt && \
@@ -47,7 +42,7 @@ RUN apt-get update && \
 	chown -R ${USER_NAME}:${USER_NAME} ${NODE_HOME}/package.json && \
 	npm -g config set user ${USER_NAME} && \
 	npm install -g --cache /tmp/root-cache \
-				gulp \
+				gulp-cli \
 				nodemon
 
 COPY . ${APP_HOME}
