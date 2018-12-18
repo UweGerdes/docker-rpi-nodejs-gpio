@@ -101,10 +101,12 @@ const tasks = {
       console.log(`gpio stdout: ${data}`);
     });
     gpioServer.stderr.on('data', (data) => { // jscs:ignore jsDoc
-      console.log(`stderr: ${data}`);
+      if (data.indexOf('sigHandler: Unhandled signal 15, terminating') < 0) {
+        console.log(`gpio stderr: ${data}`);
+      }
     });
     gpioServer.on('close', (code) => { // jscs:ignore jsDoc
-      console.log(`child process exited with code ${code}`);
+      console.log(`gpio process exited with code ${code}`);
     });
     callback();
   },
@@ -117,8 +119,7 @@ const tasks = {
    */
   'gpio-stop': (callback) => {
     const kill = spawn('sudo', ['pkill', '-f', 'sudo node gpio.js']);
-    kill.on('close', (code) => { // jscs:ignore jsDoc
-      console.log(`child process exited with code ${code}`);
+    kill.on('close', () => { // jscs:ignore jsDoc
       callback();
     });
   },
