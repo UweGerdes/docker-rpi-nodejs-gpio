@@ -26,7 +26,7 @@ let gpioServer;
 
 const tasks = {
   /**
-   * ### server restart and run tests
+   * ### server start and run tests
    *
    * @task server
    * @namespace tasks
@@ -102,9 +102,9 @@ const tasks = {
     );
   },
   /**
-   * ### server restart task
+   * ### server changed task
    *
-   * @task server-restart
+   * @task server-changed
    * @namespace tasks
    * @param {function} callback - gulp callback
    */
@@ -150,9 +150,13 @@ const tasks = {
    * @namespace tasks
    */
   'livereload-start': () => {
-    livereload.listen({ port: config.server.livereloadPort, delay: 2000, quiet: false });
+    livereload.listen({
+      port: config.server.livereloadPort || process.env.LIVERELOAD_PORT,
+      delay: 2000,
+      quiet: false
+    });
     log.info('livereload listening on http://' +
-      ipv4addresses.get()[0] + ':' + config.server.livereloadPort);
+      ipv4addresses.get()[0] + ':' + (config.server.livereloadPort || process.env.LIVERELOAD_PORT));
   }
 };
 

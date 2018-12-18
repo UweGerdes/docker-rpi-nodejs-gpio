@@ -17,7 +17,7 @@ const chalk = require('chalk'),
   config = require('./lib/config').config,
   ipv4addresses = require('./lib/ipv4addresses');
 
-const serverPort = config.server.httpPort || process.env.SERVER_HTTP || 8080;
+const serverPort = config.server.httpPort || process.env.SERVER_PORT || 8080;
 let socket;
 
 let items = {};
