@@ -47,3 +47,8 @@ $ pinout
 
 - (https://www.npmjs.com/package/pigpio)[https://www.npmjs.com/package/pigpio]
 - (https://www.elektronik-kompendium.de/sites/raspberry-pi/1907101.htm [de])[https://www.elektronik-kompendium.de/sites/raspberry-pi/1907101.htm]
+
+
+## Changelog
+
+0.0.8 message passing reworked, refactoring
