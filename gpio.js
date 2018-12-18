@@ -172,15 +172,7 @@ ipc.serveNet(() => {
           objects[data.group][data.item].setValue
       ) {
         objects[data.group][data.item].setValue(data);
-        ipc.server.emit(
-          socket,
-          'app.item.data',
-          {
-            group: data.group,
-            item: data.item,
-            data: objects[data.group][data.item].getData()
-          }
-        );
+        sendStatus(socket, data.group, data.item);
       } else {
         console.log('no setValue for', data);
       }

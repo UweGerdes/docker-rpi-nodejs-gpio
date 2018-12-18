@@ -22,70 +22,64 @@ const serverPort = config.server.httpPort || process.env.SERVER_HTTP || 8080;
 let socket;
 
 let items = {};
-let items2 = {};
 
 ipc.config.id = 'client';
 ipc.config.retry = 1000;
 ipc.config.silent = true;
 
-ipc.connectToNet(
-  'gpio',
-  () => { // jscs:ignore jsDoc
-    ipc.of.gpio.on(
-      'connect',
-      () => { // jscs:ignore jsDoc
-        for (const [group, list] of Object.entries(config.gpio)) {
-          for (const [name, data] of Object.entries(list)) {
-            ipc.of.gpio.emit(
-              'app.create',
-              {
-                group: group,
-                name: name,
-                data: data
-              }
-            );
+/**
+ * connect to gpio backend server
+ */
+ipc.connectToNet('gpio', () => {
+  /**
+   * on connect create items
+   */
+  ipc.of.gpio.on('connect', () => {
+    for (const [group, list] of Object.entries(config.gpio)) {
+      for (const [name, data] of Object.entries(list)) {
+        ipc.of.gpio.emit(
+          'app.create',
+          {
+            group: group,
+            name: name,
+            data: data
           }
-        }
+        );
       }
-    );
-    ipc.of.gpio.on(
-      'disconnect',
-      () => { // jscs:ignore jsDoc
-        ipc.log('disconnected from gpio');
-      }
-    );
-    ipc.of.gpio.on(
-      'app.created',
-      (data) => { // jscs:ignore jsDoc
-        if (!items2[data.group]) {
-          items2[data.group] = { };
-        }
-        items2[data.group][data.name] = data.data;
-        if (socket) {
-          socket.emit(data.id + '.created', data);
-        }
-      }
-    );
-    ipc.of.gpio.on(
-      'app.item.data',
-      (data) => { // jscs:ignore jsDoc
-        items2[data.group][data.item] = data.data;
-        if (socket) {
-          socket.emit('item.data.' + data.group + '.' + data.item, data.data);
-        }
-      }
-    );
-    ipc.of.gpio.on(
-      'gpio.item-status',
-      (data) => { // jscs:ignore jsDoc
-        items2[data.group][data.item] = data.data;
-        if (socket) {
-          socket.emit('item.data.' + data.group + '.' + data.item, data.data);
-        }
-      }
-    );
-  }
-);
+    }
+  });
+  /**
+   * on disconnect show message
+   */
+  ipc.of.gpio.on('disconnect', () => {
+    console.log('disconnected from gpio');
+  });
+  /**
+   * set up internal data for items reported by gpio
+   *
+   * @param {object} data - item data
+   */
+  ipc.of.gpio.on('app.created', (data) => {
+    if (!items[data.group]) {
+      items[data.group] = { };
+    }
+    items[data.group][data.name] = data.data;
+    if (socket) {
+      socket.emit(data.id + '.created', data);
+    }
+  });
+  /**
+   * receive item status from gpio
+   *
+   * @param {object} data - item data
+   */
+  ipc.of.gpio.on('gpio.item-status', (data) => {
+    items[data.group][data.item] = data.data;
+    if (socket) {
+      socket.emit('item.data.' + data.group + '.' + data.item, data.data);
+    }
+  });
+});
 
 http.listen(serverPort);
 console.log('server listening on ' +
@@ -129,9 +123,7 @@ function handler(request, response) { // jscs:ignore jsDoc
   });
 }
 
-io.sockets.on('connection', function (sock) { // jscs:ignore jsDoc
-  socket = sock;
-  socket.emit('data', getItems());
+io.sockets.on('connection', function (socket) { // jscs:ignore jsDoc
   socket.on('allOff', () => { // jscs:ignore jsDoc
     allOff();
   });
@@ -148,7 +140,7 @@ io.sockets.on('connection', function (sock) { // jscs:ignore jsDoc
     smooth(data.group, data.item, data.timeout);
   });
   socket.on('getItems', () => { // jscs:ignore jsDoc
-    socket.emit('items', items2);
+    socket.emit('items', items);
   });
   socket.on('setValue', (data) => { // jscs:ignore jsDoc
     ipc.of.gpio.emit('app.setValue', data);
@@ -157,6 +149,7 @@ io.sockets.on('connection', function (sock) { // jscs:ignore jsDoc
 
 process.once('SIGUSR2', exitHandler);
 process.once('SIGTERM', exitHandler);
+process.once(15, exitHandler);
 
 function exitHandler() { // jscs:ignore jsDoc
   console.log('server exiting');
@@ -222,12 +215,4 @@ function smooth(group, item, timeout) { // jscs:ignore jsDoc
       );
     }
   }
-}
-
-function getItems() { // jscs:ignore jsDoc
-  let result = {};
-  Object.keys(items).forEach((item) => { // jscs:ignore jsDoc
-    result[item] = items[item].getData();
-  });
-  return result;
 }
