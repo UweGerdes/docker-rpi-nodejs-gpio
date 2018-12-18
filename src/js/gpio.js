@@ -67,7 +67,6 @@ function createElement(group, item, data) { // jscs:ignore jsDoc
     newDiv.appendChild(makePreview(group, item, id, data.type, data.color, data.pwmValue));
   }
   newDiv.appendChild(newLabel);
-  console.log(data.type);
   newDiv.appendChild(elementTypes[data.type](group, item, id, data));
   return newDiv;
 }
@@ -210,7 +209,6 @@ function makeRange(group, item, id, range, pwmValue, color) { // jscs:ignore jsD
     } else {
       console.log('ERROR item.data.' + group + '.' + item, data);
     }
-    console.log('item.data.' + group + '.' + item, data);
   });
   return element;
 }
