@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const { spawn } = require('child_process'),
+const spawn = require('child_process').spawn,
   gulp = require('gulp'),
   changedInPlace = require('gulp-changed-in-place'),
   debug = require('gulp-debug'),
@@ -96,7 +96,7 @@ const tasks = {
    * @param {function} callback - gulp callback
    */
   'gpio-start': (callback) => {
-    gpioServer = spawn('sudo', ['node', 'gpio.js'], { cwd: baseDir });
+    gpioServer = spawn('sudo', ['node', 'gpio/index.js'], { cwd: baseDir });
     gpioServer.stdout.on('data', (data) => { // jscs:ignore jsDoc
       console.log(`gpio stdout: ${data}`);
     });
@@ -118,7 +118,7 @@ const tasks = {
    * @param {function} callback - gulp callback
    */
   'gpio-stop': (callback) => {
-    const kill = spawn('sudo', ['pkill', '-f', 'sudo node gpio.js']);
+    const kill = spawn('sudo', ['pkill', '-f', 'sudo node gpio/index.js']);
     kill.on('close', () => { // jscs:ignore jsDoc
       callback();
     });

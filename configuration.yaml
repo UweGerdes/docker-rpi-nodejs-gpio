@@ -8,11 +8,13 @@ gulp:
       - 'src/js/*.js'
     jsdoc:
 #      - '*.js'
+#      - 'gpio/**/*.js'
       - 'gulp/**/*.js'
 #      - 'lib/**/*.js'
 #      - 'src/**/*.js'
     jshint:
       - '*.js'
+      - 'gpio/**/*.js'
       - 'gulp/**/*.js'
       - 'lib/**/*.js'
       - 'src/**/*.js'
@@ -36,8 +38,7 @@ gulp:
     server-restart:
       - './server.js'
     gpio-restart:
-      - './gpio.js'
-      - 'lib/**/*.js'
+      - 'gpio/**/*.js'
     livereload:
       - 'public/**/*.html'
       - 'public/css/gpio.css'
@@ -46,6 +47,7 @@ gulp:
     jsdoc:
       src:
         - '*.js'
+        - 'gpio/**/*.js'
         - 'gulp/**/*.js'
         - 'lib/**/*.js'
         - 'modules/**/*.js'

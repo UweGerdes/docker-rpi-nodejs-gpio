@@ -8,11 +8,11 @@
 const ipc = require('node-ipc');
 
 const devices = {};
-devices.LED = require('./lib/led.js');
-devices.RGBLED = require('./lib/rgbled.js');
-devices.Servo = require('./lib/servo.js');
-devices.Button = require('./lib/button.js');
-devices.Sensor = require('./lib/sensor.js');
+devices.LED = require('./led.js');
+devices.RGBLED = require('./rgbled.js');
+devices.Servo = require('./servo.js');
+devices.Button = require('./button.js');
+devices.Sensor = require('./sensor.js');
 
 const objects = {};
 const items = {};
