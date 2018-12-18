@@ -1,13 +1,16 @@
 {
 	"node": true,
-	"esversion": 6,
+	"esnext": true,
 	"bitwise": true,
+	"camelcase": true,
 	"curly": true,
 	"evil": true,
 	"forin": true,
+	"immed": true,
+	"newcap": true,
 	"noarg": true,
 	"strict": true,
 	"undef": true,
-	"unused": true,
+	"unused": "vars",
 	"varstmt": true
 }
