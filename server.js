@@ -1,11 +1,10 @@
-/*
+/**
+ * ## GPIO HTTP server
+ *
  * Start a HTTP server for raspberry pi gpio control
  *
- * node server.js
- *
- * (c) Uwe Gerdes, entwicklung@uwegerdes.de
+ * @module server
  */
-
 'use strict';
 
 const chalk = require('chalk'),
