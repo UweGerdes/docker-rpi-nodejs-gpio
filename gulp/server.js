@@ -35,6 +35,8 @@ const tasks = {
   'server-restart': [['jshint'], (callback) => {
     if (process.env.NODE_ENV == 'development') {
       sequence(
+        'gpio-stop',
+        'gpio-start',
         'server-changed',
         'livereload-delayed',
         //'tests',
@@ -42,52 +44,13 @@ const tasks = {
       );
     } else {
       sequence(
+        'gpio-stop',
+        'gpio-start',
         'server-changed',
         callback
       );
     }
   }],
-  /**
-   * ### server livereload task
-   *
-   * @task livereload
-   * @namespace tasks
-   */
-  'livereload': () => {
-    console.log('livereload triggered');
-    return gulp.src(config.gulp.watch.livereload)
-      .pipe(debug({ title: 'livereload', showCount: false }))
-      .pipe(changedInPlace({ howToDetermineDifference: 'modification-time' }))
-      .pipe(livereload())
-      ;
-  },
-  /**
-   * ### trigger of livereload task with delay
-   *
-   * @task livereload-delayed
-   * @namespace tasks
-   */
-  'livereload-delayed': () => {
-    return gulp.src(config.gulp.watch['server-restart'])
-      .pipe(wait(1000))
-      .pipe(debug({ title: 'livereload', showCount: false }))
-      .pipe(livereload())
-      ;
-  },
-  /**
-   * ### gpio server start task
-   *
-   * @task gpio-start
-   * @namespace tasks
-   * @param {function} callback - gulp callback
-   */
-  'gpio-restart': (callback) => {
-    sequence(
-      'gpio-stop',
-      'gpio-start',
-      callback
-    );
-  },
   /**
    * ### gpio server start task
    *
@@ -152,6 +115,33 @@ const tasks = {
       }
       callback();
     });
+  },
+  /**
+   * ### server livereload task
+   *
+   * @task livereload
+   * @namespace tasks
+   */
+  'livereload': () => {
+    console.log('livereload triggered');
+    return gulp.src(config.gulp.watch.livereload)
+      .pipe(debug({ title: 'livereload', showCount: false }))
+      .pipe(changedInPlace({ howToDetermineDifference: 'modification-time' }))
+      .pipe(livereload())
+      ;
+  },
+  /**
+   * ### trigger of livereload task with delay
+   *
+   * @task livereload-delayed
+   * @namespace tasks
+   */
+  'livereload-delayed': () => {
+    return gulp.src(config.gulp.watch.livereload[0])
+      .pipe(wait(1000))
+      .pipe(debug({ title: 'livereload', showCount: false }))
+      .pipe(livereload())
+      ;
   },
   /**
    * ### server livereload start task

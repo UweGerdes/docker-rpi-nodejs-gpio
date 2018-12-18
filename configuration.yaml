@@ -37,7 +37,6 @@ gulp:
       - 'src/less/**/*.less'
     server-restart:
       - './server.js'
-    gpio-restart:
       - 'gpio/**/*.js'
     livereload:
       - 'public/**/*.html'
