@@ -120,62 +120,76 @@ messages['gpio.item-smooth'] = (data, socket) => {
  * @property {object} socket - connection for reply
  */
 
-ipc.serveNet(
-  () => { // jscs:ignore jsDoc
-    ipc.server.on(
-      'app.create',
-      (data, socket) => { // jscs:ignore jsDoc
-        if (!objects[data.group]) {
-          objects[data.group] = { };
+/**
+ * message server for communication to server
+ */
+ipc.serveNet(() => {
+  /**
+   * create item
+   *
+   * @param {object} data - item configuration
+   * @param {socket} socket - connection for answer
+   */
+  ipc.server.on('app.create', (data, socket) => {
+      if (!objects[data.group]) {
+        objects[data.group] = { };
+      }
+      if (!items[data.group]) {
+        items[data.group] = { };
+      }
+      /**
+       * callback for status change of input items
+       *
+       * @param {object} status - status value
+       */
+      const inputCallback = (status) => {
+        console.log('sendStatus', data, status);
+        sendStatus(socket, data.group, data.name);
+      };
+      objects[data.group][data.name] = new devices[data.data.type](data.data, inputCallback);
+      items[data.group][data.name] = objects[data.group][data.name].getData();
+      ipc.server.emit(
+        socket,
+        'app.created',
+        {
+          id: ipc.config.id,
+          group: data.group,
+          name: data.name,
+          data: items[data.group][data.name]
         }
-        if (!items[data.group]) {
-          items[data.group] = { };
-        }
-        const inputCallback = (status) => { // jscs:ignore jsDoc
-          console.log('sendStatus', data, status);
-          sendStatus(socket, data.group, data.name);
-        };
-        objects[data.group][data.name] = new devices[data.data.type](data.data, inputCallback);
-        items[data.group][data.name] = objects[data.group][data.name].getData();
+      );
+    }
+  );
+  /**
+   * set value for item
+   *
+   * @param {object} data - item selection
+   * @param {socket} socket - connection for answer
+   */
+  ipc.server.on('app.setValue', (data, socket) => {
+      if (objects[data.group] &&
+          objects[data.group][data.item] &&
+          objects[data.group][data.item].setValue
+      ) {
+        objects[data.group][data.item].setValue(data);
         ipc.server.emit(
           socket,
-          'app.created',
+          'app.item.data',
           {
-            id: ipc.config.id,
             group: data.group,
-            name: data.name,
-            data: items[data.group][data.name]
+            item: data.item,
+            data: objects[data.group][data.item].getData()
           }
         );
+      } else {
+        console.log('no setValue for', data);
       }
-    );
-    ipc.server.on(
-      'app.setValue',
-      (data, socket) => { // jscs:ignore jsDoc
-        if (objects[data.group] &&
-            objects[data.group][data.item] &&
-            objects[data.group][data.item].setValue
-        ) {
-          objects[data.group][data.item].setValue(data);
-          ipc.server.emit(
-            socket,
-            'app.item.data',
-            {
-              group: data.group,
-              item: data.item,
-              data: objects[data.group][data.item].getData()
-            }
-          );
-        } else {
-          console.log('no setValue for', data);
-        }
-      }
-    );
-    for (const [event, func] of Object.entries(messages)) {
-      ipc.server.on(event, func);
     }
+  );
+  for (const [event, func] of Object.entries(messages)) {
+    ipc.server.on(event, func);
   }
-);
+});
 
 ipc.server.start();
 
