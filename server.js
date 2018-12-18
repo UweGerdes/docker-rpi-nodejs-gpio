@@ -123,7 +123,8 @@ function handler(request, response) { // jscs:ignore jsDoc
   });
 }
 
-io.sockets.on('connection', function (socket) { // jscs:ignore jsDoc
+io.sockets.on('connection', function (newSocket) { // jscs:ignore jsDoc
+  socket = newSocket;
   socket.on('allOff', () => { // jscs:ignore jsDoc
     allOff();
   });
