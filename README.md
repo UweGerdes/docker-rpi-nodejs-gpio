@@ -51,4 +51,6 @@ $ pinout
 
 ## Changelog
 
+0.0.9 expressjs with pug templates
+
 0.0.8 message passing reworked, refactoring
