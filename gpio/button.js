@@ -5,7 +5,7 @@ const Gpio = require('pigpio').Gpio;
 
 class Button {
 
-  constructor(data) {
+  constructor(data, callback) {
     this.pin = data.gpio;
     this.value = 0;
     this.Button = new Gpio(this.pin, {
@@ -15,6 +15,7 @@ class Button {
     });
     this.Button.on('interrupt', (value) => { // jscs:ignore jsDoc
       this.value = value;
+      callback(value);
     });
   }
 
