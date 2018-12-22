@@ -111,7 +111,7 @@ const tasks = {
   'livereload': () => {
     return gulp.src(config.gulp.watch.livereload)
       .pipe(changedInPlace({ howToDetermineDifference: 'modification-time' }))
-      .pipe(debug({ title: 'livereload', showCount: false }))
+      .pipe(debug({ title: 'livereload: <%= file.path %>', showCount: false }))
       .pipe(livereload());
   },
   /**
@@ -124,18 +124,6 @@ const tasks = {
     return gulp.src(config.gulp.watch.livereload[0])
       .pipe(livereload())
       .pipe(debug({ title: 'livereload: <%= file.path %>', showCount: false }));
-  },
-  /**
-   * ### trigger of livereload task with delay
-   *
-   * @task livereload-delayed
-   * @namespace tasks
-   */
-  'livereload-delayed': () => {
-    return gulp.src(config.gulp.watch.livereload[0])
-      .pipe(wait(1000))
-      .pipe(debug({ title: 'livereload', showCount: false }))
-      .pipe(livereload());
   },
   /**
    * ### server livereload start task
