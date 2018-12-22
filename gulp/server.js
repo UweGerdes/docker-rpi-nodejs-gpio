@@ -3,6 +3,7 @@
  *
  * @module gulp/server
  */
+
 'use strict';
 
 const spawn = require('child_process').spawn,
@@ -17,8 +18,7 @@ const spawn = require('child_process').spawn,
   config = require('../lib/config'),
   ipv4addresses = require('../lib/ipv4addresses.js'),
   loadTasks = require('./lib/load-tasks'),
-  log = require('../lib/log')
-  ;
+  log = require('../lib/log');
 
 const baseDir = path.join(__dirname, '..');
 
@@ -32,24 +32,11 @@ const tasks = {
    * @namespace tasks
    * @param {function} callback - gulp callback
    */
-  'server-restart': [['jshint'], (callback) => {
-    if (process.env.NODE_ENV == 'development') {
-      sequence(
-        'gpio-stop',
-        'gpio-start',
-        'server-changed',
-        'livereload-delayed',
-        //'tests',
-        callback
-      );
-    } else {
-      sequence(
-        'gpio-stop',
-        'gpio-start',
-        'server-changed',
-        callback
-      );
-    }
+  'server': [['eslint'], (callback) => {
+    sequence(
+      ...config.gulp.start[process.env.NODE_ENV].server,
+      callback
+    );
   }],
   /**
    * ### gpio server start task
@@ -95,11 +82,10 @@ const tasks = {
    */
   'server-start': (callback) => {
     server.listen({
-        path: config.server.server,
-        env: { VERBOSE: true, FORCE_COLOR: 1 }
-      },
-      callback
-    );
+      path: config.server.server,
+      env: { VERBOSE: true, FORCE_COLOR: 1 }
+    },
+    callback);
   },
   /**
    * ### server changed task
@@ -109,9 +95,9 @@ const tasks = {
    * @param {function} callback - gulp callback
    */
   'server-changed': (callback) => {
-    server.changed((error) => { // jscs:ignore jsDoc
-      if (error) {
-        console.log('server-changed', error);
+    server.changed((error) => {
+      if (!error) {
+        livereload.changed({ path: '/', quiet: false });
       }
       callback();
     });
@@ -123,12 +109,22 @@ const tasks = {
    * @namespace tasks
    */
   'livereload': () => {
-    console.log('livereload triggered');
+    console.log('livereload triggered', livereload);
     return gulp.src(config.gulp.watch.livereload)
       .pipe(debug({ title: 'livereload', showCount: false }))
       .pipe(changedInPlace({ howToDetermineDifference: 'modification-time' }))
+      .pipe(livereload());
+  },
+  /**
+   * ### trigger of livereload task with first file
+   *
+   * @task livereload-index
+   * @namespace tasks
+   */
+  'livereload-index': () => {
+    return gulp.src(config.gulp.watch.livereload[0])
       .pipe(livereload())
-      ;
+      .pipe(debug({ title: 'livereload: <%= file.path %>', showCount: false }));
   },
   /**
    * ### trigger of livereload task with delay
@@ -140,8 +136,7 @@ const tasks = {
     return gulp.src(config.gulp.watch.livereload[0])
       .pipe(wait(1000))
       .pipe(debug({ title: 'livereload', showCount: false }))
-      .pipe(livereload())
-      ;
+      .pipe(livereload());
   },
   /**
    * ### server livereload start task
@@ -156,20 +151,8 @@ const tasks = {
       quiet: false
     });
     log.info('livereload listening on http://' +
-      ipv4addresses.get()[0] + ':' + (config.server.livereloadPort || process.env.LIVERELOAD_PORT));
+      ipv4addresses.get()[0] + ':' + config.server.livereloadPort);
   }
 };
-
-process.once('SIGTERM', exitHandler);
-process.once('SIGUSR2', exitHandler);
-
-function exitHandler() { // jscs:ignore jsDoc
-  console.log('stop gpio server');
-  gpioServer.kill('SIGUSR2');
-  setTimeout(() => { // jscs:ignore jsDoc
-    console.log('shutting down gulp server');
-    process.exit(0);
-  }, 500);
-}
 
 loadTasks.importTasks(tasks);
