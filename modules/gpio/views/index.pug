@@ -20,4 +20,5 @@ block content
         button#allOn.button.controlButton(name='RGBsmooth', value='RGBsmooth') RGB smooth
 
     #gpio-groups.gpio-groups.flex-block.flex-center
-      h2 Boilerplate
+      each list, group in items
+        .group= group

@@ -6,13 +6,13 @@
 
 'use strict';
 
-const chalk = require('chalk'),
-  http = require('http').createServer(),
+const http = require('http').createServer(),
   ipc = require('node-ipc'),
   path = require('path'),
   io = require('socket.io')(http),
   config = require('../../../lib/config').config,
   ipv4addresses = require('../../../lib/ipv4addresses'),
+  log = require('../../../lib/log'),
   model = require('./model.js');
 
 const viewBase = path.join(path.dirname(__dirname), 'views');
@@ -33,7 +33,7 @@ ipc.connectToNet('gpio', () => {
    * on connect create items
    */
   ipc.of.gpio.on('connect', () => {
-    console.log('connected to gpio', config);
+    log.info('controller connected to gpio');
     for (const [group, list] of Object.entries(config.gpio)) {
       for (const [name, data] of Object.entries(list)) {
         ipc.of.gpio.emit(
@@ -51,7 +51,7 @@ ipc.connectToNet('gpio', () => {
    * on disconnect show message
    */
   ipc.of.gpio.on('disconnect', () => {
-    console.log('disconnected from gpio');
+    log.info('controller disconnected from gpio');
   });
   /**
    * set up internal data for items reported by gpio
@@ -59,7 +59,6 @@ ipc.connectToNet('gpio', () => {
    * @param {object} data - item data
    */
   ipc.of.gpio.on('gpio.created', (data) => {
-    console.log('gpio.created', data);
     if (!items[data.group]) {
       items[data.group] = { };
     }
@@ -74,7 +73,7 @@ ipc.connectToNet('gpio', () => {
    * @param {object} data - item data
    */
   ipc.of.gpio.on('gpio.item-status', (data) => {
-    console.log('gpio.item-status', data);
+    log.info('gpio.item-status', data);
     items[data.group][data.item] = data.data;
     if (socket) {
       socket.emit('item.data.' + data.group + '.' + data.item, data.data);
@@ -82,9 +81,8 @@ ipc.connectToNet('gpio', () => {
   });
 });
 
-http.listen(8082);
-console.log('server listening on ' +
-  chalk.greenBright('http://' + ipv4addresses.get()[0] + ':' + 8082));
+http.listen(config.server.socketPort);
+log.info('gpio socket listening on http://' + ipv4addresses.get()[0] + ':' + config.server.socketPort);
 
 io.sockets.on('connection', function (newSocket) { // jscs:ignore jsDoc
   socket = newSocket;
@@ -174,6 +172,7 @@ function smooth(group, item, timeout) { // jscs:ignore jsDoc
 
 const viewRenderParams = {
   // model data
+  items: items
   // view helper functions
 };
 
