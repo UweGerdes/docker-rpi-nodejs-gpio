@@ -11,5 +11,13 @@ block content
       #header-wrapper.flex-wrapper
         h1#headline.headline.flex-block.flex-left= module.name
 
-    #gpio-container.gpio-container.flex-block.flex-center
+    #gpio-buttons.gpio-buttons.controlButtons.flex-block.flex-center
+      .buttonContainer
+        button#allOff.button.controlButton(name='allOff', value='allOff') alle aus
+        button#allOn.button.controlButton(name='allOn', value='allOn') alle an
+        button#allOn.button.controlButton(name='smooth', value='smooth') smooth
+        button#allOn.button.controlButton(name='LEDsmooth', value='LEDsmooth') LED smooth
+        button#allOn.button.controlButton(name='RGBsmooth', value='RGBsmooth') RGB smooth
+
+    #gpio-groups.gpio-groups.flex-block.flex-center
       h2 Boilerplate
