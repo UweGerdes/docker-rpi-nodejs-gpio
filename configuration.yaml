@@ -1,47 +1,103 @@
 #
 #  Configuration for docker-rpi-nodejs-gpio
 #
-
 gulp:
+  start:
+    development:
+      gulp:
+        - 'lint'
+        - 'build'
+        - 'watch'
+        - 'gpio-stop'
+        - 'gpio-start'
+        - 'livereload-start'
+        - 'server-start'
+        - 'tests'
+      build:
+        - 'less'
+        - 'js'
+#        - 'jsdoc'
+      tests:
+        - 'test-modules'
+      lint:
+        - 'ejslint'
+        - 'eslint'
+        - 'jsonlint'
+        - 'lesshint'
+        - 'yamllint'
+        - 'puglint'
+        - 'ejslint'
+      server:
+        - 'gpio-stop'
+        - 'gpio-start'
+        - 'server-changed'
+        - 'tests'
+    production:
+      gulp:
+        - 'build'
+        - 'gpio-stop'
+        - 'gpio-start'
+        - 'server-start'
+      build:
+        - 'less'
+        - 'js'
+      tests: []
+      lint: []
+      server:
+        - 'server-changed'
   watch:
-    js:
-      - 'src/js/*.js'
-    jsdoc:
-#      - '*.js'
-#      - 'gpio/**/*.js'
-      - 'gulp/**/*.js'
-#      - 'lib/**/*.js'
-#      - 'src/**/*.js'
-    jshint:
+    eslint:
       - '*.js'
+      - '.eslintrc.js'
       - 'gpio/**/*.js'
       - 'gulp/**/*.js'
       - 'lib/**/*.js'
-      - 'src/**/*.js'
+      - 'modules/**/*.js'
+    js:
+      - 'modules/*/js/*.js'
+    jsdoc:
+      - 'nofile.js'
     jsonlint:
       - '**/*.json'
-      - '.jscsrc'
-      - '.jshintrc'
       - '.lesshintrc'
     lesshint:
+      - 'modules/**/less/**/*.less'
       - 'src/less/**/*.less'
     yamllint:
       - '**/*.yaml'
       - '**/*.yml'
-    ejslint:
+    ejslint-livereload:
       - '**/*.ejs'
+    less:
+      - 'src/less/**/*.less'
+      - 'modules/**/*.less'
     puglint:
       - '**/*.pug'
-    less:
-      - 'src/less/gpio.less'
-      - 'src/less/**/*.less'
-    server-restart:
-      - './server.js'
+    server:
+      - 'server.js'
       - 'gpio/**/*.js'
+      - 'modules/**/!(tests)/server/*.js'
+    gpio-stop:
+      - 'configuration.yaml'
+      - 'gulpfile.js'
+      - 'gulp/**/*.js'
     livereload:
       - 'public/**/*.html'
-      - 'public/css/gpio.css'
+      - 'modules/**/*.pug'
+      - 'public/img/**/*.*'
+      - 'public/css/*.css'
       - 'public/js/**/*.js'
+    test-modules:
+      - 'modules/**/tests/model/*.*'
+      - 'modules/**/tests/server/*.*'
+      - 'modules/**/views/**/*.*'
+      - 'htdocs/css/*.css'
+      - 'htdocs/js/**/*.js'
+  tests:
+    modules:
+      - 'modules/**/tests/model/*.js'
+      - 'modules/**/tests/server/*.js'
+      - 'modules/**/tests/views/*.js'
   build:
     jsdoc:
       src:
@@ -53,12 +109,12 @@ gulp:
         - 'src/**/*.js'
       dest: 'docs/jsdoc'
     js:
-      src: 'src/js/*.js'
+      src: 'modules/*/js/*.js'
       dest: 'public/js'
       replace:
         '/js': ''
     less:
-      src: 'src/less/gpio.less'
+      src: 'src/less/app.less'
       dest: 'public/css'
 
 gpio:
@@ -107,8 +163,9 @@ gpio:
       gpio: 8
 
 server:
-  server: './server.js'
+  server: ./server.js
   docroot: ./public
+  modules: ./modules
   httpPort: 8080
   livereloadPort: 8081
   verbose: false

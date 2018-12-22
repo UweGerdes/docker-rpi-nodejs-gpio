@@ -2,8 +2,9 @@
   "decimalZero": "none",
   "finalNewline": true,
   "hexLength": {
-    "style": "short"
+    "style": "long"
   },
+  "idSelector": false,
   "spaceAfterPropertyColon": {
     "enabled": true,
     "style": "one_space"
@@ -12,3 +13,4 @@
     "style": "no_unit"
   }
 }
+

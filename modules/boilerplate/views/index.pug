@@ -1,0 +1,15 @@
+//- index.pug
+extends ../../pages/views/page.pug
+
+append head
+  script(src='/js/boilerplate/script.js')
+
+block content
+  div#boilerplate.boilerplate.flex-wrapper
+
+    #head.flex-block.flex-header
+      #header-wrapper.flex-wrapper
+        h1#headline.headline.flex-block.flex-left= module.name
+
+    #boilerplate-container.boilerplate-container.flex-block.flex-center
+      h2 Boilerplate

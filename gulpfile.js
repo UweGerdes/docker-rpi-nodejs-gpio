@@ -9,16 +9,18 @@
  * @module
  *
  */
+
 'use strict';
 
 require('./gulp/build');
 require('./gulp/lint');
 require('./gulp/server');
+require('./gulp/tests');
 require('./gulp/watch');
 
 const gulp = require('gulp'),
-  sequence = require('gulp-sequence')
-  ;
+  sequence = require('gulp-sequence'),
+  config = require('./lib/config');
 
 /**
  * #### default task
@@ -28,21 +30,8 @@ const gulp = require('gulp'),
  * @param {function} callback - gulp callback
  */
 gulp.task('default', (callback) => {
-  if (process.env.NODE_ENV == 'development') {
-    sequence(
-      'lint',
-      'build',
-      'watch',
-      'gpio-start',
-      'livereload-start',
-      'server-start',
-      callback);
-  } else {
-    sequence(
-      'build',
-      'watch',
-      'livereload-start',
-      'server-start',
-      callback);
-  }
+  sequence(
+    ...config.gulp.start[process.env.NODE_ENV].gulp,
+    callback
+  );
 });

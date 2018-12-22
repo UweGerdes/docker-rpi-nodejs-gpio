@@ -1,218 +1,147 @@
 /**
- * ## GPIO HTTP server
- *
- * Start a HTTP server for raspberry pi gpio control
+ * ## HTTP-Server for boilerplate
  *
  * @module server
  */
+
 'use strict';
 
-const chalk = require('chalk'),
-  fs = require('fs'),
-  http = require('http').createServer(handler),
-  ipc = require('node-ipc'),
-  io = require('socket.io')(http),
+const bodyParser = require('body-parser'),
+  cookieParser = require('cookie-parser'),
+  chalk = require('chalk'),
+  dateFormat = require('dateformat'),
+  express = require('express'),
+  glob = require('glob'),
+  morgan = require('morgan'),
   path = require('path'),
-  url = require('url'),
-  config = require('./lib/config').config,
-  ipv4addresses = require('./lib/ipv4addresses');
+  config = require('./lib/config'),
+  ipv4addresses = require('./lib/ipv4addresses'),
+  log = require('./lib/log'),
+  app = express();
 
-const serverPort = config.server.httpPort || process.env.SERVER_PORT || 8080;
-let socket;
-
-let items = {};
-
-ipc.config.id = 'client';
-ipc.config.retry = 1000;
-ipc.config.silent = true;
+let modules = { };
 
 /**
- * connect to gpio backend server
+ * Weberver logging
+ *
+ * using log format starting with [time]
  */
-ipc.connectToNet('gpio', () => {
-  /**
-   * on connect create items
-   */
-  ipc.of.gpio.on('connect', () => {
-    for (const [group, list] of Object.entries(config.gpio)) {
-      for (const [name, data] of Object.entries(list)) {
-        ipc.of.gpio.emit(
-          'app.create',
-          {
-            group: group,
-            name: name,
-            data: data
-          }
-        );
-      }
-    }
+if (config.server.verbose) {
+  morgan.token('time', () => {
+    return dateFormat(new Date(), 'HH:MM:ss');
   });
-  /**
-   * on disconnect show message
-   */
-  ipc.of.gpio.on('disconnect', () => {
-    console.log('disconnected from gpio');
-  });
-  /**
-   * set up internal data for items reported by gpio
-   *
-   * @param {object} data - item data
-   */
-  ipc.of.gpio.on('app.created', (data) => {
-    if (!items[data.group]) {
-      items[data.group] = { };
-    }
-    items[data.group][data.name] = data.data;
-    if (socket) {
-      socket.emit(data.id + '.created', data);
-    }
-  });
-  /**
-   * receive item status from gpio
-   *
-   * @param {object} data - item data
-   */
-  ipc.of.gpio.on('gpio.item-status', (data) => {
-    items[data.group][data.item] = data.data;
-    if (socket) {
-      socket.emit('item.data.' + data.group + '.' + data.item, data.data);
-    }
-  });
+  app.use(morgan('[' + chalk.gray(':time') + '] ' +
+    ':method :status :url :res[content-length] Bytes - :response-time ms'));
+}
+
+// base directory for views
+app.set('views', __dirname);
+
+// render ejs files
+app.set('view engine', 'ejs');
+
+// work on post requests
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// work on cookies
+app.use(cookieParser());
+
+// Serve static files
+app.use(express.static(config.server.docroot));
+
+/**
+ * Route for root dir
+ *
+ * @param {Object} req - request
+ * @param {Object} res - response
+ */
+app.get('/', (req, res) => {
+  res.sendFile(path.join(config.server.docroot, 'index.html'));
 });
 
-http.listen(serverPort);
-console.log('server listening on ' +
-  chalk.greenBright('http://' + ipv4addresses.get()[0] + ':' + serverPort));
+/**
+ * Route for app main page
+ *
+ * @param {Object} req - request
+ * @param {Object} res - response
+ */
+app.get('/app', (req, res) => {
+  res.render(viewPath('app'), getHostData(req));
+});
 
-function handler(request, response) { // jscs:ignore jsDoc
-  const uri = url.parse(request.url).pathname,
-      filename = path.join(process.cwd(), 'public', uri.replace(/\/$/, '/index.html'));
+/**
+ * Routes from modules
+ */
+glob.sync(config.server.modules + '/*/server/index.js')
+  .forEach((filename) => {
+    const regex = new RegExp(config.server.modules + '(/[^/]+)/server/index.js');
+    const baseRoute = filename.replace(regex, '$1');
+    modules[baseRoute] = require('./' + path.join(config.server.modules, baseRoute, 'config.json'));
+    app.use(baseRoute, require(filename));
+  });
 
-  const contentTypesByExtension = {
-    '.html': 'text/html',
-    '.css':  'text/css',
-    '.js':   'text/javascript'
+/**
+ * Route for everything else
+ *
+ * @param {Object} req - request
+ * @param {Object} res - response
+ */
+app.get('*', (req, res) => {
+  res.status(404).render(viewPath('404'), getHostData(req));
+});
+
+// Fire it up!
+log.info('server listening on ' +
+  chalk.greenBright('http://' + ipv4addresses.get()[0] + ':' + config.server.httpPort));
+
+app.listen(config.server.httpPort);
+
+/**
+ * Handle server errors
+ *
+ * @param {Object} err - error
+ * @param {Object} req - request
+ * @param {Object} res - response
+ * @param {Object} next - needed for complete signature
+ */
+app.use((err, req, res, next) => {
+  console.error('SERVER ERROR:', err);
+  if (err) {
+    res.status(500)
+      .render(viewPath('500'), Object.assign({ error: err }, getHostData(req)));
+  } else {
+    next();
+  }
+});
+
+/**
+ * Get the path for file to render
+ *
+ * @private
+ * @param {String} page - page type
+ * @param {String} type - file type (ejs, jade, pug, html)
+ */
+function viewPath(page = '404', type = 'ejs') {
+  return config.server.modules + '/pages/' + page + '/views/index.' + type;
+}
+
+/**
+ * Get the host data for ports and modules
+ *
+ * @private
+ * @param {String} req - request
+ */
+function getHostData(req) {
+  let livereloadPort = config.server.livereloadPort;
+  const host = req.get('Host');
+  if (host.indexOf(':') > 0) {
+    livereloadPort = parseInt(host.split(':')[1], 10) + 1;
+  }
+  return {
+    hostname: req.hostname,
+    httpPort: config.server.httpPort,
+    livereloadPort: livereloadPort,
+    modules: modules
   };
-
-  fs.exists(filename, (exists) => { // jscs:ignore jsDoc
-    if (!exists) {
-      response.writeHead(404, { 'Content-Type': 'text/plain' });
-      response.write('404 Not Found\n');
-      response.end();
-      return;
-    }
-
-    fs.readFile(filename, 'binary', (err, file) => { // jscs:ignore jsDoc
-      if (err) {
-        response.writeHead(500, { 'Content-Type': 'text/plain' });
-        response.write(err + '\n');
-        response.end();
-        return;
-      }
-
-      const headers = {};
-      const contentType = contentTypesByExtension[path.extname(filename)];
-      if (contentType) {
-        headers['Content-Type'] = contentType;
-      }
-      response.writeHead(200, headers);
-      response.write(file, 'binary');
-      response.end();
-    });
-  });
-}
-
-io.sockets.on('connection', function (newSocket) { // jscs:ignore jsDoc
-  socket = newSocket;
-  socket.on('allOff', () => { // jscs:ignore jsDoc
-    allOff();
-  });
-  socket.on('allOn', () => { // jscs:ignore jsDoc
-    allOn();
-  });
-  socket.on('allSmooth', (timeout) => { // jscs:ignore jsDoc
-    smooth(undefined, undefined, timeout);
-  });
-  socket.on('off', (data) => { // jscs:ignore jsDoc
-    off(data.group, data.item);
-  });
-  socket.on('smooth', (data) => { // jscs:ignore jsDoc
-    smooth(data.group, data.item, data.timeout);
-  });
-  socket.on('getItems', () => { // jscs:ignore jsDoc
-    socket.emit('items', items);
-  });
-  socket.on('setValue', (data) => { // jscs:ignore jsDoc
-    ipc.of.gpio.emit('app.setValue', data);
-  });
-});
-
-process.once('SIGUSR2', exitHandler);
-process.once('SIGTERM', exitHandler);
-process.once(15, exitHandler);
-
-function exitHandler() { // jscs:ignore jsDoc
-  console.log('server exiting');
-  process.exit();
-}
-
-function allOff() { // jscs:ignore jsDoc
-  for (const [group, list] of Object.entries(config.gpio)) {
-    for (const item of Object.keys(list)) {
-      ipc.of.gpio.emit(
-        'gpio.item-off',
-        {
-          group: group,
-          item: item
-        }
-      );
-    }
-  }
-}
-
-function allOn() { // jscs:ignore jsDoc
-  for (const [group, list] of Object.entries(config.gpio)) {
-    for (const item of Object.keys(list)) {
-      ipc.of.gpio.emit(
-        'gpio.item-on',
-        {
-          group: group,
-          item: item
-        }
-      );
-    }
-  }
-}
-
-function off(group, item) { // jscs:ignore jsDoc
-  ipc.of.gpio.emit(
-    'gpio.item-off',
-    {
-      group: group,
-      item: item
-    }
-  );
-}
-
-function smooth(group, item, timeout) { // jscs:ignore jsDoc
-  let items = config.gpio;
-  if (group) {
-    if (item) {
-      items = { [group]: { [item]: config.gpio[group][item] } };
-    } else {
-      items = { [group]: config.gpio[group] };
-    }
-  }
-  for (const [group, list] of Object.entries(items)) {
-    for (const item of Object.keys(list)) {
-      ipc.of.gpio.emit(
-        'gpio.item-smooth',
-        {
-          group: group,
-          item: item,
-          timeout: timeout
-        }
-      );
-    }
-  }
 }

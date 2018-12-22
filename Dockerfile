@@ -57,8 +57,6 @@ RUN export NODE_TLS_REJECT_UNAUTHORIZED=0 && \
 
 WORKDIR ${APP_HOME}
 
-VOLUME [ "${APP_HOME}" ]
-
 EXPOSE ${SERVER_PORT} ${LIVERELOAD_PORT}
 
-CMD [ "npm", "start" ]
+CMD [ "npm", "run", "dev" ]
