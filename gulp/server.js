@@ -109,10 +109,9 @@ const tasks = {
    * @namespace tasks
    */
   'livereload': () => {
-    console.log('livereload triggered', livereload);
     return gulp.src(config.gulp.watch.livereload)
-      .pipe(debug({ title: 'livereload', showCount: false }))
       .pipe(changedInPlace({ howToDetermineDifference: 'modification-time' }))
+      .pipe(debug({ title: 'livereload', showCount: false }))
       .pipe(livereload());
   },
   /**
