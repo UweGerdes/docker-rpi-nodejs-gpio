@@ -122,7 +122,7 @@ const tasks = {
   'livereload-index': () => {
     return gulp.src(config.gulp.watch.livereload[0])
       .pipe(notify({ message: 'triggered', title: 'livereload' }))
-      .pipe(livereload({ quiet: true }))
+      .pipe(livereload({ quiet: true }));
   },
   /**
    * ### server livereload start task
