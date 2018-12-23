@@ -1,24 +1,46 @@
 //- index.pug
 extends ../../pages/views/page.pug
 
-append head
-  script(src='/js/gpio/script.js')
-
 block content
-  div#gpio.gpio.flex-wrapper
+  .uncolored
+    #gpio.gpio.flex-wrapper
 
-    #head.flex-block.flex-header
-      #header-wrapper.flex-wrapper
-        h1#headline.headline.flex-block.flex-left= module.name
+      #head.flex-block.flex-header
+        #header-wrapper.flex-wrapper
+          h1#headline.headline.flex-block.flex-left= module.name
 
-    #gpio-buttons.gpio-buttons.controlButtons.flex-block.flex-center
-      .buttonContainer
-        button#allOff.button.controlButton(name='allOff', value='allOff') alle aus
-        button#allOn.button.controlButton(name='allOn', value='allOn') alle an
-        button#allOn.button.controlButton(name='smooth', value='smooth') smooth
-        button#allOn.button.controlButton(name='LEDsmooth', value='LEDsmooth') LED smooth
-        button#allOn.button.controlButton(name='RGBsmooth', value='RGBsmooth') RGB smooth
+      #gpio-buttons.gpio-buttons.controlButtons.flex-block.flex-center
+        .button-container
+          button#allOff.button.controlButton(name='allOff', value='allOff') alle aus
+          button#allOn.button.controlButton(name='allOn', value='allOn') alle an
+          button#smooth.button.controlButton(name='smooth', value='smooth') smooth
+          button#LEDsmooth.button.controlButton(name='LEDsmooth', value='LEDsmooth') LED smooth
+          button#RGBsmooth.button.controlButton(name='RGBsmooth', value='RGBsmooth') RGB smooth
 
-    #gpio-groups.gpio-groups.flex-block.flex-center
-      each list, group in items
-        .group= group
+      #gpio-groups.gpio-groups.flex-block.flex-center
+        each list, group in items
+          .group(id='group_' + group)
+            h2.group-headline= group
+            .group-items
+              each item, name in list
+                .group-item(id='item_' + name.replace(/[^A-zA-Z0-9]/, '_'))
+                  if item.type == 'LED'
+                    include items/led.pug
+                  else if item.type == 'RGBLED'
+                    include items/rgbled.pug
+                  else if item.type == 'Servo'
+                    include items/servo.pug
+                  else if item.type == 'Button'
+                    include items/button.pug
+                  else if item.type == 'Sensor'
+                    include items/sensor.pug
+                  else
+                    h3.error= item.type + ' not recognized'
+      .row
+        .cell
+          #elementContainer
+
+append footer
+  script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js')
+  script var socket = io();
+  script(src='/js/gpio/gpio.js')
