@@ -6,18 +6,15 @@
 
 'use strict';
 
-const http = require('http').createServer(),
-  ipc = require('node-ipc'),
+const ipc = require('node-ipc'),
   path = require('path'),
-  io = require('socket.io')(http),
   config = require('../../../lib/config').config,
-  ipv4addresses = require('../../../lib/ipv4addresses'),
   log = require('../../../lib/log'),
   model = require('./model.js');
 
 const viewBase = path.join(path.dirname(__dirname), 'views');
 
-let socket;
+let socket, io;
 
 let items = {};
 
@@ -81,35 +78,7 @@ ipc.connectToNet('gpio', () => {
   });
 });
 
-http.listen(config.server.socketPort);
-log.info('gpio socket listening on http://' + ipv4addresses.get()[0] + ':' + config.server.socketPort);
-
-io.sockets.on('connection', function (newSocket) { // jscs:ignore jsDoc
-  socket = newSocket;
-  socket.on('allOff', () => { // jscs:ignore jsDoc
-    allOff();
-  });
-  socket.on('allOn', () => { // jscs:ignore jsDoc
-    allOn();
-  });
-  socket.on('allSmooth', (timeout) => { // jscs:ignore jsDoc
-    smooth(undefined, undefined, timeout);
-  });
-  socket.on('off', (data) => { // jscs:ignore jsDoc
-    off(data.group, data.item);
-  });
-  socket.on('smooth', (data) => { // jscs:ignore jsDoc
-    smooth(data.group, data.item, data.timeout);
-  });
-  socket.on('getItems', () => { // jscs:ignore jsDoc
-    socket.emit('items', items);
-  });
-  socket.on('setValue', (data) => { // jscs:ignore jsDoc
-    ipc.of.gpio.emit('gpio.setValue', data);
-  });
-});
-
-function allOff() { // jscs:ignore jsDoc
+function allOff() {
   for (const [group, list] of Object.entries(config.gpio)) {
     for (const item of Object.keys(list)) {
       ipc.of.gpio.emit(
@@ -123,7 +92,7 @@ function allOff() { // jscs:ignore jsDoc
   }
 }
 
-function allOn() { // jscs:ignore jsDoc
+function allOn() {
   for (const [group, list] of Object.entries(config.gpio)) {
     for (const item of Object.keys(list)) {
       ipc.of.gpio.emit(
@@ -137,7 +106,7 @@ function allOn() { // jscs:ignore jsDoc
   }
 }
 
-function off(group, item) { // jscs:ignore jsDoc
+function off(group, item) {
   ipc.of.gpio.emit(
     'gpio.item-off',
     {
@@ -147,7 +116,7 @@ function off(group, item) { // jscs:ignore jsDoc
   );
 }
 
-function smooth(group, item, timeout) { // jscs:ignore jsDoc
+function smooth(group, item, timeout) {
   let items = config.gpio;
   if (group) {
     if (item) {
@@ -195,8 +164,44 @@ const index = (req, res) => {
   res.render(path.join(viewBase, 'index.pug'), data);
 };
 
+/**
+ * ### set express for socket
+ *
+ * @param {object} app - express instance
+ */
+const setExpress = (server) => {
+  console.log('setExpress for socket.io');
+  io = require('socket.io')(server);
+  io.sockets.on('connection', function (newSocket) {
+    socket = newSocket;
+    socket.on('allOff', () => {
+      allOff();
+    });
+    socket.on('allOn', () => {
+      allOn();
+    });
+    socket.on('allSmooth', (timeout) => {
+      console.log('allSmooth');
+      smooth(undefined, undefined, timeout);
+    });
+    socket.on('off', (data) => {
+      off(data.group, data.item);
+    });
+    socket.on('smooth', (data) => {
+      smooth(data.group, data.item, data.timeout);
+    });
+    socket.on('getItems', () => {
+      socket.emit('items', items);
+    });
+    socket.on('setValue', (data) => {
+      ipc.of.gpio.emit('gpio.setValue', data);
+    });
+  });
+};
+
 module.exports = {
-  index: index
+  index: index,
+  setExpress: setExpress
 };
 
 /**

@@ -1,44 +1,49 @@
 
 'use strict';
 
-/* jshint browser: true */
 /* globals socket */
 //var socket = io(); //loaded in html
 
-let changedPicker = false;
-
 window.addEventListener('load', documentLoaded);
 
-function documentLoaded() { // jscs:ignore jsDoc
+function documentLoaded() {
   const allOff = document.getElementById('allOff');
-  allOff.addEventListener('click', () => { // jscs:ignore jsDoc
+  allOff.addEventListener('click', () => {
     socket.emit('allOff', true);
   });
   const allOn = document.getElementById('allOn');
-  allOn.addEventListener('click', () => { // jscs:ignore jsDoc
+  allOn.addEventListener('click', () => {
     socket.emit('allOn', true);
   });
   const smooth = document.getElementById('smooth');
-  smooth.addEventListener('click', () => { // jscs:ignore jsDoc
+  smooth.addEventListener('click', () => {
     socket.emit('allSmooth', 2000);
   });
-  document.getElementById('RGBsmooth').addEventListener('click', () => { // jscs:ignore jsDoc
+  document.getElementById('RGBsmooth').addEventListener('click', () => {
     socket.emit('smooth', { group: 'RGB_LED', timeout: 2000 });
   });
-  document.getElementById('LEDsmooth').addEventListener('click', () => { // jscs:ignore jsDoc
+  document.getElementById('LEDsmooth').addEventListener('click', () => {
     socket.emit('smooth', { group: 'LED', timeout: 2000 });
   });
   socket.emit('getItems', true);
 }
 
-socket.on('items', (items) => { // jscs:ignore jsDoc
+socket.on('connect', () => {
+  console.log('connected');
+});
+
+socket.on('connect_error', (error) => {
+  console.log('connect_error', error);
+});
+
+socket.on('items', (items) => {
   const container = document.getElementById('elementContainer');
   if (container) {
     createElements(container, items);
   }
 });
 
-function createElements(container, data) { // jscs:ignore jsDoc
+function createElements(container, data) {
   while (container.childNodes.length > 0) {
     container.removeChild(container.childNodes[0]);
   }
@@ -46,14 +51,14 @@ function createElements(container, data) { // jscs:ignore jsDoc
     const newDiv = document.createElement('div');
     newDiv.setAttribute('id', group + '_container');
     newDiv.setAttribute('class', 'element_container');
-    for (const [item, data] of Object.entries(items)) { // jscs:ignore jsDoc
+    for (const [item, data] of Object.entries(items)) {
       newDiv.appendChild(createElement(group, item, data));
     }
     container.appendChild(newDiv);
   }
 }
 
-function createElement(group, item, data) { // jscs:ignore jsDoc
+function createElement(group, item, data) {
   const id = item.replace(/[^A-Za-z0-9-]/g, '_');
   const newDiv = document.createElement('div');
   newDiv.setAttribute('id', id + '_container');
@@ -79,7 +84,7 @@ const elementTypes = {
   Sensor: makeSensor,
 };
 
-function makeLED(group, item, id, data) { // jscs:ignore jsDoc
+function makeLED(group, item, id, data) {
   const newControls = document.createElement('div');
   newControls.setAttribute('class', data.type + '_controls');
   newControls.setAttribute('data-group', group);
@@ -89,12 +94,12 @@ function makeLED(group, item, id, data) { // jscs:ignore jsDoc
   return newControls;
 }
 
-function makeRGBLED(group, item, id, data) { // jscs:ignore jsDoc
+function makeRGBLED(group, item, id, data) {
   const newControls = document.createElement('div');
   newControls.setAttribute('class', data.type + '_controls');
   newControls.setAttribute('data-group', group);
   newControls.setAttribute('data-item', item);
-  data.color.forEach((color) => { // jscs:ignore jsDoc
+  data.color.forEach((color) => {
     const element = makeRange(group, item, id, data.range[color], data.pwmValue[color], color);
     newControls.appendChild(element);
   });
@@ -102,8 +107,7 @@ function makeRGBLED(group, item, id, data) { // jscs:ignore jsDoc
   element.setAttribute('id', id + '_picker');
   element.setAttribute('type', 'color');
   element.setAttribute('value', rgbToHex(data.pwmValue));
-  element.addEventListener('change', (event) => { // jscs:ignore jsDoc
-    changedPicker = true;
+  element.addEventListener('change', (event) => {
     const color = hexToRgb(event.currentTarget.value);
     socket.emit('setValue',
       {
@@ -113,7 +117,7 @@ function makeRGBLED(group, item, id, data) { // jscs:ignore jsDoc
       }
     );
   });
-  socket.on('item.data.' + group + '.' + item, (data) => { // jscs:ignore jsDoc
+  socket.on('item.data.' + group + '.' + item, (data) => {
     if (data.pwmValue) {
       element.value = rgbToHex(data.pwmValue);
     } else {
@@ -124,7 +128,7 @@ function makeRGBLED(group, item, id, data) { // jscs:ignore jsDoc
   return newControls;
 }
 
-function makePreview(group, item, id, type, color, pwmValue = 0) { // jscs:ignore jsDoc
+function makePreview(group, item, id, type, color, pwmValue = 0) {
   const element = document.createElement('div');
   element.setAttribute('id', id + '_preview');
   element.setAttribute('class', type + '_preview');
@@ -142,8 +146,8 @@ function makePreview(group, item, id, type, color, pwmValue = 0) { // jscs:ignor
   }
   element.setAttribute('data-pwmValue', pwm, rgbToHex(pwm));
   element.style.backgroundColor = rgbToHex(pwm);
-  element.addEventListener('click', (event) => { // jscs:ignore jsDoc
-    if (event.currentTarget.getAttribute('data-status') == 'smooth') {
+  element.addEventListener('click', (event) => {
+    if (event.currentTarget.getAttribute('data-status') === 'smooth') {
       socket.emit('off',
         {
           group: group,
@@ -154,7 +158,7 @@ function makePreview(group, item, id, type, color, pwmValue = 0) { // jscs:ignor
       socket.emit('smooth', { group: group, item: item, timeout: 2000 });
     }
   });
-  socket.on('item.data.' + group + '.' + item, (data) => { // jscs:ignore jsDoc
+  socket.on('item.data.' + group + '.' + item, (data) => {
     if (data.color && typeof data.color === 'string') {
       const color = { };
       color[data.color] = data.pwmValue;
@@ -173,7 +177,7 @@ function makePreview(group, item, id, type, color, pwmValue = 0) { // jscs:ignor
   return element;
 }
 
-function makeRange(group, item, id, range, pwmValue, color) { // jscs:ignore jsDoc
+function makeRange(group, item, id, range, pwmValue, color) {
   const element = document.createElement('input');
   element.setAttribute('id', id + '_' + color);
   element.setAttribute('type', 'range');
@@ -189,17 +193,17 @@ function makeRange(group, item, id, range, pwmValue, color) { // jscs:ignore jsD
   try {
     addRule('#' + id + '_' + color + '::-moz-range-thumb', { 'background': color });
   } catch (e) { /* not mozilla */ }
-  element.addEventListener('change', (event) => { // jscs:ignore jsDoc
+  element.addEventListener('change', (event) => {
     socket.emit('setValue',
       {
         group: group,
         item: item,
         color: color,
-        pwmValue: parseInt(event.currentTarget.value)
+        pwmValue: parseInt(event.currentTarget.value, 10)
       }
     );
   });
-  socket.on('item.data.' + group + '.' + item, (data) => { // jscs:ignore jsDoc
+  socket.on('item.data.' + group + '.' + item, (data) => {
     if (data.color && typeof data.color === 'string') {
       element.value = data.pwmValue <= 0 ? '1' : data.pwmValue;
     } else if (data.pwmValue) {
@@ -213,7 +217,7 @@ function makeRange(group, item, id, range, pwmValue, color) { // jscs:ignore jsD
   return element;
 }
 
-function makeServo(group, item, id, data) { // jscs:ignore jsDoc
+function makeServo(group, item, id, data) {
   const div = document.createElement('div');
   div.setAttribute('class', data.type + '_controls');
   div.setAttribute('data-group', group);
@@ -230,7 +234,7 @@ function makeServo(group, item, id, data) { // jscs:ignore jsDoc
   return div;
 }
 
-function makeServoRange(group, item, id, range, rangeValue) { // jscs:ignore jsDoc
+function makeServoRange(group, item, id, range, rangeValue) {
   const element = document.createElement('input');
   element.setAttribute('id', id + '_range');
   element.setAttribute('type', 'range');
@@ -240,16 +244,16 @@ function makeServoRange(group, item, id, range, rangeValue) { // jscs:ignore jsD
   element.setAttribute('class', 'slider range');
   element.setAttribute('data-group', group);
   element.setAttribute('data-item', item);
-  element.addEventListener('change', (event) => { // jscs:ignore jsDoc
+  element.addEventListener('change', (event) => {
     socket.emit('setValue',
       {
         group: group,
         item: item,
-        pwmValue: parseInt(event.currentTarget.value)
+        pwmValue: parseInt(event.currentTarget.value, 10)
       }
     );
   });
-  socket.on('item.data.' + group + '.' + item, (data) => { // jscs:ignore jsDoc
+  socket.on('item.data.' + group + '.' + item, (data) => {
     if (data.pwmValue) {
       element.value = data.pwmValue;
     } else {
@@ -259,14 +263,14 @@ function makeServoRange(group, item, id, range, rangeValue) { // jscs:ignore jsD
   return element;
 }
 
-function makeServoButtons(group, item, id, data, values) { // jscs:ignore jsDoc
+function makeServoButtons(group, item, id, data, values) {
   const container = document.createElement('div');
   container.setAttribute('class', 'controlButtons');
   container.setAttribute('data-group', group);
   container.setAttribute('data-item', item);
   const buttonContainer = document.createElement('div');
   buttonContainer.setAttribute('class', 'buttonContainer');
-  Object.keys(values).forEach((key) => { // jscs:ignore jsDoc
+  Object.keys(values).forEach((key) => {
     const button = makeServoButton(group, item, id, key, values[key]);
     buttonContainer.appendChild(button);
   });
@@ -274,7 +278,7 @@ function makeServoButtons(group, item, id, data, values) { // jscs:ignore jsDoc
   return container;
 }
 
-function makeServoButton(group, item, id, key, value) { // jscs:ignore jsDoc
+function makeServoButton(group, item, id, key, value) {
   const button = document.createElement('button');
   button.setAttribute('id', id + '_' + key.replace(/ /g, '_'));
   button.setAttribute('name', id + '_' + key.replace(/ /g, '_'));
@@ -282,17 +286,17 @@ function makeServoButton(group, item, id, key, value) { // jscs:ignore jsDoc
   button.setAttribute('class', 'button');
   const buttonText = document.createTextNode(key);
   button.appendChild(buttonText);
-  button.addEventListener('click', (event) => { // jscs:ignore jsDoc
+  button.addEventListener('click', (event) => {
     socket.emit('setValue',
       {
         group: group,
         item: item,
-        pwmValue: parseInt(event.currentTarget.value)
+        pwmValue: parseInt(event.currentTarget.value, 10)
       }
     );
   });
-  socket.on('item.data.' + group + '.' + item, (data) => { // jscs:ignore jsDoc
-    if ('' + data.pwmValue == value) {
+  socket.on('item.data.' + group + '.' + item, (data) => {
+    if ('' + data.pwmValue === value) {
       button.disabled = true;
     } else {
       button.disabled = false;
@@ -301,7 +305,7 @@ function makeServoButton(group, item, id, key, value) { // jscs:ignore jsDoc
   return button;
 }
 
-function makeButton(group, item, id, data) { // jscs:ignore jsDoc
+function makeButton(group, item, id, data) {
   const div = document.createElement('div');
   div.setAttribute('class', data.type + '_status');
   div.setAttribute('data-group', group);
@@ -310,14 +314,14 @@ function makeButton(group, item, id, data) { // jscs:ignore jsDoc
   element.setAttribute('id', id + '_checkbox');
   element.setAttribute('type', 'checkbox');
   div.appendChild(element);
-  socket.on(item, (value) => { // jscs:ignore jsDoc
+  socket.on(item, (value) => {
     console.log('button value: ' + value);
     element.checked = value === 1;
   });
   return div;
 }
 
-function makeSensor(group, item, id, data) { // jscs:ignore jsDoc
+function makeSensor(group, item, id, data) {
   const div = document.createElement('div');
   div.setAttribute('class', data.type + '_status');
   div.setAttribute('data-group', group);
@@ -326,7 +330,7 @@ function makeSensor(group, item, id, data) { // jscs:ignore jsDoc
   element.setAttribute('id', id + '_checkbox');
   element.setAttribute('type', 'checkbox');
   div.appendChild(element);
-  socket.on('item.data.' + group + '.' + item, (data) => { // jscs:ignore jsDoc
+  socket.on('item.data.' + group + '.' + item, (data) => {
     if (data.touched) {
       element.checked = !element.checked;
     }
@@ -334,21 +338,21 @@ function makeSensor(group, item, id, data) { // jscs:ignore jsDoc
   return div;
 }
 
-const addRule = ((style) => { // jscs:ignore jsDoc
+const addRule = ((style) => {
   const sheet = document.head.appendChild(style).sheet;
-  return function (selector, css) { // jscs:ignore jsDoc
+  return function (selector, css) {
     const propText = typeof css === 'string' ? css : Object.keys(css).map(
-      function (p) { // jscs:ignore jsDoc
+      function (p) {
         return p + ':' + (p === 'content' ? '\'' + css[p] + '\'' : css[p]);
       }).join(';');
     sheet.insertRule(selector + '{' + propText + '}', sheet.cssRules.length);
   };
 })(document.createElement('style'));
 
-function hexToRgb(hex) { // jscs:ignore jsDoc
+function hexToRgb(hex) {
   // Expand shorthand form (e.g. '03F') to full form (e.g. '0033FF')
   const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-  hex = hex.replace(shorthandRegex, (m, r, g, b) => { // jscs:ignore jsDoc
+  hex = hex.replace(shorthandRegex, (m, r, g, b) => {
     return r + r + g + g + b + b;
   });
 
@@ -360,27 +364,27 @@ function hexToRgb(hex) { // jscs:ignore jsDoc
   } : null;
 }
 
-function componentToHex(c) { // jscs:ignore jsDoc
+function componentToHex(c) {
   let hex = '00';
   if (c) {
     hex = c.toString(16);
   }
-  return hex.length == 1 ? '0' + hex : hex;
+  return hex.length === 1 ? '0' + hex : hex;
 }
 
-function rgbToHex(color) { // jscs:ignore jsDoc
+function rgbToHex(color) {
   let hex = '';
-  if (Object.keys(color)[0] == 'yellow') {
+  if (Object.keys(color)[0] === 'yellow') {
     hex += componentToHex(color.yellow);
     hex += hex;
     hex += '00';
   } else {
-    ['red', 'green', 'blue'].forEach((rgb) => { // jscs:ignore jsDoc
+    ['red', 'green', 'blue'].forEach((rgb) => {
       let col = color[rgb];
-      if (typeof col == 'string') {
-        col = parseInt(col);
+      if (typeof col === 'string') {
+        col = parseInt(col, 10);
       }
-      col = rgb != 'red' ? Math.min(col * 5, 255) : col;
+      col = rgb !== 'red' ? Math.min(col * 5, 255) : col;
       hex += componentToHex(col);
     });
   }

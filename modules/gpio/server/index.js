@@ -13,4 +13,7 @@ const controller = require('./controller.js');
 // gpio overview
 router.get('/', controller.index);
 
-module.exports = router;
+module.exports = {
+  router: router,
+  setExpress: controller.setExpress
+};
