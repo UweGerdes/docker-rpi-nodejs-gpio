@@ -8,21 +8,11 @@
 
 const gulp = require('gulp'),
   mocha = require('gulp-mocha'),
-  notify = require('gulp-notify'),
   sequence = require('gulp-sequence'),
   config = require('../lib/config'),
   filePromises = require('./lib/files-promises'),
-  loadTasks = require('./lib/load-tasks');
-
-/**
- * log only to console, not GUI
- *
- * @param {pbject} options - setting options
- * @param {function} callback - gulp callback
- */
-const log = notify.withReporter((options, callback) => {
-  callback();
-});
+  loadTasks = require('./lib/load-tasks'),
+  notify = require('./lib/notify');
 
 const tasks = {
   /**
@@ -56,7 +46,7 @@ const tasks = {
           .on('error', function () {
             self.emit('end');
           })
-          .pipe(log({ message: 'tested: <%= file.path %>', title: 'Gulp test-modules' }));
+          .pipe(notify({ message: 'tested: <%= file.path %>', title: 'Gulp test-modules' }));
         return self;
       })
       .then(() => {
