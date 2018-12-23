@@ -77,10 +77,6 @@ gulp:
       - 'server.js'
       - 'gpio/**/*.js'
       - 'modules/**/!(tests)/server/*.js'
-    gpio-stop:
-      - 'configuration.yaml'
-      - 'gulpfile.js'
-      - 'gulp/**/*.js'
     livereload:
       - 'public/**/*.html'
       - 'modules/**/*.pug'
