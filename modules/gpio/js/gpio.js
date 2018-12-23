@@ -2,7 +2,7 @@
 'use strict';
 
 /* globals socket */
-//var socket = io(); //loaded in html
+// var socket = io(); //loaded in html
 
 window.addEventListener('load', documentLoaded);
 
@@ -81,7 +81,7 @@ const elementTypes = {
   RGBLED: makeRGBLED,
   Servo: makeServo,
   Button: makeButton,
-  Sensor: makeSensor,
+  Sensor: makeSensor
 };
 
 function makeLED(group, item, id, data) {
@@ -114,8 +114,7 @@ function makeRGBLED(group, item, id, data) {
         group: group,
         item: item,
         pwmValue: color
-      }
-    );
+      });
   });
   socket.on('item.data.' + group + '.' + item, (data) => {
     if (data.pwmValue) {
@@ -152,8 +151,7 @@ function makePreview(group, item, id, type, color, pwmValue = 0) {
         {
           group: group,
           item: item
-        }
-      );
+        });
     } else {
       socket.emit('smooth', { group: group, item: item, timeout: 2000 });
     }
@@ -200,8 +198,7 @@ function makeRange(group, item, id, range, pwmValue, color) {
         item: item,
         color: color,
         pwmValue: parseInt(event.currentTarget.value, 10)
-      }
-    );
+      });
   });
   socket.on('item.data.' + group + '.' + item, (data) => {
     if (data.color && typeof data.color === 'string') {
@@ -223,13 +220,13 @@ function makeServo(group, item, id, data) {
   div.setAttribute('data-group', group);
   div.setAttribute('data-item', item);
   div.appendChild(makeServoButtons(group, item, id, data,
-      {
-        'Links': data.range.min,
-        'Halblinks': data.range.min + (data.range.max - data.range.min) / 4,
-        'Mitte': data.midValue,
-        'Halbrechts': data.range.min + (data.range.max - data.range.min) * 3 / 4,
-        'Rechts': data.range.max,
-      }));
+    {
+      'Links': data.range.min,
+      'Halblinks': data.range.min + (data.range.max - data.range.min) / 4,
+      'Mitte': data.midValue,
+      'Halbrechts': data.range.min + (data.range.max - data.range.min) * 3 / 4,
+      'Rechts': data.range.max
+    }));
   div.appendChild(makeServoRange(group, item, id, data.range, data.rangeValue));
   return div;
 }
@@ -250,8 +247,7 @@ function makeServoRange(group, item, id, range, rangeValue) {
         group: group,
         item: item,
         pwmValue: parseInt(event.currentTarget.value, 10)
-      }
-    );
+      });
   });
   socket.on('item.data.' + group + '.' + item, (data) => {
     if (data.pwmValue) {
@@ -292,8 +288,7 @@ function makeServoButton(group, item, id, key, value) {
         group: group,
         item: item,
         pwmValue: parseInt(event.currentTarget.value, 10)
-      }
-    );
+      });
   });
   socket.on('item.data.' + group + '.' + item, (data) => {
     if ('' + data.pwmValue === value) {
@@ -344,7 +339,8 @@ const addRule = ((style) => {
     const propText = typeof css === 'string' ? css : Object.keys(css).map(
       function (p) {
         return p + ':' + (p === 'content' ? '\'' + css[p] + '\'' : css[p]);
-      }).join(';');
+      }
+    ).join(';');
     sheet.insertRule(selector + '{' + propText + '}', sheet.cssRules.length);
   };
 })(document.createElement('style'));

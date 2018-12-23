@@ -36,9 +36,9 @@ block content
                     include items/sensor.pug
                   else
                     h3.error= item.type + ' not recognized'
-      .row
-        .cell
-          #elementContainer
+  .row
+    .cell
+      #elementContainer
 
 append footer
   script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js')

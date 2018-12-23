@@ -14,7 +14,8 @@ const ipc = require('node-ipc'),
 
 const viewBase = path.join(path.dirname(__dirname), 'views');
 
-let socket, io;
+let socket,
+  io;
 
 let items = {};
 
