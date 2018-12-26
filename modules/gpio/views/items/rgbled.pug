@@ -1,2 +1,9 @@
 //- items/rgbled.pug
-h3.item-headline= name
+.gpio-item-rgbled
+  .gpio-item-header
+    .gpio-item-header-right
+      label.gpio-item-label= name
+    .gpio-item-header-right
+      include ../widgets/preview.pug
+  each thumbColor in item.color
+    include ../widgets/slider.pug

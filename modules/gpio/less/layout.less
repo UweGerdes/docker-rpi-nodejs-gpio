@@ -7,10 +7,35 @@
     text-align: center;
   }
 
+  &-group {
+    width: 100%;
+  }
+
   &-item {
+    border: 1px solid #aaaaaa;
+    margin: 0 1em 1em 0;
+    padding: 1em 1em 0.5em;
+
+    &-header {
+      align-content: flex-start;
+      display: flex;
+      flex-flow: row wrap;
+
+      &-left {
+        flex: 2 0 auto;
+        order: 1;
+      }
+
+      &-right {
+        flex: 1 0 8%;
+        order: 3;
+        text-align: right;
+      }
+    }
+
     &-label {
       display: block;
-      font-size: 1.2em;
+      font-size: 1.4em;
       font-weight: bold;
       line-height: auto;
       text-align: left;
