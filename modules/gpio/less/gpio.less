@@ -8,22 +8,91 @@
   text-align: center;
 }
 
-.controlButtons {
-  padding: 0 0 1em;
-  text-align: center;
-}
-
-.button_container {
-  white-space: nowrap;
-}
-
-.button {
-  font-size: 1.2em;
-  font-weight: bold;
-  padding: .5em .6em;
+.item {
 }
 
 .element_container {
+  .controlButtons {
+    padding: 0 0 1em;
+    text-align: center;
+  }
+
+  .button {
+    font-size: 1.2em;
+    font-weight: bold;
+    padding: .5em .6em;
+  }
+
+  .button_container {
+    white-space: nowrap;
+  }
+
+  .LED,
+  .RGBLED {
+    &_container {
+      border: 1px solid #cccccc;
+      float: left;
+      margin: 0 0.5% 2% 0;
+      padding: 0 2%;
+      width: 95%;
+    }
+
+    &_label {
+      display: block;
+      float: left;
+      font-size: 1.2em;
+      font-weight: bold;
+      padding: 1em 0 0;
+      text-align: center;
+    }
+
+    &_preview {
+      border: 2px solid #000000;
+      float: right;
+      height: 20px;
+      margin: 1em 0 0;
+      width: 40px;
+    }
+
+    &_controls {
+      margin: 5px 0;
+    }
+  }
+
+  .SERVO {
+    &_container {
+      border: 1px solid #cccccc;
+      float: right;
+      margin: 0 0.8% 2%;
+      padding: 0 2%;
+      width: 94%;
+    }
+
+    &_label {
+      display: block;
+      float: left;
+      font-size: 1.2em;
+      font-weight: bold;
+      padding: 1em 0 0;
+      text-align: center;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .LED {
+      &_container {
+        width: 20%;
+      }
+    }
+
+    .RGBLED {
+      &_container {
+        margin: 0 0.8% 2% 0;
+        width: 28%;
+      }
+    }
+  }
+
   &:after {
     clear: both;
     content: '';
@@ -32,69 +101,3 @@
 }
 
 @import 'inc/slider';
-
-.LED,
-.RGBLED {
-  &_container {
-    border: 1px solid #cccccc;
-    float: left;
-    margin: 0 0.5% 2% 0;
-    padding: 0 2%;
-    width: 95%;
-  }
-
-  &_label {
-    display: block;
-    float: left;
-    font-size: 1.2em;
-    font-weight: bold;
-    padding: 1em 0 0;
-    text-align: center;
-  }
-
-  &_preview {
-    border: 2px solid #000000;
-    float: right;
-    height: 20px;
-    margin: 1em 0 0;
-    width: 40px;
-  }
-
-  &_controls {
-    margin: 5px 0;
-  }
-}
-
-.SERVO {
-  &_container {
-    border: 1px solid #cccccc;
-    float: right;
-    margin: 0 0.8% 2%;
-    padding: 0 2%;
-    width: 94%;
-  }
-
-  &_label {
-    display: block;
-    float: left;
-    font-size: 1.2em;
-    font-weight: bold;
-    padding: 1em 0 0;
-    text-align: center;
-  }
-}
-
-@media (min-width: 1024px) {
-  .LED {
-    &_container {
-      width: 20%;
-    }
-  }
-
-  .RGBLED {
-    &_container {
-      margin: 0 0.8% 2% 0;
-      width: 28%;
-    }
-  }
-}

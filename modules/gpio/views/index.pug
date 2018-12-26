@@ -23,7 +23,7 @@ block content
             h2.group-headline= group
             .group-items
               each item, name in list
-                .group-item(id='item_' + name.replace(/[^A-zA-Z0-9]/, '_'))
+                .item(id='item_' + name.replace(/[^A-zA-Z0-9]/, '_'))
                   if item.type == 'LED'
                     include items/led.pug
                   else if item.type == 'RGBLED'
