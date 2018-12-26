@@ -13,9 +13,9 @@ const chai = require('chai'),
 
 chai.use(chaiHttp);
 
-describe('/gpio/tests/server/index.js', function () {
+describe('/gpio/tests/server/led.js', function () {
   describe('GET /gpio/', function () {
-    it('should have head', function (done) {
+    it('should have leds', function (done) {
       chai.request('http://localhost:8080')
         .get('/gpio/')
         .end(function (err, res) {
@@ -23,11 +23,12 @@ describe('/gpio/tests/server/index.js', function () {
           expect(res).to.have.status(200);
           expect(res).to.be.html;
           const { document } = (new JSDOM(res.text)).window;
-          assert.equal(document.title, 'gpio');
+          const leds = document.querySelectorAll('.gpio-item-led');
+          assert.equal(leds.length, 4);
           done();
         });
     });
-    it('should have headline and script', function (done) {
+    it('should have led headlines', function (done) {
       chai.request('http://localhost:8080')
         .get('/gpio/')
         .end(function (err, res) {
@@ -35,14 +36,13 @@ describe('/gpio/tests/server/index.js', function () {
           expect(res).to.have.status(200);
           expect(res).to.be.html;
           const { document } = (new JSDOM(res.text)).window;
-          const headline = document.getElementById('headline');
-          assert.equal(headline.textContent, 'Raspberry Pi 3 GPIO');
-          const gpioScript = document.querySelectorAll('script[src="/js/gpio/gpio.js"]');
-          assert.equal(gpioScript.length, 1);
+          const ledHeadlines = document.querySelectorAll('.gpio-item-led .gpio-item-headline');
+          assert.equal(ledHeadlines.length, 4);
+          assert.equal(ledHeadlines[0].textContent, 'LED 1');
           done();
         });
     });
-    it('should have groups', function (done) {
+    it('should have led previews', function (done) {
       chai.request('http://localhost:8080')
         .get('/gpio/')
         .end(function (err, res) {
@@ -50,10 +50,11 @@ describe('/gpio/tests/server/index.js', function () {
           expect(res).to.have.status(200);
           expect(res).to.be.html;
           const { document } = (new JSDOM(res.text)).window;
-          const groupsContainer = document.querySelectorAll('.gpio-groups');
-          assert.equal(groupsContainer.length, 1);
-          const groups = document.querySelectorAll('.gpio-group');
-          assert.equal(groups.length, 5);
+          const ledPreviews = document.querySelectorAll('.gpio-item-led .gpio-item-preview');
+          assert.equal(ledPreviews.length, 4);
+          assert.equal(ledPreviews[0].getAttribute('data-group'), 'LED');
+          assert.equal(ledPreviews[0].getAttribute('data-item'), 'LED 1');
+          assert.equal(ledPreviews[0].getAttribute('data-type'), 'LED');
           done();
         });
     });

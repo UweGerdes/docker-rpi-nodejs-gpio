@@ -1,8 +1,10 @@
 //- items/led.pug
-h3.item-headline= name
-.item-preview&attributes({
-  id: name.replace(/[^A-zA-Z0-9]/, '_') + '_preview',
-  'data-group': 'LED',
-  'data-item': name,
-  style: 'background-color: ' + item.color
-})
+.gpio-item-led
+  h3.gpio-item-headline= name
+  .gpio-item-preview&attributes({
+    id: name.replace(/[^A-zA-Z0-9]/, '_') + '_preview',
+    'data-group': 'LED',
+    'data-item': name,
+    'data-type': item.type,
+    style: 'background-color: ' + item.color
+  })

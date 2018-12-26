@@ -7,7 +7,7 @@ block content
 
       #head.flex-block.flex-header
         #header-wrapper.flex-wrapper
-          h1#headline.headline.flex-block.flex-left= module.name
+          h1#headline.headline.gpio-headline.flex-block.flex-left= module.name
 
       #gpio-buttons.gpio-buttons.controlButtons.flex-block.flex-center
         .button-container
@@ -19,11 +19,11 @@ block content
 
       #gpio-groups.gpio-groups.flex-block.flex-center
         each list, group in items
-          .group(id='group_' + group)
-            h2.group-headline= group
-            .group-items
+          .gpio-group(id='group_' + group)
+            h2.gpio-group-headline= group
+            .gpio-group-items
               each item, name in list
-                .item(id='item_' + name.replace(/[^A-zA-Z0-9]/, '_'))
+                .gpio-item(id='item_' + name.replace(/[^A-zA-Z0-9]/, '_'))
                   if item.type == 'LED'
                     include items/led.pug
                   else if item.type == 'RGBLED'
