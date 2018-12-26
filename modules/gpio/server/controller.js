@@ -171,7 +171,6 @@ const index = (req, res) => {
  * @param {object} app - express instance
  */
 const setExpress = (server) => {
-  console.log('setExpress for socket.io');
   io = require('socket.io')(server);
   io.sockets.on('connection', function (newSocket) {
     socket = newSocket;
