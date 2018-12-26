@@ -36,9 +36,9 @@ describe('/gpio/tests/server/led.js', function () {
           expect(res).to.have.status(200);
           expect(res).to.be.html;
           const { document } = (new JSDOM(res.text)).window;
-          const ledHeadlines = document.querySelectorAll('.gpio-item-led .gpio-item-headline');
-          assert.equal(ledHeadlines.length, 4);
-          assert.equal(ledHeadlines[0].textContent, 'LED 1');
+          const ledLabels = document.querySelectorAll('.gpio-item-led .gpio-item-label');
+          assert.equal(ledLabels.length, 4);
+          assert.equal(ledLabels[0].textContent, 'LED 1');
           done();
         });
     });
