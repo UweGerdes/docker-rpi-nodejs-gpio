@@ -14,11 +14,9 @@ ENV SERVER_PORT ${SERVER_PORT}
 ENV LIVERELOAD_PORT ${LIVERELOAD_PORT}
 ENV GPIO_GROUP ${GPIO_GROUP}
 
-COPY package.json ${NODE_HOME}/
-
 USER root
 
-WORKDIR ${NODE_HOME}
+COPY package.json ${NODE_HOME}/
 
 RUN apt-get update && \
 	apt-get dist-upgrade -y && \
@@ -47,10 +45,11 @@ RUN apt-get update && \
 
 COPY . ${APP_HOME}
 
-RUN echo "starting chown -R ${USER_NAME}:${USER_NAME} ${APP_HOME}" && \
-	chown -R ${USER_NAME}:${USER_NAME} ${APP_HOME}
+RUN chown -R ${USER_NAME}:${USER_NAME} ${APP_HOME}
 
 USER ${USER_NAME}
+
+WORKDIR ${NODE_HOME}
 
 RUN export NODE_TLS_REJECT_UNAUTHORIZED=0 && \
 	npm install --cache /tmp/node-cache
