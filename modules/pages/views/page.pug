@@ -2,7 +2,7 @@
 html
   head
     include ../../page-elements/head.pug
-  body
+  body(class=(module.bodyclass ? module.bodyclass : ''))
     #page.page
       block content
       include ../../page-elements/footer.pug

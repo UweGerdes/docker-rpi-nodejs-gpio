@@ -1,3 +1,4 @@
 {
-  "name": "Raspberry Pi 3 GPIO"
+  "name": "Raspberry Pi 3 GPIO",
+  "bodyclass": "gpio"
 }
