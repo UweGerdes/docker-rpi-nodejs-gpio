@@ -23,7 +23,6 @@ gulp:
         - 'ejslint'
         - 'eslint'
         - 'jsonlint'
-        - 'lesshint'
         - 'yamllint'
         - 'puglint'
         - 'ejslint'
@@ -60,9 +59,6 @@ gulp:
     jsonlint:
       - '**/*.json'
       - '.lesshintrc'
-    lesshint:
-      - 'modules/**/less/**/*.less'
-      - 'src/less/**/*.less'
     yamllint:
       - '**/*.yaml'
       - '**/*.yml'
