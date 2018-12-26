@@ -25,7 +25,7 @@ let gpioServer;
 
 const tasks = {
   /**
-   * ### server start and run tests
+   * ### server start
    *
    * @task server
    * @namespace tasks

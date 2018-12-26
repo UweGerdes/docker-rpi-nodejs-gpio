@@ -1,5 +1,5 @@
 /**
- * gulpfile for project docker-rpi-nodejs-gpio
+ * gulpfile
  *
  * (c) Uwe Gerdes, entwicklung@uwegerdes.de
  *
