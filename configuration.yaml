@@ -131,7 +131,7 @@ gpio:
       gpio: 10
       color: 'blue'
       range: { min: 1, max: 255 }
-  RGB_LED:
+  'RGB LED':
     'RGB LED 1':
       type: 'RGBLED'
       gpio: { red: 23, green: 24, blue: 25 }

@@ -1,2 +1,7 @@
 //- items/button.pug
-h3.item-headline= name
+.gpio-item-button
+  .gpio-item-header
+    .gpio-item-header-right
+      label.gpio-item-label= name
+    .gpio-item-header-right
+      include ../widgets/status.pug

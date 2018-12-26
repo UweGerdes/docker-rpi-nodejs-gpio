@@ -42,6 +42,26 @@ describe('/gpio/tests/server/index.js', function () {
           done();
         });
     });
+    it('should have buttons', function (done) {
+      chai.request('http://localhost:8080')
+        .get('/gpio/')
+        .end(function (err, res) {
+          expect(err).to.be.null;
+          expect(res).to.have.status(200);
+          expect(res).to.be.html;
+          const { document } = (new JSDOM(res.text)).window;
+          const buttonsContainer = document.querySelectorAll('.gpio-buttons');
+          assert.equal(buttonsContainer.length, 1);
+          const buttons = document.querySelectorAll('.gpio-button');
+          assert.equal(buttons.length, 5);
+          assert.equal(buttons[0].textContent, 'alle aus');
+          assert.equal(buttons[1].textContent, 'alle an');
+          assert.equal(buttons[2].textContent, 'smooth');
+          assert.equal(buttons[3].textContent, 'LED smooth');
+          assert.equal(buttons[4].textContent, 'RGB smooth');
+          done();
+        });
+    });
     it('should have groups', function (done) {
       chai.request('http://localhost:8080')
         .get('/gpio/')

@@ -52,7 +52,7 @@ describe('/gpio/tests/server/rgbled.js', function () {
           const { document } = (new JSDOM(res.text)).window;
           const ledPreviews = document.querySelectorAll('.gpio-item-rgbled .gpio-item-status');
           assert.equal(ledPreviews.length, 3);
-          assert.equal(ledPreviews[0].getAttribute('data-group'), 'RGB_LED');
+          assert.equal(ledPreviews[0].getAttribute('data-group'), 'RGB LED');
           assert.equal(ledPreviews[0].getAttribute('data-name'), 'RGB LED 1');
           assert.equal(ledPreviews[0].getAttribute('data-type'), 'RGBLED');
           done();
@@ -69,7 +69,7 @@ describe('/gpio/tests/server/rgbled.js', function () {
           const ledSliders = document.querySelectorAll('.gpio-item-rgbled .gpio-item-slider');
           assert.equal(ledSliders.length, 9);
           assert.equal(ledSliders[0].getAttribute('type'), 'range');
-          assert.equal(ledSliders[0].getAttribute('data-group'), 'RGB_LED');
+          assert.equal(ledSliders[0].getAttribute('data-group'), 'RGB LED');
           assert.equal(ledSliders[0].getAttribute('data-name'), 'RGB LED 1');
           assert.equal(ledSliders[0].getAttribute('data-type'), 'RGBLED');
           let led1Slider1 = document.querySelectorAll('.gpio-item-rgbled [id="RGB_LED 3_green_slider"]');
