@@ -13,9 +13,9 @@ const chai = require('chai'),
 
 chai.use(chaiHttp);
 
-describe('/gpio/tests/server/led.js', function () {
+describe('/gpio/tests/server/rgbled.js', function () {
   describe('GET /gpio/', function () {
-    it('should have leds', function (done) {
+    it('should have rgbleds', function (done) {
       chai.request('http://localhost:8080')
         .get('/gpio/')
         .end(function (err, res) {
@@ -23,12 +23,12 @@ describe('/gpio/tests/server/led.js', function () {
           expect(res).to.have.status(200);
           expect(res).to.be.html;
           const { document } = (new JSDOM(res.text)).window;
-          const leds = document.querySelectorAll('.gpio-item-led');
-          assert.equal(leds.length, 4);
+          const leds = document.querySelectorAll('.gpio-item-rgbled');
+          assert.equal(leds.length, 3);
           done();
         });
     });
-    it('should have led headlines', function (done) {
+    it('should have rgbled headlines', function (done) {
       chai.request('http://localhost:8080')
         .get('/gpio/')
         .end(function (err, res) {
@@ -36,13 +36,13 @@ describe('/gpio/tests/server/led.js', function () {
           expect(res).to.have.status(200);
           expect(res).to.be.html;
           const { document } = (new JSDOM(res.text)).window;
-          const ledLabels = document.querySelectorAll('.gpio-item-led .gpio-item-label');
-          assert.equal(ledLabels.length, 4);
-          assert.equal(ledLabels[0].textContent, 'LED 1');
+          const ledLabels = document.querySelectorAll('.gpio-item-rgbled .gpio-item-label');
+          assert.equal(ledLabels.length, 3);
+          assert.equal(ledLabels[0].textContent, 'RGB LED 1');
           done();
         });
     });
-    it('should have led previews', function (done) {
+    it('should have rgbled previews', function (done) {
       chai.request('http://localhost:8080')
         .get('/gpio/')
         .end(function (err, res) {
@@ -50,15 +50,15 @@ describe('/gpio/tests/server/led.js', function () {
           expect(res).to.have.status(200);
           expect(res).to.be.html;
           const { document } = (new JSDOM(res.text)).window;
-          const ledPreviews = document.querySelectorAll('.gpio-item-led .gpio-item-status');
-          assert.equal(ledPreviews.length, 4);
-          assert.equal(ledPreviews[0].getAttribute('data-group'), 'LED');
-          assert.equal(ledPreviews[0].getAttribute('data-name'), 'LED 1');
-          assert.equal(ledPreviews[0].getAttribute('data-type'), 'LED');
+          const ledPreviews = document.querySelectorAll('.gpio-item-rgbled .gpio-item-status');
+          assert.equal(ledPreviews.length, 3);
+          assert.equal(ledPreviews[0].getAttribute('data-group'), 'RGB_LED');
+          assert.equal(ledPreviews[0].getAttribute('data-name'), 'RGB LED 1');
+          assert.equal(ledPreviews[0].getAttribute('data-type'), 'RGBLED');
           done();
         });
     });
-    it('should have led sliders', function (done) {
+    it('should have rgbled sliders', function (done) {
       chai.request('http://localhost:8080')
         .get('/gpio/')
         .end(function (err, res) {
@@ -66,12 +66,15 @@ describe('/gpio/tests/server/led.js', function () {
           expect(res).to.have.status(200);
           expect(res).to.be.html;
           const { document } = (new JSDOM(res.text)).window;
-          const ledSliders = document.querySelectorAll('.gpio-item-led .gpio-item-slider');
-          assert.equal(ledSliders.length, 4);
+          const ledSliders = document.querySelectorAll('.gpio-item-rgbled .gpio-item-slider');
+          assert.equal(ledSliders.length, 9);
           assert.equal(ledSliders[0].getAttribute('type'), 'range');
-          assert.equal(ledSliders[0].getAttribute('data-group'), 'LED');
-          assert.equal(ledSliders[0].getAttribute('data-name'), 'LED 1');
-          assert.equal(ledSliders[0].getAttribute('data-type'), 'LED');
+          assert.equal(ledSliders[0].getAttribute('data-group'), 'RGB_LED');
+          assert.equal(ledSliders[0].getAttribute('data-name'), 'RGB LED 1');
+          assert.equal(ledSliders[0].getAttribute('data-type'), 'RGBLED');
+          let led1Slider1 = document.querySelectorAll('.gpio-item-rgbled [id="RGB_LED 3_green_slider"]');
+          assert.equal(led1Slider1.length, 1);
+          assert.equal(ledSliders[0].getAttribute('name'), 'RGB_LED 1_red_slider');
           done();
         });
     });

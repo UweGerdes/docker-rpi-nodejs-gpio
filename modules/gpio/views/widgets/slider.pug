@@ -3,8 +3,9 @@ div(
   class=item.type + '_controls ' + thumbColor
 )
   input.gpio-item-slider&attributes({
-    id: name.replace(/[^A-zA-Z0-9]/, '_') + '_slider',
+    id: name.replace(/[^A-zA-Z0-9]/, '_') + (item.type == 'RGBLED' ? '_' + thumbColor : '') + '_slider',
     type: 'range',
+    name: name.replace(/[^A-zA-Z0-9]/, '_') + (item.type == 'RGBLED' ? '_' + thumbColor : '') + '_slider',
     min: item.range.min,
     max: item.range.max,
     value: 0,
