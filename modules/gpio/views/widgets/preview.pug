@@ -1,8 +1,8 @@
 //- items/preview.pug
 .gpio-item-preview&attributes({
   id: name.replace(/[^A-zA-Z0-9]/, '_') + '_preview',
-  'data-group': 'LED',
-  'data-item': name,
+  'data-group': group,
+  'data-name': name,
   'data-type': item.type,
   style: 'background-color: ' + item.color
 })

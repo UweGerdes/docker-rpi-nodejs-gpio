@@ -2,3 +2,5 @@
 .gpio-item-led
   label.gpio-item-label= name
   include ../widgets/preview.pug
+  - thumbColor = item.color ? item.color : '#000000'
+  include ../widgets/slider.pug

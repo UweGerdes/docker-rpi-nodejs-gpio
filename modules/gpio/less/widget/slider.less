@@ -1,0 +1,66 @@
+// less file for slider layout
+
+@slider-width: 15px;
+
+&-slider {
+  -webkit-appearance: none;
+  background: #d3d3d3;
+  border-radius: @slider-width;
+  height: 2 * @slider-width;
+  margin: 10px 0;
+  width: 100%;
+
+  &:hover {
+      opacity: 1;
+    }
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    background: #303030;
+    border-radius: 50%;
+    cursor: pointer;
+    height: 2 * @slider-width;
+    width: 2 * @slider-width;
+
+    .red & {
+      background-color: #ff0000;
+    }
+
+    .yellow & {
+      background-color: #ffff00;
+    }
+
+    .green & {
+      background-color: #00ff00;
+    }
+
+    .blue & {
+      background-color: #0000ff;
+    }
+  }
+
+  &::-moz-range-thumb {
+    background: #303030;
+    border-radius: 50%;
+    cursor: pointer;
+    height: 2 * @slider-width;
+    width: 2 * @slider-width;
+
+    .red & {
+      background-color: #ff0000;
+    }
+
+    .yellow & {
+      background-color: #ffff00;
+    }
+
+    .green & {
+      background-color: #00ff00;
+    }
+
+    .blue & {
+      background-color: #0000ff;
+    }
+  }
+}

@@ -53,8 +53,24 @@ describe('/gpio/tests/server/led.js', function () {
           const ledPreviews = document.querySelectorAll('.gpio-item-led .gpio-item-preview');
           assert.equal(ledPreviews.length, 4);
           assert.equal(ledPreviews[0].getAttribute('data-group'), 'LED');
-          assert.equal(ledPreviews[0].getAttribute('data-item'), 'LED 1');
+          assert.equal(ledPreviews[0].getAttribute('data-name'), 'LED 1');
           assert.equal(ledPreviews[0].getAttribute('data-type'), 'LED');
+          done();
+        });
+    });
+    it('should have led sliders', function (done) {
+      chai.request('http://localhost:8080')
+        .get('/gpio/')
+        .end(function (err, res) {
+          expect(err).to.be.null;
+          expect(res).to.have.status(200);
+          expect(res).to.be.html;
+          const { document } = (new JSDOM(res.text)).window;
+          const ledSliders = document.querySelectorAll('.gpio-item-led .gpio-item-slider');
+          assert.equal(ledSliders.length, 4);
+          assert.equal(ledSliders[0].getAttribute('data-group'), 'LED');
+          assert.equal(ledSliders[0].getAttribute('data-name'), 'LED 1');
+          assert.equal(ledSliders[0].getAttribute('data-type'), 'LED');
           done();
         });
     });
