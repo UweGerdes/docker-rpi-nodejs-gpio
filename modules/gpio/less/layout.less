@@ -11,19 +11,42 @@
     text-align: center;
   }
 
-  &-button {
-    font-size: 1.4em;
-    font-weight: bold;
-    padding: 0.25em 1em;
+  &-button-group {
+    align-content: flex-start;
+    display: flex;
+    flex-flow: row wrap;
   }
 
-  &-group {
-    width: 100%;
+  &-button {
+    flex: 1 0 auto;
+    font-size: 1.4em;
+    font-weight: bold;
+    margin: 0 0.5em 0.5em 0;
+    padding: 0.25em 0;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+
+  @media (min-width: 800px) {
+    &-button-group {
+      display: inline-block;
+      margin-right: 0.75em;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+
+    &-button {
+      padding: 0.25em 1em;
+    }
   }
 
   &-item {
     border: 1px solid #aaaaaa;
-    margin: 0 1em 1em 0;
+    margin: 0 0 1em;
     padding: 1em 1em 0.75em;
 
     &-header {
@@ -53,6 +76,47 @@
 
     @import 'widget/slider';
     @import 'widget/status';
+  }
+
+  @media (min-width: 1000px) {
+    &-groups {
+      align-content: flex-start;
+      display: flex;
+      flex-flow: row wrap;
+    }
+
+    &-group {
+      flex: 1 0 auto;
+    }
+
+    &-group-items {
+      align-content: flex-start;
+      display: flex;
+      flex-flow: row wrap;
+    }
+
+    &-item {
+      flex: 1 0 auto;
+    }
+  }
+
+  @media (min-width: 2024px) {
+    &-group {
+      &-items {
+        align-content: flex-start;
+        display: flex;
+        flex-flow: row wrap;
+      }
+    }
+
+    &-item {
+      flex: 1 0 auto;
+      margin-right: 1em;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
   }
 
   .footer {

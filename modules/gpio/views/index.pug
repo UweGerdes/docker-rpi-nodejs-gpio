@@ -10,15 +10,20 @@ block content
           h1#headline.headline.gpio-headline.flex-block.flex-left= module.name
 
       #gpio-buttons.gpio-buttons.controlButtons.flex-block.flex-center
-        button#allOff.button.gpio-button.controlButton(name='allOff', value='allOff') alle aus
-        button#allOn.button.gpio-button.controlButton(name='allOn', value='allOn') alle an
-        button#smooth.button.gpio-button.controlButton(name='smooth', value='smooth') smooth
-        button#LEDsmooth.button.gpio-button.controlButton(name='LEDsmooth', value='LEDsmooth') LED smooth
-        button#RGBsmooth.button.gpio-button.controlButton(name='RGBsmooth', value='RGBsmooth') RGB smooth
+        .gpio-button-group
+          button#allOff.button.gpio-button.controlButton(name='allOff', value='allOff') alle aus
+          button#allOn.button.gpio-button.controlButton(name='allOn', value='allOn') alle an
+          button#smooth.button.gpio-button.controlButton(name='smooth', value='smooth') smooth
+        .gpio-button-group
+          button#LEDsmooth.button.gpio-button.controlButton(name='LEDsmooth', value='LEDsmooth') LED smooth
+          button#RGBsmooth.button.gpio-button.controlButton(name='RGBsmooth', value='RGBsmooth') RGB smooth
 
       #gpio-groups.gpio-groups.flex-block.flex-center
         each list, group in items
-          .gpio-group(id='group_' + group.replace(/[^A-zA-Z0-9]/, '_'))
+          div(
+            id='group_' + group.replace(/[^A-zA-Z0-9]/, '_'),
+            class='gpio-group gpio-group_' + group.replace(/[^A-zA-Z0-9]/, '_')
+          )
             h2.gpio-group-headline= group
             .gpio-group-items
               each item, name in list

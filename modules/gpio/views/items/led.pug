@@ -1,9 +1,10 @@
 //- items/led.pug
 .gpio-item-led
   .gpio-item-header
-    .gpio-item-header-right
+    .gpio-item-header-left
       label.gpio-item-label= name
     .gpio-item-header-right
       include ../widgets/status.pug
-  - thumbColor = item.color
-  include ../widgets/slider.pug
+  .gpio-item-slider-container
+    - thumbColor = item.color
+    include ../widgets/slider.pug

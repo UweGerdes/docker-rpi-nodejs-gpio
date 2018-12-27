@@ -71,4 +71,19 @@
       background-color: #000000;
     }
   }
+
+  @media (min-width: 1000px) {
+    .gpio-item-led &,
+    .gpio-item-rgbled & {
+      height: 256px + (2 * @slider-width);
+      margin: 0 0.5em;
+      width: 2 * @slider-width;
+
+      &-container {
+        border: 1px solid #99ff99;
+        height: 300px;
+        writing-mode: vertical-rl;
+      }
+    }
+  }
 }
