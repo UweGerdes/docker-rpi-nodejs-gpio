@@ -29,6 +29,13 @@ socket.on('connect_error', (error) => {
 
 function addEmitter(element) {
   element.addEventListener('click', () => {
-    socket.emit(element.dataset.emit, JSON.parse(element.dataset.data.replace(/'/g, '"')));
+    socket.emit(
+      element.dataset.emit,
+      JSON.parse(
+        element.dataset.data
+          .replace(/'/g, '"')
+          .replace(/([a-z0-9]+):/g, '"$1":')
+      )
+    );
   });
 }
