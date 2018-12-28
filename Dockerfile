@@ -2,7 +2,7 @@
 # Dockerfile for rpi gpio with nodejs
 
 ARG NODEIMAGE_VERSION=latest
-FROM uwegerdes/rpi-nodejs:${NODEIMAGE_VERSION}
+FROM uwegerdes/nodejs:${NODEIMAGE_VERSION}
 
 MAINTAINER Uwe Gerdes <entwicklung@uwegerdes.de>
 
