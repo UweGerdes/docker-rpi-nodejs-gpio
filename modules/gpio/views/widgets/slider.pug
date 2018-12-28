@@ -1,6 +1,6 @@
 //- items/slider.pug
 div(
-  class=item.type + '_controls ' + thumbColor
+  class=item.type + '_controls gpio-item-slider-wrapper ' + thumbColor
 )
   input.gpio-item-slider&attributes({
     id: name.replace(/[^A-zA-Z0-9]/, '_') + (item.type == 'RGBLED' ? '_' + thumbColor : '') + '_slider',

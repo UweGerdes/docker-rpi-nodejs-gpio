@@ -1,9 +1,5 @@
 //- items/servo.pug
 .gpio-item-servo
-  .gpio-item-header
-    .gpio-item-header-left
-      label.gpio-item-label= name
-    .gpio-item-header-right
-      include ../widgets/status.pug
+  include ../widgets/header.pug
   - thumbColor = 'black'
   include ../widgets/slider.pug

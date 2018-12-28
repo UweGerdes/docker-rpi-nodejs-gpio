@@ -44,8 +44,43 @@
     }
   }
 
+  &-groups {
+    align-content: flex-start;
+    display: flex;
+    flex-flow: row wrap;
+  }
+
+  &-group {
+    &_LED {
+      flex-basis: 100%;
+    }
+
+    &_RGB_LED {
+      flex-basis: 100%;
+    }
+
+    &_Servo {
+      flex-basis: 100%;
+    }
+
+    &_Button {
+      flex-basis: 50%;
+    }
+
+    &_Sensor {
+      flex-basis: 50%;
+    }
+
+    &-items {
+      align-content: flex-start;
+      display: flex;
+      flex-flow: row wrap;
+    }
+  }
+
   &-item {
-    border: 1px solid #aaaaaa;
+    border: 1px solid #cccccc;
+    flex-basis: 100%;
     margin: 0 0 1em;
     padding: 1em 1em 0.75em;
 
@@ -54,13 +89,13 @@
       display: flex;
       flex-flow: row wrap;
 
-      &-left {
+      &-label {
         flex: 2 0 auto;
         order: 1;
       }
 
-      &-right {
-        flex: 1 0 8%;
+      &-status {
+        flex: 1 0 (@status-size + 2px);
         order: 3;
         text-align: right;
       }
@@ -78,48 +113,58 @@
     @import 'widget/status';
   }
 
-  @media (min-width: 1000px) {
-    &-groups {
-      align-content: flex-start;
-      display: flex;
-      flex-flow: row wrap;
-    }
-
+  @media (min-width: 750px) {
     &-group {
-      flex: 1 0 auto;
-    }
+      &_LED {
+        flex-basis: auto;
+        flex-grow: 3;
+        flex-shrink: 1;
 
-    &-group-items {
-      align-content: flex-start;
-      display: flex;
-      flex-flow: row wrap;
-    }
+        .gpio-item-header-label {
+          display: none;
+        }
 
-    &-item {
-      flex: 1 0 auto;
-    }
-  }
+        .gpio-item-header-status {
+          flex-basis: 100%;
+          text-align: center;
+        }
 
-  @media (min-width: 2024px) {
-    &-group {
-      &-items {
-        align-content: flex-start;
-        display: flex;
-        flex-flow: row wrap;
+        .gpio-item-slider-container {
+          width: 100%;
+        }
+      }
+
+      &_RGB_LED {
+        flex-basis: auto;
+        flex-grow: 7;
+        flex-shrink: 2;
+
+        .gpio-item-header-label {
+          display: none;
+        }
+
+        .gpio-item-header-status {
+          flex-basis: 100%;
+          text-align: center;
+        }
+
+        .gpio-item-slider-container {
+          width: 100%;
+        }
       }
     }
 
     &-item {
       flex: 1 0 auto;
-      margin-right: 1em;
 
-      &:last-child {
-        margin-right: 0;
+      .gpio-group_LED &,
+      .gpio-group_RGB_LED & {
+        padding: 1em 0em 0.75em;
       }
     }
   }
 
   .footer {
-    background-color: #ffffff;
+    border-top: 2px solid #cccccc;
   }
 }

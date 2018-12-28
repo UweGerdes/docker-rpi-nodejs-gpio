@@ -1,10 +1,6 @@
 //- items/rgbled.pug
 .gpio-item-rgbled
-  .gpio-item-header
-    .gpio-item-header-left
-      label.gpio-item-label= name
-    .gpio-item-header-right
-      include ../widgets/status.pug
+  include ../widgets/header.pug
   .gpio-item-slider-container
     each thumbColor in item.color
       include ../widgets/slider.pug
