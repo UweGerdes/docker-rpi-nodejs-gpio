@@ -180,14 +180,11 @@ const setExpress = (server) => {
     socket.on('allOn', () => {
       allOn();
     });
-    socket.on('allSmooth', (timeout) => {
-      smooth(undefined, undefined, timeout);
+    socket.on('smooth', (data) => {
+      smooth(data.group, data.item, data.timeout);
     });
     socket.on('off', (data) => {
       off(data.group, data.item);
-    });
-    socket.on('smooth', (data) => {
-      smooth(data.group, data.item, data.timeout);
     });
     socket.on('getItems', () => {
       socket.emit('items', items);
