@@ -71,7 +71,7 @@ ipc.connectToNet('gpio', () => {
    * @param {object} data - item data
    */
   ipc.of.gpio.on('gpio.item-status', (data) => {
-    log.info('gpio.item-status', data);
+    // log.info('ipc gpio.item-status', data);
     items[data.group][data.item] = data.data;
     if (socket) {
       socket.emit('item.data.' + data.group + '.' + data.item, data.data);
@@ -181,7 +181,6 @@ const setExpress = (server) => {
       allOn();
     });
     socket.on('allSmooth', (timeout) => {
-      console.log('allSmooth');
       smooth(undefined, undefined, timeout);
     });
     socket.on('off', (data) => {

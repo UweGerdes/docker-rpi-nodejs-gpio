@@ -4,38 +4,6 @@
 /* globals socket */
 // var socket = io(); //loaded in html
 
-window.addEventListener('load', documentLoaded);
-
-function documentLoaded() {
-  const allOff = document.getElementById('allOff');
-  allOff.addEventListener('click', () => {
-    socket.emit('allOff', true);
-  });
-  const allOn = document.getElementById('allOn');
-  allOn.addEventListener('click', () => {
-    socket.emit('allOn', true);
-  });
-  const smooth = document.getElementById('smooth');
-  smooth.addEventListener('click', () => {
-    socket.emit('allSmooth', 2000);
-  });
-  document.getElementById('RGBsmooth').addEventListener('click', () => {
-    socket.emit('smooth', { group: 'RGB_LED', timeout: 2000 });
-  });
-  document.getElementById('LEDsmooth').addEventListener('click', () => {
-    socket.emit('smooth', { group: 'LED', timeout: 2000 });
-  });
-  socket.emit('getItems', true);
-}
-
-socket.on('connect', () => {
-  console.log('connected');
-});
-
-socket.on('connect_error', (error) => {
-  console.log('connect_error', error);
-});
-
 socket.on('items', (items) => {
   const container = document.getElementById('elementContainer');
   if (container) {

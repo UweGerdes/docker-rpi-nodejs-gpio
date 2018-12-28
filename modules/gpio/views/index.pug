@@ -1,8 +1,8 @@
 //- index.pug
 extends ../../pages/views/page.pug
 
-mixin button(name, label)
-  button.button.gpio-button(id=name, name=name, value=name)= label
+mixin button(msg, data, label)
+  button.button.gpio-button&attributes({ 'data-emit': msg, 'data-data': data })= label
 
 block content
   .uncolored
@@ -14,12 +14,12 @@ block content
 
       #gpio-buttons.gpio-buttons.controlButtons.flex-block.flex-center
         .gpio-button-group
-          + button('allOff', 'alle aus')
-          + button('allOn', 'alle an')
-          + button('smooth', 'smooth')
+          + button('allOff', '[]', 'alle aus')
+          + button('allOn', '[]', 'alle an')
+          + button('smooth', "{'timeout': 2000}", 'smooth')
         .gpio-button-group
-          + button('LEDsmooth', 'LED smooth')
-          + button('RGBsmooth', 'RGB smooth')
+          + button('smooth', "{'group': 'LED', 'timeout': 2000}", 'LED smooth')
+          + button('smooth', "{'group': 'RGB_LED', 'timeout': 2000}", 'RGB smooth')
 
       #gpio-groups.gpio-groups.flex-block.flex-center
         each list, group in items
@@ -51,3 +51,4 @@ append footer
   script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js')
   script var socket = io();
   script(src='/js/gpio/gpio.js')
+  script(src='/js/gpio/index.js')
