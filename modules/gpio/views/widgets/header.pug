@@ -2,5 +2,6 @@
 .gpio-item-header
   .gpio-item-header-label
     label.gpio-item-label= name
-  .gpio-item-header-status
-    include ../widgets/status.pug
+  if !hidePreview
+    .gpio-item-header-status
+      include ../widgets/status.pug

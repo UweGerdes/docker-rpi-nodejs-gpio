@@ -106,6 +106,11 @@
       font-size: 1.4em;
       font-weight: bold;
       line-height: auto;
+    }
+
+    &-button &-header-status,
+    &-sensor &-header-status {
+      flex-grow: 4;
       text-align: left;
     }
 
@@ -113,11 +118,11 @@
     @import 'widget/status';
   }
 
-  @media (min-width: 750px) {
+  @media (min-width: 780px) {
     &-group {
       &_LED {
         flex-basis: auto;
-        flex-grow: 3;
+        flex-grow: 1;
         flex-shrink: 1;
 
         .gpio-item-header-label {
@@ -136,7 +141,7 @@
 
       &_RGB_LED {
         flex-basis: auto;
-        flex-grow: 7;
+        flex-grow: 2;
         flex-shrink: 2;
 
         .gpio-item-header-label {
@@ -159,7 +164,7 @@
 
       .gpio-group_LED &,
       .gpio-group_RGB_LED & {
-        padding: 1em 0em 0.75em;
+        padding: 1em 0 0.75em;
       }
     }
   }

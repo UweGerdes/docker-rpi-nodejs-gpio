@@ -1,5 +1,7 @@
 //- items/servo.pug
 .gpio-item-servo
+  - hidePreview = true
   include ../widgets/header.pug
+  - hidePreview = false
   - thumbColor = 'black'
   include ../widgets/slider.pug
