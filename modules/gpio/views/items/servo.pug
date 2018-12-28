@@ -1,7 +1,17 @@
 //- items/servo.pug
+mixin servobutton(name, label)
+  button.button.gpio-button-servo(id=name, name=name, value=name)= label
+
 .gpio-item-servo
   - hidePreview = true
   include ../widgets/header.pug
   - hidePreview = false
   - thumbColor = 'black'
+  .gpio-item-button-group
+    + servobutton('left', '<<')
+    + servobutton('halfleft', '<')
+    + servobutton('middle', '|')
+    + servobutton('halfright', '>')
+    + servobutton('right', '>>')
+
   include ../widgets/slider.pug

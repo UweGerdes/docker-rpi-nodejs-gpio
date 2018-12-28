@@ -7,43 +7,6 @@
     text-align: center;
   }
 
-  &-buttons {
-    text-align: center;
-  }
-
-  &-button-group {
-    align-content: flex-start;
-    display: flex;
-    flex-flow: row wrap;
-  }
-
-  &-button {
-    flex: 1 0 auto;
-    font-size: 1.4em;
-    font-weight: bold;
-    margin: 0 0.5em 0.5em 0;
-    padding: 0.25em 0;
-
-    &:last-child {
-      margin-right: 0;
-    }
-  }
-
-  @media (min-width: 800px) {
-    &-button-group {
-      display: inline-block;
-      margin-right: 0.75em;
-
-      &:last-child {
-        margin-right: 0;
-      }
-    }
-
-    &-button {
-      padding: 0.25em 1em;
-    }
-  }
-
   &-groups {
     align-content: flex-start;
     display: flex;
@@ -114,9 +77,30 @@
       text-align: left;
     }
 
+    &-servo &-header {
+      display: block;
+      float: left;
+      width: 20%;
+    }
+
+    &-servo &-button-group {
+      display: block;
+      float: left;
+      text-align: right;
+      width: 80%;
+
+      @media (min-width: 780px) {
+        margin-right: 20%;
+        text-align: center;
+        width: 60%;
+      }
+    }
+
     @import 'widget/slider';
     @import 'widget/status';
   }
+
+  @import 'widget/button';
 
   @media (min-width: 780px) {
     &-group {
