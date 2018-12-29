@@ -9,7 +9,6 @@ Before you build this image please build my `docker-baseimage-rpi-raspbian` and 
 ```bash
 $ docker build -t uwegerdes/rpi-nodejs-gpio \
 	--build-arg GPIO_GROUP="$(sed -nr "s/^gpio:x:([0-9]+):.*/\1/p" /etc/group)" \
-	--network=host \
 	.
 ```
 
