@@ -11,6 +11,8 @@
 
 window.addEventListener('load', documentLoaded);
 
+let items = {};
+
 function documentLoaded() {
   const emitterElements = document.querySelectorAll('[data-emit]');
   emitterElements.forEach((element) => {
@@ -20,6 +22,17 @@ function documentLoaded() {
   statusElements.forEach((element) => {
     addStatusEmitter(element);
   });
+  const uiElements = document.querySelectorAll('[data-group][data-name]');
+  uiElements.forEach((element) => {
+    if (!items[element.dataset.group]) {
+      items[element.dataset.group] = {};
+    }
+    if (!items[element.dataset.group][element.dataset.name]) {
+      items[element.dataset.group][element.dataset.name] = [];
+    }
+    items[element.dataset.group][element.dataset.name].push(element);
+  });
+  console.log(items);
   socket.emit('getItems', true);
 }
 
