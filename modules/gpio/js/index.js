@@ -34,7 +34,7 @@ function addEmitter(element) {
       JSON.parse(
         element.dataset.data
           .replace(/'/g, '"')
-          .replace(/([a-z0-9]+):/g, '"$1":')
+          .replace(/([A-Za-z0-9_-]+):/g, '"$1":')
       )
     );
   });

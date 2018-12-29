@@ -1,6 +1,9 @@
 //- items/servo.pug
-mixin servobutton(name, label)
-  button.button.gpio-button-servo(id=name, name=name, value=name)= label
+mixin servobutton(msg, value, label)
+  button.button.gpio-button-servo&attributes({
+    'data-emit': msg,
+    'data-data': "{group: '" + group + "', item: '" + name + "', pwmValue: " + value + "}"
+  })= label
 
 .gpio-item-servo
   - hidePreview = true
@@ -8,10 +11,10 @@ mixin servobutton(name, label)
   - hidePreview = false
   - thumbColor = 'black'
   .gpio-item-button-group
-    + servobutton('left', '<<')
-    + servobutton('halfleft', '<')
-    + servobutton('middle', '|')
-    + servobutton('halfright', '>')
-    + servobutton('right', '>>')
+    + servobutton('setValue', 1000, '<<')
+    + servobutton('setValue', 1250, '<')
+    + servobutton('setValue', 1500, '|')
+    + servobutton('setValue', 1750, '>')
+    + servobutton('setValue', 2000, '>>')
 
   include ../widgets/slider.pug
