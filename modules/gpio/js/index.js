@@ -51,15 +51,25 @@ socket.on('item.data', (data) => {
     } else {
       element.dataset.status = '';
     }
+    if (element.classList.contains('gpio-item-status')) {
+      if (data.data.type === 'LED') {
+        console.log('LED backgroundColor', rgb2hex({ [data.data.color]: data.data.pwmValue }));
+        element.style.backgroundColor = rgb2hex({ [data.data.color]: data.data.pwmValue });
+      } else if (data.data.type === 'RGBLED') {
+        // console.log('RGBLED color', element.classList, element.dataset.color, data.data.pwmValue[element.dataset.color]);
+        element.style.backgroundColor = rgb2hex(data.data.pwmValue);
+      } else {
+        console.log('other status item.data', data);
+      }
+    }
     if (element.type === 'range') {
       if (data.data.type === 'LED') {
         // console.log('LED item.data', data);
         element.value = data.data.pwmValue;
       } else if (data.data.type === 'RGBLED') {
-        console.log('RGBLED color', element.dataset.color, data.data.pwmValue[element.dataset.color]);
+        // console.log('RGBLED color', element.classList, element.dataset.color, data.data.pwmValue[element.dataset.color]);
         element.value = data.data.pwmValue[element.dataset.color];
       } else if (data.data.type === 'Servo') {
-        console.log('Servo item.data', data);
         element.value = data.data.pwmValue;
       } else {
         console.log('other item.data', data);
@@ -93,4 +103,31 @@ function addStatusEmitter(element) {
       socket.emit('smooth', { group: element.dataset.group, item: element.dataset.name, timeout: 2000 });
     }
   });
+}
+
+function rgb2hex(color) {
+  let hex = '';
+  if (Object.keys(color)[0] === 'yellow') {
+    hex += componentToHex(color.yellow);
+    hex += hex;
+    hex += '00';
+  } else {
+    ['red', 'green', 'blue'].forEach((rgb) => {
+      let col = color[rgb];
+      if (typeof col === 'string') {
+        col = parseInt(col, 10);
+      }
+      col = rgb !== 'red' ? Math.min(col * 5, 255) : col;
+      hex += componentToHex(col);
+    });
+  }
+  return '#' + hex;
+}
+
+function componentToHex(c) {
+  let hex = '00';
+  if (c) {
+    hex = c.toString(16);
+  }
+  return hex.length === 1 ? '0' + hex : hex;
 }
