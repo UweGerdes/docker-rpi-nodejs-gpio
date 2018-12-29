@@ -96,7 +96,6 @@ function addEmitter(element) {
 function addValueEmitter(element) {
   element.addEventListener('change', (event) => {
     const value = event.currentTarget.value;
-    console.log(value);
     if (value.indexOf('#') === 0) {
       socket.emit('setValue',
         {
