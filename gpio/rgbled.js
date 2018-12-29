@@ -37,6 +37,7 @@ class RGBLED {
     this.pwmValue.green = this.range.green.max;
     this.blue.on();
     this.pwmValue.blue = this.range.blue.max;
+    this.timeout = null;
   }
 
   off() {
@@ -66,7 +67,7 @@ class RGBLED {
       clearInterval(this.blinkInterval);
     }
     this.off();
-    this.timeout = undefined;
+    this.timeout = null;
   }
 
   smooth(timeout) {
@@ -93,6 +94,7 @@ class RGBLED {
   }
 
   setValue(data) {
+    this.timeout = null;
     if (data.color && typeof data.color === 'string') {
       this.pwmValue[data.color] = data.pwmValue;
     } else if ('pwmValue' in data) {

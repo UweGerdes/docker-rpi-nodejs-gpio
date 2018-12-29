@@ -29,6 +29,8 @@ class LED {
   }
 
   on() {
+    this.smoothOff();
+    this.blinkOff();
     this.value = this.onValue;
     this.pwmValue = this.pwmMax;
     this.LED.pwmWrite(this.pwmMax);
@@ -105,6 +107,8 @@ class LED {
   }
 
   setValue(data) {
+    this.smoothOff();
+    this.blinkOff();
     if ('pwmValue' in data) {
       this.pwmWrite(data.pwmValue);
     } else {
