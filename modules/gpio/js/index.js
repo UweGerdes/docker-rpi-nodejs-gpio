@@ -32,7 +32,6 @@ function documentLoaded() {
     }
     items[element.dataset.group][element.dataset.name].push(element);
   });
-  console.log(items);
   socket.emit('getItems', true);
 }
 
@@ -42,6 +41,17 @@ socket.on('connect', () => {
 
 socket.on('connect_error', (error) => {
   console.log('connect_error', error);
+});
+
+socket.on('item.data', (data) => {
+  // console.log('item.data', data);
+  items[data.group][data.item].forEach((element) => {
+    if (data.data.smoothTimeout) {
+      element.dataset.status = 'smooth';
+    } else {
+      element.dataset.status = '';
+    }
+  });
 });
 
 function addEmitter(element) {
