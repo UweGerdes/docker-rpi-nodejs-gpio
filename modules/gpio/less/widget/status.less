@@ -3,10 +3,16 @@
 @status-size: 25px;
 
 &-status {
+  background-color: #000000;
   border: 1px solid #666666;
   border-radius: 50%;
   display: inline-block;
   height: @status-size;
   margin: 0 0 0.5em 2px;
+  transition: background-color linear 0.1s;
   width: @status-size;
+
+  &.touched {
+    background-color: #ffffff;
+  }
 }
