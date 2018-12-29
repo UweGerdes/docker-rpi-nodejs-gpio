@@ -9,7 +9,6 @@ mixin servobutton(msg, value, label)
   - hidePreview = true
   include ../widgets/header.pug
   - hidePreview = false
-  - thumbColor = 'black'
   .gpio-item-button-group
     + servobutton('setValue', 1000, '<<')
     + servobutton('setValue', 1250, '<')
@@ -17,4 +16,5 @@ mixin servobutton(msg, value, label)
     + servobutton('setValue', 1750, '>')
     + servobutton('setValue', 2000, '>>')
 
+  - color = 'black'
   include ../widgets/slider.pug

@@ -51,6 +51,20 @@ socket.on('item.data', (data) => {
     } else {
       element.dataset.status = '';
     }
+    if (element.type === 'range') {
+      if (data.data.type === 'LED') {
+        console.log('LED item.data', data);
+        element.value = data.data.pwmValue;
+      } else if (data.data.type === 'RGBLED') {
+        console.log('RGBLED item.data', data);
+        element.value = data.data.pwmValue;
+      } else if (data.data.type === 'Servo') {
+        console.log('Servo item.data', data);
+        element.value = data.data.pwmValue;
+      } else  {
+        console.log('other item.data', data);
+      }
+    }
   });
 });
 
