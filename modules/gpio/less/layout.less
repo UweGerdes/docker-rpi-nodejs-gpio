@@ -51,32 +51,11 @@
       align-content: flex-start;
       display: flex;
       flex-flow: row wrap;
+      justify-content: center;
 
       &-label {
         flex: 2 0 auto;
         order: 1;
-      }
-
-      &-status {
-        flex: 1 0 (@status-size + 2px);
-        margin: 0 0 1em 0;
-        order: 3;
-        text-align: right;
-
-        &-color {
-          height: 25px;
-          opacity: 0;
-          width: 25px;
-
-          &-container {
-            background-image: linear-gradient(to right, red,orange,yellow,green,blue,indigo,violet);
-            border-radius: 5px;
-            display: inline-block;
-            height: 25px;
-            margin: 0 0 0 0.5em;
-            width: 25px;
-          }
-        }
       }
     }
 
@@ -130,8 +109,7 @@
         }
 
         .gpio-item-header-status {
-          flex-basis: 100%;
-          text-align: center;
+          flex-basis: auto;
         }
 
         .gpio-item-slider-container {
@@ -149,8 +127,7 @@
         }
 
         .gpio-item-header-status {
-          flex-basis: 100%;
-          text-align: center;
+          flex-basis: auto;
         }
 
         .gpio-item-slider-container {

@@ -37,7 +37,7 @@ describe('/gpio/tests/server/index.js', function () {
           const { document } = (new JSDOM(res.text)).window;
           const headline = document.getElementById('headline');
           assert.equal(headline.textContent, 'Raspberry Pi 3 GPIO');
-          const gpioScript = document.querySelectorAll('script[src="/js/gpio/gpio.js"]');
+          const gpioScript = document.querySelectorAll('script[src="/js/gpio/index.js"]');
           assert.equal(gpioScript.length, 1);
           done();
         });

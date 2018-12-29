@@ -6,13 +6,38 @@
   background-color: #000000;
   border: 1px solid #666666;
   border-radius: 50%;
-  display: inline-block;
+  display: block;
+  float: left;
   height: @status-size;
   margin: 0 0 -0.5em 0;
   transition: background-color linear 0.1s;
   width: @status-size;
 
-  &.touched {
+  .touched& {
     background-color: #ffffff;
+  }
+}
+
+&-header {
+  &-status {
+    margin: 0 0 1em 0;
+    order: 3;
+    text-align: right;
+
+    &-color {
+      height: 25px;
+      opacity: 0;
+      width: 25px;
+
+      &-container {
+        background-image: linear-gradient(to right, red, orange, yellow, green, blue);
+        border-radius: 5px;
+        display: block;
+        float: left;
+        height: 25px;
+        margin: 0 0 0 0.5em;
+        width: 25px;
+      }
+    }
   }
 }

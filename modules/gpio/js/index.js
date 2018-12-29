@@ -40,7 +40,7 @@ function documentLoaded() {
 }
 
 socket.on('connect', () => {
-  console.log('connected');
+  // console.log('connected');
 });
 
 socket.on('connect_error', (error) => {
