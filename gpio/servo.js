@@ -29,17 +29,13 @@ class Servo {
     this.Servo.servoWrite(this.midValue);
   }
 
-  toString() {
-    return 'Servo on pin ' + this.pin + ' has rangeValue ' + this.rangeValue;
-  }
-
   getData() {
     return {
       type: 'Servo',
       range: { min: this.rangeMin, max: this.rangeMax },
       pin: this.pin,
       pwmValue: this.rangeValue < 0 ? 0 : this.rangeValue,
-      midValue: this.midValue,
+      midValue: this.midValue
     };
   }
 

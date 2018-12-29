@@ -47,6 +47,7 @@ class RGBLED {
     this.pwmValue.green = 0;
     this.blue.off();
     this.pwmValue.blue = 0;
+    this.timeout = null;
   }
 
   onOff(timeout) {
@@ -72,21 +73,11 @@ class RGBLED {
     this.timeout = {
       red: (timeout + Math.random() * 1000),
       green: (timeout + Math.random() * 1000),
-      blue: (timeout + Math.random() * 100),
+      blue: (timeout + Math.random() * 100)
     };
     this.red.smooth(this.timeout.red);
     this.green.smooth(this.timeout.green);
     this.blue.smooth(this.timeout.blue);
-  }
-
-  toString() {
-    return 'RGB LED on pins ' + this.pins.red + ', ' + this.pins.green + ', ' + this.pins.blue +
-      (this.blinkInterval ? ' is blinking' : (
-        this.pwmValue >= 0 ? ' has color ' + this.color.red + ', ' + this.color.green + ', ' +
-          this.color.blue :
-        this.value == 1 ? ' is on' : (
-        this.value == 0 ? ' is off' : ' undefined'))
-      );
   }
 
   getData() {
@@ -96,9 +87,7 @@ class RGBLED {
       pin: this.pin,
       color: this.color,
       pwmValue: { red: this.red.pwmValue, green: this.green.pwmValue, blue: this.blue.pwmValue },
-      blinking: this.blinkInterval ? true : false,
-      on: this.value == this.onValue ? true : (
-          this.value == this.offValue ? false : undefined),
+      blinking: !!this.blinkInterval,
       smoothTimeout: this.timeout
     };
   }

@@ -19,15 +19,11 @@ class Button {
     });
   }
 
-  toString() {
-    return 'Button on pin ' + this.pin + ' is ' + this.value;
-  }
-
   getData() {
     return {
       type: 'Button',
       pin: this.pin,
-      value: this.value,
+      value: this.value
     };
   }
 }

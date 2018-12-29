@@ -20,15 +20,11 @@ class Sensor {
     });
     this.timeout = null;
     this.Sensor.on('interrupt', (value) => { // jscs:ignore jsDoc
-      if (this.timeout == null && value == 0) {
-        this.timeout = setTimeout(() => {this.timeout = null;}, 500); // jscs:ignore jsDoc
+      if (this.timeout === null && value === 0) {
+        this.timeout = setTimeout(() => { this.timeout = null; }, 500); // jscs:ignore jsDoc
         callback(true);
       }
     });
-  }
-
-  toString() {
-    return 'Sensor on pin ' + this.pin + ' is ' + this.value;
   }
 
   getData() {

@@ -92,15 +92,6 @@ class LED {
     this.timeout = undefined;
   }
 
-  toString() {
-    return this.color + ' LED on pin ' + this.pin +
-        (this.blinkInterval ? ' is blinking' : (
-         this.pwmValue >= 0 ? ' has pwmValue ' + this.pwmValue :
-         this.value == this.onValue ? ' is on' : (
-         this.value == this.offValue ? ' is off' : ' undefined'))
-        );
-  }
-
   getData() {
     return {
       type: 'LED',
@@ -108,9 +99,7 @@ class LED {
       pin: this.pin,
       color: this.color,
       pwmValue: this.pwmValue < 0 ? 0 : this.pwmValue,
-      blinking: this.blinkInterval ? true : false,
-      on: this.value == this.onValue ? true : (
-          this.value == this.offValue ? false : undefined),
+      blinking: !!this.blinkInterval,
       smoothTimeout: this.timeout
     };
   }
