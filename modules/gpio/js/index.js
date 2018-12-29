@@ -6,8 +6,7 @@
 
 'use strict';
 
-/* globals socket */
-// var socket = io(); //loaded in html
+var socket = io();
 
 window.addEventListener('load', documentLoaded);
 
