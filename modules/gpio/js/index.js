@@ -16,6 +16,10 @@ function documentLoaded() {
   emitterElements.forEach((element) => {
     addEmitter(element);
   });
+  const statusElements = document.querySelectorAll('[data-type=LED], [data-type=RGBLED]');
+  statusElements.forEach((element) => {
+    addStatusEmitter(element);
+  });
   socket.emit('getItems', true);
 }
 
@@ -37,5 +41,19 @@ function addEmitter(element) {
           .replace(/([A-Za-z0-9_-]+):/g, '"$1":')
       )
     );
+  });
+}
+
+function addStatusEmitter(element) {
+  element.addEventListener('click', (event) => {
+    if (event.currentTarget.getAttribute('data-status') === 'smooth') {
+      socket.emit('off',
+        {
+          group: element.dataset.group,
+          item: element.dataset.name
+        });
+    } else {
+      socket.emit('smooth', { group: element.dataset.group, item: element.dataset.name, timeout: 2000 });
+    }
   });
 }
