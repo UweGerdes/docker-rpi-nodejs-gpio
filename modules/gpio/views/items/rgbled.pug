@@ -3,4 +3,5 @@
   include ../widgets/header.pug
   .gpio-item-slider-container
     each color in item.color
+      - range = item.range[color]
       include ../widgets/slider.pug

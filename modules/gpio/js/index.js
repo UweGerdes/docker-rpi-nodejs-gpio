@@ -18,7 +18,7 @@ function documentLoaded() {
   emitterElements.forEach((element) => {
     addEmitter(element);
   });
-  const statusElements = document.querySelectorAll('[data-type=LED], [data-type=RGBLED]');
+  const statusElements = document.querySelectorAll('.gpio-item-status[data-type=LED], .gpio-item-status[data-type=RGBLED]');
   statusElements.forEach((element) => {
     addStatusEmitter(element);
   });
@@ -53,15 +53,15 @@ socket.on('item.data', (data) => {
     }
     if (element.type === 'range') {
       if (data.data.type === 'LED') {
-        console.log('LED item.data', data);
+        // console.log('LED item.data', data);
         element.value = data.data.pwmValue;
       } else if (data.data.type === 'RGBLED') {
-        console.log('RGBLED item.data', data);
-        element.value = data.data.pwmValue;
+        console.log('RGBLED color', element.dataset.color, data.data.pwmValue[element.dataset.color]);
+        element.value = data.data.pwmValue[element.dataset.color];
       } else if (data.data.type === 'Servo') {
         console.log('Servo item.data', data);
         element.value = data.data.pwmValue;
-      } else  {
+      } else {
         console.log('other item.data', data);
       }
     }
