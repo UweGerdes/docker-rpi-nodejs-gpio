@@ -1,5 +1,5 @@
 /**
- * receive events from server
+ * receive events from server and emit actions
  *
  * @module gpio/socker-events
  */
