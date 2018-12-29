@@ -20,6 +20,7 @@ COPY package.json ${NODE_HOME}/
 
 RUN apt-get update && \
 	apt-get dist-upgrade -y && \
+	apt-get install -y python3-distutils && \
 	apt-get clean && \
 	rm -rf /var/lib/apt/lists/* && \
 	cd /opt && \
