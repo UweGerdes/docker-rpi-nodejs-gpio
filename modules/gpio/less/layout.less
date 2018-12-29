@@ -59,8 +59,24 @@
 
       &-status {
         flex: 1 0 (@status-size + 2px);
+        margin: 0 0 1em 0;
         order: 3;
         text-align: right;
+
+        &-color {
+          height: 25px;
+          opacity: 0;
+          width: 25px;
+
+          &-container {
+            background-image: linear-gradient(to right, red,orange,yellow,green,blue,indigo,violet);
+            border-radius: 5px;
+            display: inline-block;
+            height: 25px;
+            margin: 0 0 0 0.5em;
+            width: 25px;
+          }
+        }
       }
     }
 

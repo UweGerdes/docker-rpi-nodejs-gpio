@@ -5,3 +5,14 @@
   if !hidePreview
     .gpio-item-header-status
       include ../widgets/status.pug
+      if item.type == 'RGBLED'
+        .gpio-item-header-status-color-container
+          input.gpio-item-header-status-color&attributes({
+            id: name.replace(/[^A-zA-Z0-9]/, '_') + '_color',
+            type: 'color',
+            name: name.replace(/[^A-zA-Z0-9]/, '_') + '_color',
+            value: '#000000',
+            'data-group': group,
+            'data-name': name,
+            'data-type': item.type
+          })
