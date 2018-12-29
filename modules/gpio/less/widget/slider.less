@@ -75,32 +75,47 @@
   @media (min-width: 780px) {
     .gpio-item-led &,
     .gpio-item-rgbled & {
-      height: 256px + (2 * @slider-width);
-      margin: 0 0.5em;
-      width: 2 * @slider-width;
+      transform: rotate(270deg) translate(-100%, 0%);
+      transform-origin: 0% 0%;
+      width: 256px + (2 * @slider-width);
 
-      &-container {
-        display: inline-flex;
-        flex-direction: column-reverse;
-        flex-wrap: wrap;
-        justify-content: center;
-        writing-mode: vertical-rl;
+      &-wrapper {
+        height: 256px + (2 * @slider-width) + @slider-width;
+        text-align: center;
+        width: 2 * @slider-width;
       }
+
     }
 
     .gpio-item-led & {
       &-wrapper {
-        flex-basis: 2 * @slider-width;;
-        flex-grow: 0;
-        flex-shrink: 1;
+        margin: 0 auto 0;
+      }
+
+      &-container {
+        width: 100%;
       }
     }
 
     .gpio-item-rgbled & {
       &-wrapper {
-        flex-basis: 2 * @slider-width;;
-        flex-grow: 0;
-        flex-shrink: 1;
+        float: left;
+        margin: 0 25px 0 0;
+
+        &:last-child {
+          margin: 0 0 0 0;
+        }
+      }
+
+      &-container {
+        margin: 0 auto;
+        width: 140px;
+
+        &::after {
+          clear: both;
+          content: '';
+          display: table;
+        }
       }
     }
   }
