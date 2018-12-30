@@ -144,8 +144,7 @@ ipc.serveNet(() => {
        * @param {object} status - status value
        */
     const inputCallback = (status) => {
-      console.log('sendStatus', data, status);
-      sendStatus(socket, data.group, data.name);
+      sendStatus(socket, data.group, data.name, status);
     };
     objects[data.group][data.name] = new devices[data.data.type](data.data, inputCallback);
     items[data.group][data.name] = objects[data.group][data.name].getData();

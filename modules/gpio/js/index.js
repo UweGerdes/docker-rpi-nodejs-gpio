@@ -59,6 +59,12 @@ socket.on('item.data', (data) => {
         element.style.backgroundColor = rgb2hex({ [data.data.color]: data.data.pwmValue });
       } else if (data.data.type === 'RGBLED') {
         element.style.backgroundColor = rgb2hex(data.data.pwmValue);
+      } else if (data.data.type === 'Button') {
+        if (data.data.value === 1) {
+          element.classList.add('pushed');
+        } else {
+          element.classList.remove('pushed');
+        }
       } else if (data.data.type === 'Sensor') {
         element.classList.toggle('touched');
       } else {
