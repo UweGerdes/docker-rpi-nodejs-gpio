@@ -55,6 +55,7 @@ socket.on('item.data', (data) => {
       element.dataset.status = '';
     }
     if (element.classList.contains('gpio-item-status')) {
+      console.log('status item.data', data);
       if (data.data.type === 'LED') {
         element.style.backgroundColor = rgb2hex({ [data.data.color]: data.data.pwmValue });
       } else if (data.data.type === 'RGBLED') {
@@ -102,6 +103,12 @@ function addValueEmitter(element) {
   element.addEventListener('change', (event) => {
     const value = event.currentTarget.value;
     if (value.indexOf('#') === 0) {
+      console.log('setValue',
+        {
+          group: element.dataset.group,
+          item: element.dataset.name,
+          pwmValue: hex2rgb(value)
+        });
       socket.emit('setValue',
         {
           group: element.dataset.group,
@@ -109,6 +116,13 @@ function addValueEmitter(element) {
           pwmValue: hex2rgb(value)
         });
     } else {
+      console.log('setValue',
+        {
+          group: element.dataset.group,
+          item: element.dataset.name,
+          color: element.dataset.color,
+          pwmValue: parseInt(value, 10)
+        });
       socket.emit('setValue',
         {
           group: element.dataset.group,

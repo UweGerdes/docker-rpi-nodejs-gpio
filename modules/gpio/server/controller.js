@@ -61,9 +61,6 @@ ipc.connectToNet('gpio', () => {
       items[data.group] = { };
     }
     items[data.group][data.name] = data.data;
-    if (socket) {
-      socket.emit(data.id + '.created', data);
-    }
   });
   /**
    * receive item status from gpio
@@ -74,7 +71,6 @@ ipc.connectToNet('gpio', () => {
     // log.info('ipc gpio.item-status', data);
     items[data.group][data.item] = data.data;
     if (socket) {
-      socket.emit('item.data.' + data.group + '.' + data.item, data.data);
       socket.emit('item.data', data);
     }
   });

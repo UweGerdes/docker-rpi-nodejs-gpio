@@ -37,7 +37,6 @@ class RGBLED {
     this.pwmValue.green = this.range.green.max;
     this.blue.on();
     this.pwmValue.blue = this.range.blue.max;
-    this.timeout = null;
   }
 
   off() {
@@ -48,37 +47,12 @@ class RGBLED {
     this.pwmValue.green = 0;
     this.blue.off();
     this.pwmValue.blue = 0;
-    this.timeout = null;
-  }
-
-  onOff(timeout) {
-    this.timeout = timeout || this.timeout;
-    this.on();
-    setTimeout(this.off.bind(this), this.timeout);
-  }
-
-  blink(interval) {
-    this.timeout = interval / 2;
-    this.blinkInterval = setInterval(this.onOff.bind(this), interval);
-  }
-
-  blinkOff() {
-    if (this.blinkInterval) {
-      clearInterval(this.blinkInterval);
-    }
-    this.off();
-    this.timeout = null;
   }
 
   smooth(timeout) {
-    this.timeout = {
-      red: (timeout + Math.random() * 1000),
-      green: (timeout + Math.random() * 1000),
-      blue: (timeout + Math.random() * 100)
-    };
-    this.red.smooth(this.timeout.red);
-    this.green.smooth(this.timeout.green);
-    this.blue.smooth(this.timeout.blue);
+    this.red.smooth(timeout + Math.random() * 1000);
+    this.green.smooth(timeout + Math.random() * 1000);
+    this.blue.smooth(timeout + Math.random() * 1000);
   }
 
   getData() {
@@ -88,19 +62,20 @@ class RGBLED {
       pin: this.pin,
       color: this.color,
       pwmValue: { red: this.red.pwmValue, green: this.green.pwmValue, blue: this.blue.pwmValue },
-      blinking: !!this.blinkInterval,
-      smoothTimeout: this.timeout
+      smoothTimeout: this.red.smoothActive || this.green.smoothActive || this.blue.smoothActive
     };
   }
 
   setValue(data) {
-    this.timeout = null;
     if (data.color && typeof data.color === 'string') {
-      this.pwmValue[data.color] = data.pwmValue;
+      console.log('setValue:', data);
+      this[data.color].setValue({ pwmValue: data.pwmValue });
     } else if ('pwmValue' in data) {
-      this.pwmValue = data.pwmValue;
+      for (const [color, pwmValue] of data.pwmValue) {
+        this[color].setValue({ pwmValue: pwmValue });
+      }
     } else {
-      console.log('setValue no usable value:', typeof data.pwmValue);
+      console.log('setValue no usable value:', data);
     }
     this.pwmWrite(this.pwmValue);
   }

@@ -19,6 +19,7 @@ class LED {
     this.pwmMin = data.range.min;
     this.pwmMax = data.range.max;
     this.smoothUp = false;
+    this.smoothActive = false;
     this.off();
   }
 
@@ -30,7 +31,6 @@ class LED {
 
   on() {
     this.smoothOff();
-    this.blinkOff();
     this.value = this.onValue;
     this.pwmValue = this.pwmMax;
     this.LED.pwmWrite(this.pwmMax);
@@ -38,36 +38,17 @@ class LED {
 
   off() {
     this.smoothOff();
-    this.blinkOff();
     this.value = this.offValue;
     this.pwmValue = this.pwmMin;
     this.LED.digitalWrite(this.offValue);
-  }
-
-  onOff(timeout) {
-    this.timeout = timeout || this.timeout;
-    this.on();
-    setTimeout(this.off.bind(this), this.timeout);
-  }
-
-  blink(interval) {
-    this.timeout = interval / 2;
-    this.blinkInterval = setInterval(this.onOff.bind(this), interval);
-  }
-
-  blinkOff() {
-    if (this.blinkInterval) {
-      clearInterval(this.blinkInterval);
-    }
-    this.timeout = undefined;
   }
 
   smooth(interval) {
     this.off();
     if (interval > 0) {
       this.pwmWrite(Math.floor(Math.random() * this.pwmMax + this.pwmMin));
-      this.timeout = 1.0 * interval / this.pwmMax;
-      this.smoothInterval = setInterval(this.smoothUpDown.bind(this), this.timeout);
+      this.smoothInterval = setInterval(this.smoothUpDown.bind(this), 1.0 * interval / this.pwmMax);
+      this.smoothActive = true;
     }
   }
 
@@ -84,14 +65,19 @@ class LED {
       diff = -1;
     }
     this.pwmValue += diff;
-    this.LED.pwmWrite(this.pwmValue);
+    if (this.pwmValue < this.pwmMin || this.pwmValue > this.pwmMax) {
+      this.pwmValue = this.pwmMin;
+    } else {
+      this.LED.pwmWrite(this.pwmValue);
+    }
   }
 
   smoothOff() {
     if (this.smoothInterval) {
       clearInterval(this.smoothInterval);
+      this.smoothInterval = undefined;
+      this.smoothActive = false;
     }
-    this.timeout = undefined;
   }
 
   getData() {
@@ -101,14 +87,12 @@ class LED {
       pin: this.pin,
       color: this.color,
       pwmValue: this.pwmValue < 0 ? 0 : this.pwmValue,
-      blinking: !!this.blinkInterval,
-      smoothTimeout: this.timeout
+      smoothTimeout: this.smoothActive
     };
   }
 
   setValue(data) {
     this.smoothOff();
-    this.blinkOff();
     if ('pwmValue' in data) {
       this.pwmWrite(data.pwmValue);
     } else {

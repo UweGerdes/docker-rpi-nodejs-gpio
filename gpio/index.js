@@ -16,7 +16,6 @@ devices.Button = require('./button.js');
 devices.Sensor = require('./sensor.js');
 
 const objects = {};
-const items = {};
 const messages = {};
 let updateInterval = null;
 
@@ -62,7 +61,6 @@ function sendStatus(socket, group, item) {
 messages['gpio.item-off'] = (data, socket) => {
   if (objects[data.group][data.item].off) {
     objects[data.group][data.item].off();
-    items[data.group][data.item] = objects[data.group][data.item].getData();
     sendStatus(socket, data.group, data.item);
     checkInterval();
   }
@@ -79,7 +77,6 @@ messages['gpio.item-off'] = (data, socket) => {
 messages['gpio.item-on'] = (data, socket) => {
   if (objects[data.group][data.item].on) {
     objects[data.group][data.item].on();
-    items[data.group][data.item] = objects[data.group][data.item].getData();
     sendStatus(socket, data.group, data.item);
     checkInterval();
   }
@@ -96,13 +93,12 @@ messages['gpio.item-on'] = (data, socket) => {
 messages['gpio.item-smooth'] = (data, socket) => {
   if (objects[data.group][data.item].smooth) {
     objects[data.group][data.item].smooth(data.timeout);
-    items[data.group][data.item] = objects[data.group][data.item].getData();
     if (updateInterval === null) {
       /** send status while smooth */
       const intervalFunc = () => {
-        for (const [group, item] of Object.entries(items)) {
+        for (const [group, item] of Object.entries(objects)) {
           for (const name of Object.keys(item)) {
-            if (items[group][name].smoothTimeout) {
+            if (objects[group][name].getData().smoothTimeout) {
               sendStatus(socket, group, name);
             }
           }
@@ -135,9 +131,6 @@ ipc.serveNet(() => {
     if (!objects[data.group]) {
       objects[data.group] = { };
     }
-    if (!items[data.group]) {
-      items[data.group] = { };
-    }
     /**
        * callback for status change of input items
        *
@@ -147,7 +140,6 @@ ipc.serveNet(() => {
       sendStatus(socket, data.group, data.name, status);
     };
     objects[data.group][data.name] = new devices[data.data.type](data.data, inputCallback);
-    items[data.group][data.name] = objects[data.group][data.name].getData();
     ipc.server.emit(
       socket,
       'gpio.created',
@@ -155,7 +147,7 @@ ipc.serveNet(() => {
         id: ipc.config.id,
         group: data.group,
         name: data.name,
-        data: items[data.group][data.name]
+        data: objects[data.group][data.name].getData()
       }
     );
   });
@@ -186,9 +178,9 @@ ipc.server.start();
 /** check for active timeouts and clear interval if possible */
 function checkInterval() {
   let timeoutActive = false;
-  for (const list of Object.values(items)) {
-    for (const data of Object.values(list)) {
-      if (data.smoothTimeout) {
+  for (const [group, item] of Object.entries(objects)) {
+    for (const name of Object.keys(item)) {
+      if (objects[group][name].getData().smoothTimeout) {
         timeoutActive = true;
       }
     }
