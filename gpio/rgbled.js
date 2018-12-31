@@ -24,9 +24,9 @@ class RGBLED {
   }
 
   pwmWrite(value) {
-    this.color.forEach((color) => { // jscs:ignore jsDoc
-      this[color].pwmWrite(value[color]);
-    });
+    for (const [color, pwmValue] of Object.entries(value)) {
+      this[color].pwmWrite(pwmValue);
+    }
   }
 
   on() {
@@ -68,7 +68,6 @@ class RGBLED {
 
   setValue(data) {
     if (data.color && typeof data.color === 'string') {
-      console.log('setValue:', data);
       this[data.color].setValue({ pwmValue: data.pwmValue });
     } else if ('pwmValue' in data) {
       for (const [color, pwmValue] of data.pwmValue) {
@@ -77,7 +76,6 @@ class RGBLED {
     } else {
       console.log('setValue no usable value:', data);
     }
-    this.pwmWrite(this.pwmValue);
   }
 }
 

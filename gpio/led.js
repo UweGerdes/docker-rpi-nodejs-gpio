@@ -33,7 +33,7 @@ class LED {
     this.smoothOff();
     this.value = this.onValue;
     this.pwmValue = this.pwmMax;
-    this.LED.pwmWrite(this.pwmMax);
+    this.pwmWrite(this.pwmMax);
   }
 
   off() {
@@ -65,10 +65,8 @@ class LED {
       diff = -1;
     }
     this.pwmValue += diff;
-    if (this.pwmValue < this.pwmMin || this.pwmValue > this.pwmMax) {
-      this.pwmValue = this.pwmMin;
-    } else {
-      this.LED.pwmWrite(this.pwmValue);
+    if (this.pwmValue >= this.pwmMin && this.pwmValue <= this.pwmMax) {
+      this.pwmWrite(this.pwmValue);
     }
   }
 
