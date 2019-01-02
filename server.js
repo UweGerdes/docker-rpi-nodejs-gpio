@@ -1,5 +1,5 @@
 /**
- * ## HTTP-Server for boilerplate
+ * ## HTTP-Server for gpio
  *
  * @module server
  */
