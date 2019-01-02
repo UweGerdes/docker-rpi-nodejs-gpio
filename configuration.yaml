@@ -162,5 +162,4 @@ server:
   modules: ./modules
   httpPort: 8080
   livereloadPort: 8081
-  socketPort: 8082
   verbose: false
