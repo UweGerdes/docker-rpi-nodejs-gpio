@@ -15,5 +15,5 @@ router.get('/', controller.index);
 
 module.exports = {
   router: router,
-  setExpress: controller.setExpress
+  connectServer: controller.connectServer
 };

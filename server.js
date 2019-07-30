@@ -86,8 +86,8 @@ glob.sync(config.server.modules + '/*/server/index.js')
     const baseRoute = filename.replace(regex, '$1');
     modules[baseRoute] = require('./' + path.join(config.server.modules, baseRoute, 'config.json'));
     const router = require(filename);
-    if (router.setExpress) {
-      router.setExpress(server);
+    if (router.connectServer) {
+      router.connectServer(server);
     }
     app.use(baseRoute, router.router);
   });

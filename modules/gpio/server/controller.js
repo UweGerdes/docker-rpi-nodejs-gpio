@@ -163,11 +163,11 @@ const index = (req, res) => {
 };
 
 /**
- * ### set express for socket
+ * ### set connection for socket
  *
  * @param {object} app - express instance
  */
-const setExpress = (server) => {
+const connectServer = (server) => {
   io = require('socket.io')(server);
   io.sockets.on('connection', function (newSocket) {
     socket = newSocket;
@@ -194,7 +194,7 @@ const setExpress = (server) => {
 
 module.exports = {
   index: index,
-  setExpress: setExpress
+  connectServer: connectServer
 };
 
 /**
