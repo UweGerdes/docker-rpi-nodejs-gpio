@@ -1,7 +1,7 @@
 /**
  * receive events from server and emit actions
  *
- * @module gpio/socker-events
+ * @module gpio/socket-events
  */
 
 'use strict';
