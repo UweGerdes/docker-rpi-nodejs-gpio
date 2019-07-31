@@ -4,7 +4,7 @@ Using the Raspberry Pi 3 GPIO pins with node wrapped in a docker container.
 
 ## Building
 
-Before you build this image please build my `docker-baseimage-rpi-raspbian` and `docker-rpi-nodejs`, you might want to use the following command more than once and this saves some 20 mins build time.
+Before you build this image please build my `docker-baseimage-arm32v7` and `docker-rpi-nodejs`.
 
 ```bash
 $ docker build -t uwegerdes/rpi-nodejs-gpio \
@@ -13,10 +13,6 @@ $ docker build -t uwegerdes/rpi-nodejs-gpio \
 ```
 
 The `GPIO_GROUP` is needed to give the docker internal user `node` access to `/dev/gpio*`.
-
-`--network=host` is needed if you used hostnames for apt or npm cache services. If you used ip address or no cache servers you should omit that line.
-
-You may add `--build-arg NODEIMAGE_VERSION="10.x"` depending on the nodejs image you have prepared.
 
 ## Usage
 
@@ -42,15 +38,17 @@ The wiring is configured in configuration.yaml - the items I use were in the (Ra
 
 See the links below for the numbering of the GPIO pins - and be aware that the GPIO pins are in an order that someone might have considered useful.
 
+Never shortcut 3.3V and 5V. This could damage you Pi 2, 3 and 4.
+
 ### LED
 
-I have LEDs with integrated 220 Ohm resistor. Check your LED, they should never be used without resistor!
+I have LEDs with integrated 220 Ohm resistor. Or calculate the resistor with 3.3V and the maximum current of the LED. Check your LED, they should never be used without resistor!
 
 The long wire at the is for the GPIO pin, the short wire is for ground connection.
 
 ### RGB LED
 
-Check for integrated resistor - if not use 220 Ohm for ever input wire.
+Check for integrated resistor - if not, use 220 Ohm for ever input wire.
 
 The wires differ: the longest one is for ground, the others are for red, green and blue.
 
