@@ -42,7 +42,8 @@ RUN apt-get update && \
 	npm -g config set user ${USER_NAME} && \
 	npm install -g --cache /tmp/root-cache \
 				gulp-cli \
-				nodemon
+				nodemon && \
+	rm -r /tmp/*
 
 COPY . ${APP_HOME}
 
@@ -53,7 +54,8 @@ USER ${USER_NAME}
 WORKDIR ${NODE_HOME}
 
 RUN export NODE_TLS_REJECT_UNAUTHORIZED=0 && \
-	npm install --cache /tmp/node-cache
+	npm install --cache /tmp/node-cache && \
+	rm -r /tmp/*
 
 WORKDIR ${APP_HOME}
 
