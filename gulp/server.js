@@ -1,12 +1,18 @@
 /**
- * ## Gulp server tasks
+ * Gulp server tasks
  *
  * @module gulp/server
+ * @requires module:lib/config
+ * @requires module:lib/ipv4addresses
+ * @requires module:gulp/lib/files-promises
+ * @requires module:gulp/lib/load-tasks
+ * @requires module:gulp/lib/notify
  */
 
 'use strict';
 
-const spawn = require('child_process').spawn,
+const fs = require('fs'),
+  spawn = require('child_process').spawn,
   gulp = require('gulp'),
   changedInPlace = require('gulp-changed-in-place'),
   server = require('gulp-develop-server'),
@@ -14,7 +20,7 @@ const spawn = require('child_process').spawn,
   sequence = require('gulp-sequence'),
   path = require('path'),
   config = require('../lib/config'),
-  ipv4addresses = require('../lib/ipv4addresses.js'),
+  ipv4addresses = require('../lib/ipv4addresses'),
   loadTasks = require('./lib/load-tasks'),
   log = require('../lib/log'),
   notify = require('./lib/notify');
@@ -25,11 +31,10 @@ let gpioServer;
 
 const tasks = {
   /**
-   * ### server start
+   * Start all configured server tasks for current NODE_ENV setting
    *
-   * @task server
-   * @namespace tasks
-   * @param {function} callback - gulp callback
+   * @function server
+   * @param {function} callback - gulp callback to signal end of task
    */
   'server': [['eslint'], (callback) => {
     sequence(
@@ -73,25 +78,24 @@ const tasks = {
     });
   },
   /**
-   * ### server start task
+   * Server start task
    *
-   * @task server-start
-   * @namespace tasks
-   * @param {function} callback - gulp callback
+   * @function server-start
+   * @param {function} callback - gulp callback to signal end of task
    */
   'server-start': (callback) => {
     server.listen({
       path: config.server.server,
-      env: { VERBOSE: true, FORCE_COLOR: 1 }
+      env: { VERBOSE: true, FORCE_COLOR: 1 },
+      delay: 2000
     },
     callback);
   },
   /**
-   * ### server changed task
+   * Server changed task restarts server
    *
-   * @task server-changed
-   * @namespace tasks
-   * @param {function} callback - gulp callback
+   * @function server-changed
+   * @param {function} callback - gulp callback to signal end of task
    */
   'server-changed': (callback) => {
     server.changed((error) => {
@@ -102,42 +106,42 @@ const tasks = {
     });
   },
   /**
-   * ### server livereload task
+   * Server livereload task notifies clients
    *
-   * @task livereload
-   * @namespace tasks
+   * @function livereload
    */
   'livereload': () => {
     return gulp.src(config.gulp.watch.livereload)
       .pipe(changedInPlace({ howToDetermineDifference: 'modification-time' }))
       .pipe(notify({ message: '<%= file.path %>', title: 'livereload' }))
-      .pipe(livereload({ quiet: true }));
+      .pipe(livereload({ quiet: false }));
   },
   /**
-   * ### trigger of livereload task with first file
+   * Trigger of livereload task with first file configured for livereload
    *
-   * @task livereload-index
-   * @namespace tasks
+   * used for full page reload if js or locales change
+   *
+   * @function livereload-all
    */
-  'livereload-index': () => {
+  'livereload-all': () => {
     return gulp.src(config.gulp.watch.livereload[0])
       .pipe(notify({ message: 'triggered', title: 'livereload' }))
-      .pipe(livereload({ quiet: true }));
+      .pipe(livereload({ quiet: false }));
   },
   /**
-   * ### server livereload start task
+   * Livereload server start task
    *
-   * @task livereload-start
-   * @namespace tasks
+   * @function livereload-start
    */
   'livereload-start': () => {
     livereload.listen({
-      port: config.server.livereloadPort || process.env.LIVERELOAD_PORT,
-      delay: 2000,
-      quiet: false
+      host: ipv4addresses.get()[0],
+      port: '8081',
+      quiet: false,
+      key: fs.readFileSync(path.join(__dirname, '..', config.server.httpsKey)),
+      cert: fs.readFileSync(path.join(__dirname, '..', config.server.httpsCert))
     });
-    log.info('livereload listening on http://' +
-      ipv4addresses.get()[0] + ':' + config.server.livereloadPort);
+    log.info('livereload listening on http://localhost:' + process.env.LIVERELOAD_PORT);
   }
 };
 

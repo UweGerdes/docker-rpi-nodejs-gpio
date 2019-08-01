@@ -1,5 +1,6 @@
 #
-public/css
-public/js
-docs/jsdoc
-
+/deploy
+/docs/jsdoc
+/generated
+/key
+/locales

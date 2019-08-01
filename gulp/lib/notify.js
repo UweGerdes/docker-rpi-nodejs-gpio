@@ -1,6 +1,7 @@
 /**
- * @module lib:helpers
- * @private
+ * Wrapper for gulp-notify
+ *
+ * @module gulp/lib/notify
  */
 
 'use strict';
@@ -8,11 +9,14 @@
 const gulpNotify = require('gulp-notify');
 
 /**
- * log only to console, not GUI
+ * Log only to console, not GUI
  *
- * @param {pbject} options - setting options
- * @param {function} callback - gulp callback
+ * @param {pbject} options - options
+ * @param {function} callback - gulp callback to signal end of task
+ * @type {function}
  */
-module.exports = gulpNotify.withReporter((options, callback) => {
+const notify = gulpNotify.withReporter((options, callback) => {
   callback();
 });
+
+module.exports = notify;

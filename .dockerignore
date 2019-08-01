@@ -1,6 +1,5 @@
 # dockerignore
-.git/
-docs/jsdoc
-public/css/
-public/js/
-
+/.git
+/deploy
+/docs/jsdoc
+/locales

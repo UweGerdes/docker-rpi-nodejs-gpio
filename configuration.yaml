@@ -13,9 +13,12 @@ gulp:
         - 'livereload-start'
         - 'server-start'
         - 'tests'
+        - 'livereload'
+#        - 'livereload-all'
       build:
         - 'less'
         - 'js'
+        - 'locales'
 #        - 'jsdoc'
       tests:
         - 'test-modules'
@@ -31,6 +34,17 @@ gulp:
         - 'gpio-start'
         - 'server-changed'
         - 'tests'
+    staging:
+      gulp:
+        - 'watch'
+        - 'server-start'
+      build: []
+      tests: []
+      lint: []
+      server:
+        - 'server-changed'
+      watch:
+        - 'server'
     production:
       gulp:
         - 'build'
@@ -40,6 +54,7 @@ gulp:
       build:
         - 'less'
         - 'js'
+        - 'locales'
       tests: []
       lint: []
       server:
@@ -55,10 +70,19 @@ gulp:
     js:
       - 'modules/*/js/*.js'
     jsdoc:
-      - 'nofile.js'
+#      - 'nofile.js'
+      - '*.js'
+      - 'gulp/**/*.js'
+      - 'lib/**/*.js'
+      - 'modules/**/*.js'
     jsonlint:
       - '**/*.json'
       - '.lesshintrc'
+      - '!src/locales/*.json'
+      - '!modules/**/locales/*.json'
+    locales:
+      - 'src/locales/*.json'
+      - 'modules/**/locales/*.json'
     yamllint:
       - '**/*.yaml'
       - '**/*.yml'
@@ -75,16 +99,17 @@ gulp:
       - 'modules/**/!(tests)/server/*.js'
     livereload:
       - 'public/**/*.html'
-      - 'modules/**/*.pug'
       - 'public/img/**/*.*'
-      - 'public/css/*.css'
-    livereload-index:
-      - 'public/js/**/*.js'
+      - 'generated/**/*.css'
+      - 'modules/**/*.ejs'
+      - 'modules/**/*.pug'
+    livereload-all:
+      - 'generated/**/*.js'
+      - 'locales/**/*.*'
     test-modules:
       - 'modules/**/tests/model/*.*'
       - 'modules/**/tests/server/*.*'
       - 'modules/**/views/**/*.*'
-      - 'htdocs/css/*.css'
       - 'htdocs/js/**/*.js'
   tests:
     modules:
@@ -104,12 +129,34 @@ gulp:
     js:
       src:
         - 'modules/*/js/*.js'
-      dest: 'public/js'
+      dest: 'generated'
       replace:
-        'modules/([^/]+)/js(/[^/]+)?/.+': '$1$2'
+        'modules/(.+/)js/.+': '$1'
     less:
-      src: 'src/less/app.less'
-      dest: 'public/css'
+      src:
+        - 'src/less/app.less'
+        - 'modules/*/less/layout.less'
+      dest: 'generated'
+    locales:
+      dest: 'locales'
+    deploy:
+      src:
+        - 'CHANGELOG.md'
+        - 'configuration.yaml'
+        - 'Dockerfile'
+        - 'LICENSE'
+        - 'package.json'
+        - 'README.md'
+        - 'server.js'
+        - 'generated/*'
+        - 'lib/**/*'
+        - 'locales/*'
+        - 'modules/*/*.json'
+        - 'modules/*/*.yaml'
+        - 'modules/*/server/**/*'
+        - 'modules/*/views/**/*'
+        - 'public/**/*'
+      dest: 'deploy'
 
 gpio:
   LED:
@@ -159,7 +206,8 @@ gpio:
 server:
   server: ./server.js
   docroot: ./public
+  generated: ./generated
   modules: ./modules
-  httpPort: 8080
-  livereloadPort: 8081
   verbose: false
+  httpsKey: ./key/selfsigned.key
+  httpsCert: ./key/selfsigned.crt

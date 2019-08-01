@@ -1,16 +1,22 @@
 /**
- * gulpfile
- *
- * (c) Uwe Gerdes, entwicklung@uwegerdes.de
+ * Gulpfile for this project
  *
  * Gulp uses configuration variables stored in `./configuration.yaml`
  *
- * @name gulp
- * @module
- *
+ * @module gulpfile
+ * @requires module:gulp/build
+ * @requires module:gulp/lint
+ * @requires module:gulp/server
+ * @requires module:gulp/tests
+ * @requires module:gulp/watch
+ * @requires module:lib/config
  */
 
 'use strict';
+
+if (!process.env.NODE_ENV) {
+  process.env.NODE_ENV = 'development';
+}
 
 require('./gulp/build');
 require('./gulp/lint');
@@ -23,11 +29,12 @@ const gulp = require('gulp'),
   config = require('./lib/config');
 
 /**
- * #### default task
+ * Default task
  *
  * start build and watch, some needed for changedInPlace dryrun
  *
- * @param {function} callback - gulp callback
+ * @name module:gulpfile.default
+ * @param {function} callback - gulp callback to signal end of task
  */
 gulp.task('default', (callback) => {
   sequence(

@@ -1,6 +1,7 @@
 /**
- * @module lib:helpers
- * @private
+ * Helper for task loading
+ *
+ * @module gulp/lib/load-tasks
  */
 
 'use strict';
@@ -27,9 +28,9 @@ module.exports = {
       });
   },
   /**
-   * get the task list
+   * Get the task list
    *
-   * @param {object} tasks - task list
+   * @return {Array} task list
    */
   tasks: () => {
     return list;
