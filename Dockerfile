@@ -31,9 +31,10 @@ RUN apt-get update && \
 	cd /opt/pigpio && \
 	make && \
 	make install && \
+	rm -r /opt/pigpio && \
 	ln -s /usr/local/lib/libpigpio.so /usr/lib/libpigpio.so && \
 	mkdir -p  /etc/svscan/pigpiod && \
-	echo "#!/bin/bash\nif [ ! -f /var/run/pigpio.pid ]; then\n	echo 'Starting'\n	exec /opt/pigpio/pigpiod\nfi" > /etc/svscan/pigpiod/run && \
+	echo "#!/bin/bash\nif [ ! -f /var/run/pigpio.pid ]; then\n	echo 'Starting'\n	exec /usr/local/bin/pigpiod\nfi" > /etc/svscan/pigpiod/run && \
 	chmod +x /etc/svscan/pigpiod/run && \
 	groupadd -g ${GPIO_GROUP} gpio && \
 	adduser ${USER_NAME} gpio && \
