@@ -1,6 +1,13 @@
 //- index.pug
 extends ../../pages/views/page.pug
 
+append head
+  link(rel='stylesheet', href='/'+ moduleName + '/layout.css')
+
+append breadcrumbs
+  li.header-breadcrumb
+    a.header-breadcrumb-link(href='/'+ moduleName + '/') Raspberry Pi 3 GPIO
+
 mixin button(msg, data, label)
   button.button.gpio-button&attributes({ 'data-emit': msg, 'data-data': data })= label
 
@@ -46,4 +53,4 @@ block content
 
 append footer
   script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js')
-  script(src='/js/gpio/index.js')
+  script(src='/gpio/index.js')

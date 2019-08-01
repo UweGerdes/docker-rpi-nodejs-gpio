@@ -23,7 +23,7 @@ describe('/gpio/tests/server/index.js', function () {
           expect(res).to.have.status(200);
           expect(res).to.be.html;
           const { document } = (new JSDOM(res.text)).window;
-          assert.equal(document.title, 'gpio');
+          assert.equal(document.title, 'Raspberry Pi 3 GPIO');
           done();
         });
     });
@@ -37,7 +37,7 @@ describe('/gpio/tests/server/index.js', function () {
           const { document } = (new JSDOM(res.text)).window;
           const headline = document.getElementById('headline');
           assert.equal(headline.textContent, 'Raspberry Pi 3 GPIO');
-          const gpioScript = document.querySelectorAll('script[src="/js/gpio/index.js"]');
+          const gpioScript = document.querySelectorAll('script[src="/gpio/index.js"]');
           assert.equal(gpioScript.length, 1);
           done();
         });

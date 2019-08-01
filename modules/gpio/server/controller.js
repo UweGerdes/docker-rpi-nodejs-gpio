@@ -2,13 +2,16 @@
  * ## Controller for gpio
  *
  * @module gpio/controller
+ * @requires module:lib/config
+ * @requires module:lib/log
+ * @requires module:gpio/model
  */
 
 'use strict';
 
 const ipc = require('node-ipc'),
   path = require('path'),
-  config = require('../../../lib/config').config,
+  config = require('../../../lib/config'),
   log = require('../../../lib/log'),
   model = require('./model.js');
 
@@ -22,6 +25,8 @@ let items = {};
 ipc.config.id = 'client';
 ipc.config.retry = 1000;
 ipc.config.silent = true;
+
+config.gpio = config.config.gpio;
 
 /**
  * connect to gpio backend server
@@ -143,77 +148,70 @@ const viewRenderParams = {
   // view helper functions
 };
 
-/**
- * ### index page
- *
- * render the index page
- *
- * @param {object} req - request
- * @param {object} res - result
- */
-const index = (req, res) => {
-  let data = Object.assign({
-    title: 'gpio'
-  },
-  req.params,
-  getHostData(req),
-  viewRenderParams,
-  model.getData());
-  res.render(path.join(viewBase, 'index.pug'), data);
-};
-
-/**
- * ### set connection for socket
- *
- * @param {object} app - express instance
- */
-const connectServer = (server) => {
-  io = require('socket.io')(server);
-  io.sockets.on('connection', function (newSocket) {
-    socket = newSocket;
-    socket.on('allOff', () => {
-      allOff();
-    });
-    socket.on('allOn', () => {
-      allOn();
-    });
-    socket.on('smooth', (data) => {
-      smooth(data.group, data.item, data.timeout);
-    });
-    socket.on('off', (data) => {
-      off(data.group, data.item);
-    });
-    socket.on('getItems', () => {
-      socket.emit('items', items);
-    });
-    socket.on('setValue', (data) => {
-      ipc.of.gpio.emit('gpio.setValue', data);
-    });
-  });
-};
-
 module.exports = {
-  index: index,
-  connectServer: connectServer
+  /**
+   * index page
+   *
+   * render the index page
+   *
+   * @param {object} req - request
+   * @param {object} res - result
+   */
+  index: (req, res) => {
+    let data = Object.assign({
+      title: 'gpio'
+    },
+    req.params,
+    getData(req),
+    viewRenderParams,
+    model.getData());
+    res.render(path.join(viewBase, 'index.pug'), data);
+  },
+  /**
+   * set connection for socket
+   *
+   * @param {object} app - express instance
+   */
+  connectServer: (server) => {
+    io = require('socket.io')(server);
+    io.sockets.on('connection', function (newSocket) {
+      socket = newSocket;
+      socket.on('allOff', () => {
+        allOff();
+      });
+      socket.on('allOn', () => {
+        allOn();
+      });
+      socket.on('smooth', (data) => {
+        smooth(data.group, data.item, data.timeout);
+      });
+      socket.on('off', (data) => {
+        off(data.group, data.item);
+      });
+      socket.on('getItems', () => {
+        socket.emit('items', items);
+      });
+      socket.on('setValue', (data) => {
+        ipc.of.gpio.emit('gpio.setValue', data);
+      });
+    });
+  }
 };
 
 /**
- * Get the host data for livereload
+ * Get the basic data for the response
  *
- * @private
- * @param {String} req - request
+ * @protected
+ * @param {Object} req - request
+ * @return {Object} config getData object + defaults
  */
-function getHostData(req) {
-  let livereloadPort = config.server.livereloadPort || process.env.LIVERELOAD_PORT;
-  const host = req.get('Host');
-  if (host.indexOf(':') > 0) {
-    livereloadPort = parseInt(host.split(':')[1], 10) + 1;
-  }
-  const module = require(path.join('..', 'config.json'));
-  return {
-    environment: process.env.NODE_ENV,
-    hostname: req.hostname,
-    livereloadPort: livereloadPort,
-    module: module
-  };
+function getData(req) {
+  return Object.assign(
+    config.getData(req),
+    {
+      data: false,
+      post: { },
+      loginLink: '/oauth2/login/'
+    }
+  );
 }
