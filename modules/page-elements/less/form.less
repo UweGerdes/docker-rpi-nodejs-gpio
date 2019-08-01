@@ -1,0 +1,139 @@
+// form.less
+
+.field {
+  background-color: #f0f0f0;
+  margin: 0 0 0.2em;
+  padding: 1em;
+
+  &-label {
+    display: block;
+    margin: 0 0 0.5em;
+
+    &-empty {
+      margin: 0;
+    }
+
+    &-textarea {
+      align-self: flex-start;
+      padding-top: 0.5em;
+    }
+  }
+
+  &-output {
+    padding-bottom: 0.5em;
+  }
+
+  &-value {
+    &-input {
+      width: 100%;
+    }
+
+    .input-text,
+    .input-email,
+    .input-url,
+    .input-password {
+      border: 1px solid #666666;
+      border-radius: 5px;
+      padding: 4px 6px;
+      width: 100%;
+    }
+
+    .input-checkbox {
+      opacity: 0;
+
+      & + .checkbox-label {
+        display: inline-block;
+        line-height: 1.5em;
+        margin-left: -20px;
+        padding: 3px 0;
+
+        &:before {
+          content: '\2610';
+          float: left;
+          font-size: 1.5em;
+          line-height: 1em;
+          padding: 0 0.3em 0 0;
+        }
+      }
+
+      &:checked + .checkbox-label {
+        &:before {
+          content: '\2611';
+        }
+      }
+    }
+
+    .input-radio {
+      opacity: 0;
+
+      & + .radio-label {
+        display: inline-block;
+        line-height: 1.5em;
+        padding: 3px 0 0;
+
+        &:nth-child(2) {
+          margin-left: -20px;
+        }
+
+        &:before {
+          content: '\25CE';
+          float: left;
+          font-size: 1.5em;
+          line-height: .8em;
+          padding: 0 0.3em 0 0;
+        }
+      }
+
+      &:checked + .radio-label {
+        &:before {
+          content: '\25C9';
+        }
+      }
+    }
+
+    .input-select {
+      border: 1px solid #666666;
+      border-radius: 5px;
+      margin-right: 0.5em;
+      padding: 4px 6px;
+    }
+
+    .input-textarea {
+      border: 1px solid #666666;
+      border-radius: 5px;
+      font-family: @font_family;
+      margin-right: 0.5em;
+      padding: 4px 6px;
+      width: 100%;
+    }
+
+    .input-button,
+    .input-submit {
+      border: 1px solid #666666;
+      border-radius: 5px;
+      margin-right: 0.5em;
+      padding: 4px 6px;
+    }
+  }
+
+  @media all and (min-width: 768px) {
+    align-items: baseline;
+    display: flex;
+
+    &-label {
+      flex-basis: 20%;
+      flex-grow: 1;
+      padding-right: 1em;
+      text-align: right;
+    }
+
+    &-value {
+      flex-basis: 80%;
+      flex-grow: 1;
+
+      & > &-input {
+        width: 50%;
+      }
+    }
+  }
+}

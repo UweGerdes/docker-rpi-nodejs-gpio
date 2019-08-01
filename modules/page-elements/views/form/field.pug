@@ -1,0 +1,28 @@
+//- widgets/form/field.pug
+mixin field(pretext, attr, posttext)
+  .field(class='field_' + (attr.class ? attr.class : attr.name))
+    .field-label= pretext
+    .field-value
+      .field-value-input(class='field-value-input-' + attr.name)
+        if attr.entries
+          - i = 0
+          each label, value in attr.entries
+            input(
+              class='input-' + attr.type,
+              type=attr.type,
+              name=attr.name,
+              value=value,
+              id=attr.name + i,
+              checked=(attr.type == 'radio' && value == post[attr.name])
+            )
+            label(class=attr.type + '-label', for=attr.name + i++)= label
+        else
+          if post[attr.name] && attr.type != 'checkbox'
+            - attr.value = post[attr.name]
+          input(
+            class='input-' + attr.type,
+            id=attr.name,
+            checked=(attr.type == 'checkbox' && attr.value == post[attr.name])
+          )&attributes(attr)
+        if posttext
+          label(class=attr.type + '-label', for=attr.name)= posttext
