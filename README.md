@@ -26,6 +26,7 @@ $ docker run -it --rm \
 	--name nodejs-gpio \
 	-p 8080:8080 \
 	-p 8081:8081 \
+	-p 8443:8443 \
 	--privileged \
 	--cap-add SYS_RAWIO \
 	uwegerdes/rpi-nodejs-gpio \
