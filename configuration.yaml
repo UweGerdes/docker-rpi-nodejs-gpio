@@ -28,7 +28,6 @@ gulp:
         - 'jsonlint'
         - 'yamllint'
         - 'puglint'
-        - 'ejslint'
       server:
         - 'gpio-stop'
         - 'gpio-start'
@@ -96,7 +95,9 @@ gulp:
     server:
       - 'server.js'
       - 'gpio/**/*.js'
-      - 'modules/**/!(tests)/server/*.js'
+      - 'lib/*.js'
+      - 'modules/*/server/*.js'
+      - 'modules/*/*.yaml'
     livereload:
       - 'public/**/*.html'
       - 'public/img/**/*.*'
@@ -107,6 +108,7 @@ gulp:
       - 'generated/**/*.js'
       - 'locales/**/*.*'
     test-modules:
+      - '*.js'
       - 'modules/**/tests/model/*.*'
       - 'modules/**/tests/server/*.*'
       - 'modules/**/views/**/*.*'
@@ -116,6 +118,9 @@ gulp:
       - 'modules/**/tests/model/*.js'
       - 'modules/**/tests/server/*.js'
       - 'modules/**/tests/views/*.js'
+  lint:
+    eslint:
+      fixtureDir: './fixture'
   build:
     jsdoc:
       src:

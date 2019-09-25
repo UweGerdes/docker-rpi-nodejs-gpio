@@ -1,5 +1,7 @@
 /**
  * Test for page elements
+ *
+ * @requires module:lib/config
  */
 
 'use strict';

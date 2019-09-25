@@ -1,0 +1,26 @@
+//- widgets/form.pug
+
+include ../../page-elements/views/form/input.pug
+include ../../page-elements/views/form/group.pug
+include ../../page-elements/views/form/address.pug
+
+mixin fieldcontainer(attr)
+  .fieldcontainer(class='fieldcontainer_' + (attr.class ? attr.class : attr.name))
+    .field-label= __(attr.label)
+    - delete(attr.label)
+    .field-value
+      .field-value-input(class='field-value-input-' + attr.name)
+        + input(attr)
+
+mixin form(form, action)
+  form#form.form(method='POST', action=action, name=form.name)
+    each section, section_name in form.sections
+      fieldset.fieldset(class=section_name)
+        legend= __(section.label)
+        each field in section.fields
+          if field.type == 'group'
+            + group(field.label, field.name, field.fields)
+          else if field.type == 'address'
+            + address(field.label, field.name, field.prefix)
+          else
+            + fieldcontainer(Object.assign({}, field))

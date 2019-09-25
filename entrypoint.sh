@@ -15,4 +15,3 @@ fi
 cd "${APP_HOME}"
 
 exec "$@"
-

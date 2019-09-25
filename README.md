@@ -91,6 +91,8 @@ Just ground GPIO-3 and it reboots.
 
 ## Changelog
 
+0.1.0 refactoring and updates from boilerplate
+
 0.0.10 boilerplate refactoring
 
 0.0.9 expressjs with pug templates

@@ -65,11 +65,11 @@ const tasks = {
           );
         }
       }))
+      .pipe(gulpIf(isFixed, gulp.dest(config.gulp.lint.eslint.fixtureDir || './fixture')))
       .pipe(gulpIf(isFixed, notify({
         message: 'fixture: <%= file.path %>',
         title: 'Gulp eslint --fix'
       })))
-      .pipe(gulpIf(isFixed, gulp.dest('fixture')))
       .pipe(eslint.failAfterError());
   },
   /**

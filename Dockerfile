@@ -24,7 +24,7 @@ RUN apt-get update && \
 	apt-get dist-upgrade -y && \
 	apt-get install -y python3-distutils && \
 	apt-get clean && \
-	rm -rf /var/lib/apt/lists/* && \
+	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
 	cd /opt && \
 	git config --global http.sslVerify false && \
 	git clone https://github.com/joan2937/pigpio && \

@@ -1,5 +1,5 @@
 /**
- * HTTP-Server for gpio
+ * HTTP-Server for expressjs projects
  *
  * @module server
  */
@@ -203,7 +203,7 @@ server.on('error', onError);
  *
  * @event server_listen:onListening
  */
-server.on('listening', onListening);
+server.on('listening', onListening.bind(null, 'http', process.env.SERVER_PORT));
 
 /**
  * Server listens on process.env.HTTPS_PORT
@@ -222,7 +222,7 @@ httpsServer.on('error', onError);
  *
  * @event server_listen:onListeningHttps
  */
-httpsServer.on('listening', onListeningHttps);
+httpsServer.on('listening', onListening.bind(null, 'https', process.env.HTTPS_PORT));
 
 /**
  * connect server and use routes from modules
@@ -243,12 +243,13 @@ for (const [baseRoute, router] of Object.entries(routers)) {
  * @param {object} res - response
  */
 const requestGet404Route = (req, res) => {
-  res.status(404).render(viewPath('error'), Object.assign({
+  res.status(404).render(viewPath('error'), {
     error: {
       code: 404,
       name: 'not found'
-    }
-  }, config.getData(req)));
+    },
+    ...config.getData(req)
+  });
 };
 app.get('*', requestGet404Route);
 
@@ -265,13 +266,14 @@ const requestError500Handler = (err, req, res, next) => {
   if (err) {
     res
       .status(500)
-      .render(viewPath('error'), Object.assign({
+      .render(viewPath('error'), {
         error: {
           code: 500,
           name: 'server error',
           error: err
-        }
-      }, config.getData(req)));
+        },
+        ...config.getData(req)
+      });
   } else {
     next();
   }
@@ -314,21 +316,18 @@ function onError(error) {
 }
 
 /**
- * Event listener for HTTP server "listening" event
+ * Event listener for server "listening" event
  *
- * @listens server_listen:onListening
- */
-function onListening() {
-  log.info('server listening on ' +
-    chalk.greenBright('http://' + ipv4addresses.get()[0] + ':' + process.env.SERVER_PORT));
-}
-
-/**
- * Event listener for HTTPS server "listening" event
+ * emits event for gulp server-start task
  *
+ * @param {string} proto - protocol
+ * @param {string} port - error object
  * @listens server_listen:onListeningHttps
  */
-function onListeningHttps() {
+function onListening(proto, port) {
   log.info('server listening on ' +
-    chalk.greenBright('https://' + ipv4addresses.get()[0] + ':' + process.env.HTTPS_PORT));
+    chalk.greenBright(proto + '://' + ipv4addresses.get()[0] + ':' + port));
+  if (process.send !== undefined && proto === 'https') {
+    process.send('server listening');
+  }
 }
