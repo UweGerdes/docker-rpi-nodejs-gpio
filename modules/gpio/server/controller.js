@@ -18,7 +18,8 @@ const ipc = require('node-ipc'),
 const viewBase = path.join(path.dirname(__dirname), 'views');
 
 let socket,
-  io;
+  io,
+  httpsIo;
 
 let items = {};
 
@@ -158,23 +159,46 @@ module.exports = {
    * @param {object} res - result
    */
   index: (req, res) => {
-    let data = Object.assign({
-      title: 'gpio'
-    },
-    req.params,
-    getData(req),
-    viewRenderParams,
-    model.getData());
+    let data = {
+      title: 'gpio',
+      ...req.params,
+      ...getData(req),
+      ...viewRenderParams,
+      ...model.getData()
+    };
     res.render(path.join(viewBase, 'index.pug'), data);
   },
   /**
    * set connection for socket
    *
-   * @param {object} app - express instance
+   * @param {object} server - express server
+   * @param {object} httpsServer - express HTTPS server
    */
-  connectServer: (server) => {
+  connectServer: (server, httpsServer) => {
     io = require('socket.io')(server);
     io.sockets.on('connection', function (newSocket) {
+      socket = newSocket;
+      socket.on('allOff', () => {
+        allOff();
+      });
+      socket.on('allOn', () => {
+        allOn();
+      });
+      socket.on('smooth', (data) => {
+        smooth(data.group, data.item, data.timeout);
+      });
+      socket.on('off', (data) => {
+        off(data.group, data.item);
+      });
+      socket.on('getItems', () => {
+        socket.emit('items', items);
+      });
+      socket.on('setValue', (data) => {
+        ipc.of.gpio.emit('gpio.setValue', data);
+      });
+    });
+    httpsIo = require('socket.io')(httpsServer);
+    httpsIo.sockets.on('connection', function (newSocket) {
       socket = newSocket;
       socket.on('allOff', () => {
         allOff();
