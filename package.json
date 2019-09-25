@@ -1,7 +1,7 @@
 {
   "name": "node-rpi-gpio",
   "description": "Raspberry Pi GPIO with Node.js",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "keywords": [
     "raspberry pi",
     "docker",
