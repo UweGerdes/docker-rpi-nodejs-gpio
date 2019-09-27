@@ -40,8 +40,6 @@ describe('/pages/tests/views/app.js', function () {
           const document = getDocument(res, err);
           const moduleLinks = document.querySelectorAll('.module-link');
           assert.isAtLeast(moduleLinks.length, 1, 'moduleLinks');
-          assert.equal(moduleLinks[0].textContent, 'Raspberry Pi 3 GPIO');
-          assert.equal(moduleLinks[0].getAttribute('href'), '/gpio/');
           done();
         });
     });

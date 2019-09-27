@@ -14,7 +14,7 @@ mixin group(label, groupname, fields, posttext)
                 each label, value in field.options
                   option(
                     value=value,
-                    selected=(value == post[field.name])
+                    selected=(value == values[field.name])
                   )= __(label)
             else
               if field.options
@@ -26,7 +26,7 @@ mixin group(label, groupname, fields, posttext)
                     name=field.name,
                     value=value,
                     id=field.name + i,
-                    checked=(field.type == 'radio' && value == post[field.name])
+                    checked=(field.type == 'radio' && value == values[field.name])
                   )
                   label(class=field.type + '-label', for=field.name + i++)= __(label)
               else
@@ -38,9 +38,10 @@ mixin group(label, groupname, fields, posttext)
                   type=field.type,
                   id=field.id || field.name,
                   name=field.name,
-                  value=(field.type !== 'checkbox' ? post[field.name] : field.value),
-                  checked=(field.type == 'checkbox' && post[field.name] && post[field.name].indexOf(value) >= 0)
-                )&attributes({ placeholder: placeholder })
+                  value=(field.type !== 'checkbox' ? values[field.name] : field.value),
+                  checked=(field.type == 'checkbox' && values[field.name] && values[field.name].indexOf(value) >= 0),
+                  placeholder=placeholder
+                )&attributes(field.attr)
                 if field.label
                   label(class=field.type + '-label', for=field.id || field.name)= __(field.label)
           if posttext

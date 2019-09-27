@@ -19,7 +19,7 @@ mixin input(attr)
         each label, value in options
           option(
             value=value,
-            selected=(value == post[attr.name])
+            selected=(value == values[attr.name])
           )= __(label)
       - attr.type = 'select'
     else
@@ -31,18 +31,18 @@ mixin input(attr)
           name=attr.name,
           value=value,
           id=attr.name + i,
-          checked=(attr.type == 'radio' && value == post[attr.name])
+          checked=(attr.type == 'radio' && value == values[attr.name])
         )
         label(class=attr.type + '-label', for=attr.name + i++)= __(label)
   else if attr.type == 'hidden'
     input(
       type='hidden',
       name=attr.name,
-      value=attr.value
+      value=(attr.value ? attr.value : values[attr.name])
     )
   else if attr.type == 'textarea'
-    if post[attr.name]
-      - value = post[attr.name]
+    if values[attr.name]
+      - value = values[attr.name]
     else
       if attr.value != ''
         - value = __(attr.value)
@@ -52,9 +52,9 @@ mixin input(attr)
     - delete(attr.value)
     textarea.input-textarea&attributes(attr)= value
   else
-    if post[attr.name]
+    if values[attr.name]
       if attr.type != 'checkbox'
-        - attr.value = post[attr.name]
+        - attr.value = values[attr.name]
     else
       if attr.value != ''
         - attr.value = __(attr.value)
@@ -63,7 +63,7 @@ mixin input(attr)
     input(
       class='input-' + attr.type,
       id=attr.name,
-      checked=(attr.type == 'checkbox' && attr.value == post[attr.name])
+      checked=(attr.type == 'checkbox' && attr.value == values[attr.name])
     )&attributes(attr)
   if text
     label(class=attr.type + '-label', for=attr.name)= text

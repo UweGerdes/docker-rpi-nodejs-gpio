@@ -12,11 +12,11 @@ block header
           #login-status.login-status
             block loginStatus
               if session.userdata
-                .login-status-ok= 'Angemeldet über ' + session.oauthProvider + ' als '  + session.userdata.name
+                .login-status-ok= 'Angemeldet über ' + session.oauthProvider + ' als '  + session.userdata.username
                 | #{' '}
                 .login-status-logout
-                  a.logout-link(href='/login/logout/') abmelden
+                  a.logout-link(href=(session.logoutLink ? session.logoutLink : '/login/logout/')) abmelden
               else
                 .login-status-login
-                  a.login-link(href='/login/') anmelden
+                  a.login-link(href=(locals.loginLink ? loginLink : '/login/')) anmelden
 
