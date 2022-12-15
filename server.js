@@ -11,6 +11,7 @@ const bodyParser = require('body-parser'),
   cookieParser = require('cookie-parser'),
   dateFormat = require('dateformat'),
   express = require('express'),
+  createGracefulShutdownMiddleware = require('express-graceful-shutdown'),
   session = require('express-session'),
   fs = require('fs'),
   glob = require('glob'),
@@ -38,6 +39,7 @@ let routers = { };
  *
  * @name set_logformat
  */
+/* c8 ignore next 7 */
 if (config.server.verbose) {
   morgan.token('time', () => {
     return dateFormat(new Date(), 'HH:MM:ss');
@@ -54,6 +56,13 @@ if (config.server.verbose) {
 app.use(express.static(config.server.docroot));
 app.use(express.static(config.server.generated));
 app.use('/jsdoc', express.static(config.gulp.build.jsdoc.dest));
+
+/**
+ * Do graceful shutdown on SIGTERM signal
+ *
+ * @name server_graceful_shutdown
+ */
+app.use(createGracefulShutdownMiddleware(server, { forceTimeout: 30000 }));
 
 /**
  * Routes from modules
@@ -148,6 +157,7 @@ app.use(session({
  * @name module_router_use_express
  */
 for (const router of Object.values(routers)) {
+  /* c8 ignore next 3 */
   if (router.useExpress) {
     router.useExpress(app);
   }
@@ -159,6 +169,7 @@ for (const router of Object.values(routers)) {
  * @param {object} req - request
  * @param {object} res - response
  */
+/* c8 ignore next 3 */
 const requestGetBaseRoute = (req, res) => {
   res.sendFile(path.join(config.server.docroot, 'index.html'));
 };
@@ -185,6 +196,14 @@ const requestGetI18nRoute = (req, res) => {
   res.render(viewPath('i18n-test'), config.getData(req));
 };
 app.get('/i18n-ejs', requestGetI18nRoute);
+
+/**
+ * Route for error 500 test page - simply throw error
+ */
+const requestGet500Route = () => {
+  throw new Error('testing server error');
+};
+app.get('/error500', requestGet500Route);
 
 /**
  * Server listens on process.env.SERVER_PORT
@@ -262,7 +281,10 @@ app.get('*', requestGet404Route);
  * @param {object} next - needed for complete signature
  */
 const requestError500Handler = (err, req, res, next) => {
-  console.error('SERVER ERROR:', err);
+  /* c8 ignore next 3 */
+  if (req.path !== '/error500/') {
+    console.error('SERVER ERROR:', err.message);
+  }
   if (err) {
     res
       .status(500)
@@ -274,6 +296,7 @@ const requestError500Handler = (err, req, res, next) => {
         },
         ...config.getData(req)
       });
+  /* c8 ignore next 3 */
   } else {
     next();
   }
@@ -286,6 +309,7 @@ app.use(requestError500Handler);
  * @param {string} page - page type
  * @param {string} type - file type (ejs, jade, pug, html)
  */
+/* c8 ignore next 3 */
 function viewPath(page = 'error', type = 'ejs') {
   return config.server.modules + '/pages/views/' + page + '.' + type;
 }
@@ -296,6 +320,7 @@ function viewPath(page = 'error', type = 'ejs') {
  * @param {object} error - error object
  * @listens server_listen:onError
  */
+/* c8 ignore next 18 */
 function onError(error) {
   if (error.syscall !== 'listen') {
     throw error;
@@ -327,6 +352,7 @@ function onError(error) {
 function onListening(proto, port) {
   log.info('server listening on ' +
     chalk.greenBright(proto + '://' + ipv4addresses.get()[0] + ':' + port));
+  /* c8 ignore next 3 */
   if (process.send !== undefined && proto === 'https') {
     process.send('server listening');
   }

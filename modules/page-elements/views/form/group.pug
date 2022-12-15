@@ -39,7 +39,7 @@ mixin group(label, groupname, fields, posttext)
                   id=field.id || field.name,
                   name=field.name,
                   value=(field.type !== 'checkbox' ? values[field.name] : field.value),
-                  checked=(field.type == 'checkbox' && values[field.name] && values[field.name].indexOf(value) >= 0),
+                  checked=(field.type == 'checkbox' && values[field.name] && values[field.name].indexOf(field.value) >= 0),
                   placeholder=placeholder
                 )&attributes(field.attr)
                 if field.label

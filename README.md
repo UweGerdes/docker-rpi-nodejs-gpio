@@ -92,6 +92,8 @@ Just ground GPIO-3 and it reboots.
 
 ## Changelog
 
+0.1.2 added coverage and updated form elements
+
 0.1.1 added https for socket.io
 
 0.1.0 refactoring and updates from boilerplate

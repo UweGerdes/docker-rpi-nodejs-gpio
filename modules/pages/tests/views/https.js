@@ -28,12 +28,12 @@ describe('/pages/tests/views/https.js', () => {
     it('should have head, headline and links', async () => {
       try {
         res = await agent.get('/app/');
+      /* c8 ignore next 3 */
       } catch (error) {
         err = error;
       }
       document = checkResponse(res, err);
-      checkPage(document, 'Module', null);
-      testError();
+      checkPage(document, 'Module', 'Home');
       testElement('#headline', { }, 'Module:');
     });
   });
@@ -68,7 +68,7 @@ function checkPage (document, title, breadcrumb) {
   const breadcrumbLinks = document.querySelectorAll('.header-breadcrumb a');
   assert.isAtLeast(breadcrumbLinks.length, 1);
   if (breadcrumb) {
-    assert.equal(breadcrumbs[breadcrumbs.length - 1].textContent, breadcrumb);
+    assert.equal(breadcrumbs[breadcrumbs.length - 1].textContent.trim(), breadcrumb);
   }
 }
 
@@ -87,20 +87,5 @@ function testElement(selector, attr, text) {
   }
   if (text) {
     assert.equal(element.textContent, text, 'element ' + selector + ' text');
-  }
-}
-
-/**
- * test error message in document
- *
- * @param {String} msg - error message or no error
- */
-function testError(msg) {
-  const errors = document.querySelectorAll('.error');
-  if (msg) {
-    assert.equal(errors.length, 1, 'errors');
-    assert.equal(errors[0].textContent, msg, 'error');
-  } else {
-    assert.equal(errors.length, 0, errors.length > 0 ? 'error ' + errors[0].textContent : 'errors');
   }
 }

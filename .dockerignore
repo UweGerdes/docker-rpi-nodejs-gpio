@@ -1,4 +1,5 @@
 # dockerignore
 /.git
+/coverage
 /deploy
 /docs/jsdoc
