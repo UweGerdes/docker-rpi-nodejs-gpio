@@ -1,4 +1,3 @@
-
 'use strict';
 
 const Gpio = require('pigpio').Gpio;

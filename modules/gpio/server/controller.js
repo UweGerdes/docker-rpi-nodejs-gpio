@@ -11,6 +11,7 @@
 
 const ipc = require('node-ipc'),
   path = require('path'),
+  { Server } = require('socket.io'),
   config = require('../../../lib/config'),
   log = require('../../../lib/log'),
   model = require('./model.js');
@@ -18,8 +19,7 @@ const ipc = require('node-ipc'),
 const viewBase = path.join(path.dirname(__dirname), 'views');
 
 let socket,
-  io,
-  httpsIo;
+  io;
 
 let items = {};
 
@@ -27,7 +27,7 @@ ipc.config.id = 'client';
 ipc.config.retry = 1000;
 ipc.config.silent = true;
 
-config.gpio = config.config.gpio;
+config.gpio = config.modules.gpio.gpio;
 
 /**
  * connect to gpio backend server
@@ -66,6 +66,7 @@ ipc.connectToNet('gpio', () => {
     if (!items[data.group]) {
       items[data.group] = { };
     }
+    console.log(data.group, data.name, JSON.stringify(data.data, null, 4));
     items[data.group][data.name] = data.data;
   });
   /**
@@ -169,36 +170,16 @@ module.exports = {
     res.render(path.join(viewBase, 'index.pug'), data);
   },
   /**
-   * set connection for socket
-   *
-   * @param {object} server - express server
-   * @param {object} httpsServer - express HTTPS server
+ * Use httpServer and httpsServer for socket
+ *
+ * @param {object} httpServer - express instance
+ * @param {object} httpsServer - httpsServer instance
    */
-  connectServer: (server, httpsServer) => {
-    io = require('socket.io')(server);
-    io.sockets.on('connection', function (newSocket) {
-      socket = newSocket;
-      socket.on('allOff', () => {
-        allOff();
-      });
-      socket.on('allOn', () => {
-        allOn();
-      });
-      socket.on('smooth', (data) => {
-        smooth(data.group, data.item, data.timeout);
-      });
-      socket.on('off', (data) => {
-        off(data.group, data.item);
-      });
-      socket.on('getItems', () => {
-        socket.emit('items', items);
-      });
-      socket.on('setValue', (data) => {
-        ipc.of.gpio.emit('gpio.setValue', data);
-      });
-    });
-    httpsIo = require('socket.io')(httpsServer);
-    httpsIo.sockets.on('connection', function (newSocket) {
+  connectServer: (httpServer, httpsServer) => {
+    io = new Server({ path: '/gpio/socket.io/', allowEIO3: true });
+    io.attach(httpServer);
+    io.attach(httpsServer);
+    io.on('connection', function (newSocket) {
       socket = newSocket;
       socket.on('allOff', () => {
         allOff();

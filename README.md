@@ -22,7 +22,9 @@ Run the container and start tests or gulp and use the web server to control the 
 
 ```bash
 $ docker run -it --rm \
-	-v $(pwd):/home/node/app \
+	-v $(pwd)/modules/gpio:/home/node/app/modules/gpio \
+	-v $(pwd)/fixture:/home/node/app/fixture \
+	-v $(pwd)/key:/home/node/app/key \
 	--name nodejs-gpio \
 	-p 8080:8080 \
 	-p 8081:8081 \
@@ -91,6 +93,8 @@ Just ground GPIO-3 and it reboots.
 
 
 ## Changelog
+
+0.1.3 rebase to expressjs-boilerplate, updates, refactoring
 
 0.1.2 added coverage and updated form elements
 

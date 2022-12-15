@@ -6,7 +6,7 @@
 
 'use strict';
 
-var socket = io();
+var socket = io({ path: '/gpio/socket.io/' });
 
 window.addEventListener('load', documentLoaded);
 
@@ -103,33 +103,41 @@ function addValueEmitter(element) {
   element.addEventListener('change', (event) => {
     const value = event.currentTarget.value;
     if (value.indexOf('#') === 0) {
-      console.log('setValue',
+      console.log(
+        'setValue',
         {
           group: element.dataset.group,
           item: element.dataset.name,
           pwmValue: hex2rgb(value)
-        });
-      socket.emit('setValue',
+        }
+      );
+      socket.emit(
+        'setValue',
         {
           group: element.dataset.group,
           item: element.dataset.name,
           pwmValue: hex2rgb(value)
-        });
+        }
+      );
     } else {
-      console.log('setValue',
+      console.log(
+        'setValue',
         {
           group: element.dataset.group,
           item: element.dataset.name,
           color: element.dataset.color,
           pwmValue: parseInt(value, 10)
-        });
-      socket.emit('setValue',
+        }
+      );
+      socket.emit(
+        'setValue',
         {
           group: element.dataset.group,
           item: element.dataset.name,
           color: element.dataset.color,
           pwmValue: parseInt(value, 10)
-        });
+        }
+      );
     }
   });
 }
@@ -137,11 +145,13 @@ function addValueEmitter(element) {
 function addStatusEmitter(element) {
   element.addEventListener('click', (event) => {
     if (event.currentTarget.getAttribute('data-status') === 'smooth') {
-      socket.emit('off',
+      socket.emit(
+        'off',
         {
           group: element.dataset.group,
           item: element.dataset.name
-        });
+        }
+      );
     } else {
       socket.emit('smooth', { group: element.dataset.group, item: element.dataset.name, timeout: 2000 });
     }

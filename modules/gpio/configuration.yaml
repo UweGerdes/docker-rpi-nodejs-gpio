@@ -1,1 +1,46 @@
 name: Raspberry Pi 3 GPIO
+
+gpio:
+  LED:
+    'LED 1':
+      type: 'LED'
+      gpio: 27
+      color: 'red'
+      range: { min: 1, max: 255 }
+    'LED 2':
+      type: 'LED'
+      gpio: 17
+      color: 'yellow'
+      range: { min: 1, max: 255 }
+    'LED 3':
+      type: 'LED'
+      gpio: 22
+      color: 'green'
+      range: { min: 1, max: 51 }
+    'LED 4':
+      type: 'LED'
+      gpio: 10
+      color: 'blue'
+      range: { min: 1, max: 255 }
+  'RGB LED':
+    'RGB LED 1':
+      type: 'RGBLED'
+      gpio: { red: 23, green: 24, blue: 25 }
+    'RGB LED 2':
+      type: 'RGBLED'
+      gpio: { red: 26, green: 19, blue: 13 }
+    'RGB LED 3':
+      type: 'RGBLED'
+      gpio: { red: 21, green: 20, blue: 16 }
+  Servo:
+    'Servo 1':
+      type: 'Servo'
+      gpio: 18
+  Button:
+    'Button 1':
+      type: 'Button'
+      gpio: 7
+  Sensor:
+    'Sensor 1':
+      type: 'Sensor'
+      gpio: 8
