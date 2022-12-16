@@ -29,12 +29,12 @@
     "epoll": "4.0.1",
     "nan": "2.17.0",
     "onoff": "^3.2.2",
+    "node-ipc": "^9.1.1",
     "pigpio": "3.3.1",
     "socket.io": "^2.2.0"
   },
   "devDependencies": {
     "gulp-sequence": "^1.0.0",
-    "node-ipc": "^9.1.1",
     "stream-combiner2": "^1.1.1",
     "sudo": "^1.0.3"
   },
@@ -44,7 +44,7 @@
   },
   "scripts": {
     "start": "node server.js",
-    "predev": "sudo node modules/gpio/bin/index.js",
+    "predev": "sudo node modules/gpio/bin/index.js &",
     "dev": "nodemon --watch gulpfile.js --watch gulp --watch configuration.yaml --delay 2 --exec gulp",
     "postdev": "sudo pkill -u root '(sudo|node)'",
     "pretest": "gulp build && npm run test-web-server",

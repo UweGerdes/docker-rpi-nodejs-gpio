@@ -52,10 +52,11 @@ ipc.connectToNet('gpio', () => {
     }
   });
   /**
-   * on disconnect show message
+   * on disconnect show message and force disconnect
    */
   ipc.of.gpio.on('disconnect', () => {
     log.info('controller disconnected from gpio');
+    ipc.disconnect('gpio');
   });
   /**
    * set up internal data for items reported by gpio
@@ -66,7 +67,6 @@ ipc.connectToNet('gpio', () => {
     if (!items[data.group]) {
       items[data.group] = { };
     }
-    console.log(data.group, data.name, JSON.stringify(data.data, null, 4));
     items[data.group][data.name] = data.data;
   });
   /**
