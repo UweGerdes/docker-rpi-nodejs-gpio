@@ -147,7 +147,6 @@ function smooth(group, item, timeout) {
 const viewRenderParams = {
   // model data
   items: items
-  // view helper functions
 };
 
 module.exports = {
