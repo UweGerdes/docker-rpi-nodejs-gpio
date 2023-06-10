@@ -9,7 +9,7 @@
 
 'use strict';
 
-const ipc = require('node-ipc'),
+const ipc = require('node-ipc').default,
   path = require('path'),
   { Server } = require('socket.io'),
   config = require('../../../lib/config'),
@@ -23,8 +23,7 @@ let socket,
 
 let items = {};
 
-ipc.config.id = 'client';
-ipc.config.retry = 1000;
+// ipc.config.retry = 1000;
 ipc.config.silent = true;
 
 config.gpio = config.modules.gpio.gpio;

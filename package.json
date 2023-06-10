@@ -22,13 +22,11 @@
   },
   "dependencies": {
     "onoff": "^6.0.3",
-    "node-ipc": "^9.1.1",
+    "node-ipc": "^11.1.0",
     "pigpio": "3.3.1",
-    "socket.io": "^4.5.4"
+    "socket.io": "^4.6.2"
   },
   "devDependencies": {
-    "gulp-sequence": "^1.0.0",
-    "stream-combiner2": "^1.1.1",
     "sudo": "^1.0.3"
   },
   "repository": {
@@ -36,18 +34,21 @@
     "url": "https://github.com/uwegerdes/docker-node-rpi-gpio"
   },
   "scripts": {
+    "start-gpio-server": "sudo node modules/gpio/bin/index.js &",
+    "prestart": "npm run start-gpio-server",
     "start": "node server.js",
-    "predev": "sudo node modules/gpio/bin/index.js &",
+    "poststart": "sudo pkill -u root node",
+    "predev": "npm run start-gpio-server",
     "dev": "nodemon --watch gulpfile.js --watch gulp --watch configuration.yaml --delay 2 --exec gulp",
     "postdev": "sudo pkill -u root node",
-    "pretest": "gulp build && npm run test-web-server",
+    "pretest": "npm run start-gpio-server && gulp build && npm run test-web-server",
     "test-web-server": "node server.js &",
     "test": "gulp tests",
-    "posttest": "pkill -f node",
-    "precoverage": "gulp build && npm run coverage-web-server",
+    "posttest": "sudo pkill -u root node",
+    "precoverage": "gulp build && npm run coverage-web-server && sudo node modules/gpio/bin/index.js &",
     "coverage-web-server": "c8 node server.js &",
     "coverage": "c8 -r none --clean false mocha --timeout 5000 ./modules/*/tests/{model,server,views}/*.js",
-    "postcoverage": "pkill -f node",
+    "postcoverage": "sudo pkill -u root node",
     "prefullcoverage": "c8 -r none gulp build && c8 -r none --clean false gulp lint && c8 -r none --clean false gulp jsdoc && c8 -r none --clean false gulp deploy && npm run fullcoverage-web-server",
     "fullcoverage-web-server": "c8 --clean false node server.js &",
     "fullcoverage": "c8 -r none --clean false gulp tests",

@@ -40,6 +40,9 @@ gpio:
     'Button 1':
       type: 'Button'
       gpio: 7
+#    'PIR 1':
+#      type: 'Button'
+#      gpio: 12
   Sensor:
     'Sensor 1':
       type: 'Sensor'

@@ -6,7 +6,7 @@
 
 'use strict';
 
-const ipc = require('node-ipc');
+const ipc = require('node-ipc').default;
 
 const devices = {};
 devices.LED = require('./led.js');
@@ -19,8 +19,7 @@ const objects = {};
 const messages = {};
 let updateInterval = null;
 
-ipc.config.id = 'gpio';
-ipc.config.retry = 1500;
+// ipc.config.retry = 1000;
 ipc.config.silent = true;
 
 /**
